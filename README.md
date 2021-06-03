@@ -12,7 +12,7 @@ We have been playing this cool online game with friends, and have been strugglin
 I decided to start this solver as a personnal project (better solvers already exists) to improve my coding skills.
 
 So far, the UI looks like this : 
-![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/Documentation/ReadMe_Global.png)
+![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/blob/main/Documentation/ReadMe_Global.png)
 
 You have the board on the left, which is customizable :
 - you can move robots/target with drag and drops
