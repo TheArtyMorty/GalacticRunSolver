@@ -72,7 +72,7 @@ int main()
     auto map = RobotSolver::Map("C://Users//lucm//source//repos//RobotSolver//Maps//HardMap1_14moves.txt");
     auto myLogger = MyConsoleLogger{};
     auto theSolver = RobotSolver::Solver{15, &myLogger };
-    auto solutions = theSolver.Solve(&map);
+    auto solutions = theSolver.Solve(map);
 
     if (!solutions.empty())
     {

@@ -48,7 +48,7 @@ namespace RobotSolverTests
 			auto map = Map(path);
 			auto myLogger = MyUnitTestsLogger{};
 			auto theSolver = Solver{ 20, &myLogger };
-			return theSolver.Solve(&map);
+			return theSolver.Solve(map);
 		}
 
 		TEST_METHOD(SolverLibraryTests_3_moves_blue_only)

@@ -62,7 +62,11 @@ namespace WPF_GalacticRunSolver
             _Map = mapvm;
 
             this.Map.DataContext = _Map;
+
+            m_Logger = new MyWPFLogger(DisplayTextBox);
         }
+
+        MyWPFLogger m_Logger;
 
         public MapViewModel _Map = new MapViewModel(16);
 
@@ -109,8 +113,7 @@ namespace WPF_GalacticRunSolver
 
         private List<ManagedSolution> SolveMap()
         {
-            MyWPFLogger myLogger = new MyWPFLogger(DisplayTextBox);
-            ManagedSolver solver = new ManagedSolver(10, myLogger);
+            ManagedSolver solver = new ManagedSolver(10, m_Logger);
             //Save map to temp file that will be deleted
             string tempFileName = System.IO.Path.GetTempFileName();
             _Map.SaveMap(tempFileName);

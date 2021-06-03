@@ -156,7 +156,15 @@ static void LogTime(ILogger* pLogger, std::chrono::steady_clock::time_point star
 	{
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
-		//pLogger->Log("Time spent : " + std::to_string(duration) + " ms");
+		if (duration > 1000)
+		{
+			duration = std::chrono::duration_cast<std::chrono::seconds>(stop - start).count();
+			pLogger->Log("Time spent : " + std::to_string(duration) + " s");
+		}
+		else
+		{
+			pLogger->Log("Time spent : " + std::to_string(duration) + " ms");
+		}
 	}
 }
 
@@ -244,16 +252,17 @@ std::vector<Solution> Solver::Solve(const Map& map)
 		auto state = State(CurrentStates.PopFirst(), map);
 
 		auto stateH = state.Heuristic(map);
+
+		if (!solutions.empty() && state.Heuristic(map) > bestSolution)
+		{
+			break;
+		}
+
 		if (currentH < stateH)
 		{
 			currentH = stateH;
 			Log(m_logger, "Considering moves with H : " + std::to_string(currentH) + "...");
 			LogTime(m_logger, initialStart);
-		}
-
-		if (!solutions.empty() && state.Heuristic(map) > bestSolution)
-		{
-			break;
 		}
 
 		auto states = CreateAllStatesFromState(state, map, statesAlreadyDone);
