@@ -18,8 +18,6 @@ static Robot& GetRobotFromState(std::vector<Robot>& robots, const Move& move)
 	throw std::exception("No roboto with this coloro foundo...");
 }
 
-
-#pragma pack(1)
 struct State
 {
 public:
@@ -80,7 +78,7 @@ public:
 	int ToKey(int mapSize) const
 	{
 		int result(0);
-		int offset = std::log2(mapSize);
+		int offset = (int)std::log2(mapSize);
 		for (const auto& robot : Robots)
 		{
 			result = result << (2 * offset);
@@ -95,7 +93,7 @@ public:
 		{
 			if (map.GetTarget().targetColor == r.color)
 			{
-				return map.GetHeuristicOfCell(r.x, r.y) + Moves.GetMoves().size();
+				return map.GetHeuristicOfCell(r.x, r.y) + (int)Moves.GetMoves().size();
 			}
 		}
 		return 99999;
@@ -141,6 +139,8 @@ bool IsSolutionValid(const State& state, const Map& map)
 	}
 	return false;
 }
+
+# pragma region Logger_Region
 
 static void Log(ILogger* pLogger, std::string tolog)
 {
@@ -217,6 +217,8 @@ static void LogAllStates(std::vector<State> const& states, ILogger* logger)
 	}
 }
 
+#pragma endregion
+
 std::vector<Solution> Solver::Solve(const Map& map)
 {
 	auto initialStart = std::chrono::high_resolution_clock::now();
@@ -271,7 +273,7 @@ std::vector<Solution> Solver::Solve(const Map& map)
 			if (IsSolutionValid(sta, map))
 			{
 				Log(m_logger, "A valid solution in " + std::to_string(sta.Moves.GetMoves().size()) + " has been found.");
-				if (bestSolution == -1) bestSolution = sta.Moves.GetMoves().size();
+				if (bestSolution == -1) bestSolution = (int)sta.Moves.GetMoves().size();
 				solutions.push_back(sta.Moves);
 			}
 			else

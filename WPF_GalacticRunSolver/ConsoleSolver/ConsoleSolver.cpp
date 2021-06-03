@@ -61,28 +61,42 @@ public:
     }
 };
 
-
-//Ez map 3 moves = TestMap.txt
-
-//HardMap 14 moves : HardMap1_14moves.txt
-
-
 int main()
 {
-    auto map = RobotSolver::Map("C://Users//lucm//source//repos//RobotSolver//Maps//HardMap1_14moves.txt");
-    auto myLogger = MyConsoleLogger{};
-    auto theSolver = RobotSolver::Solver{15, &myLogger };
-    auto solutions = theSolver.Solve(map);
+    auto path = "C://Users//lucm//source//repos//GalacticRunSolver//Maps//";
+    auto maps = std::vector<std::string>{
+        "TestMap.txt",
+        "TestMap2.txt",
+        "TestMap2_6moves_redOnly.txt",
+        "TestMap4_6moves3solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap5_10moves4solutions.txt",
+    };
 
-    if (!solutions.empty())
+    auto myLogger = MyConsoleLogger{};
+    auto theSolver = RobotSolver::Solver{25, &myLogger };
+
+    for (const auto& map : maps)
     {
-        for (const auto& solution : solutions)
+        std::cout << std::endl << "Solving Map : " << map << std::endl << std::endl;
+
+        auto solutions = theSolver.Solve(path + map);
+        if (!solutions.empty())
         {
-            OutputSolution(solution);
+            for (const auto& solution : solutions)
+            {
+                OutputSolution(solution);
+            }
         }
-    }
-    else
-    {
-        std::cout << "No solution has been found..." << std::endl;
+        else
+        {
+            std::cout << "No solution has been found..." << std::endl;
+        }
     }
 }

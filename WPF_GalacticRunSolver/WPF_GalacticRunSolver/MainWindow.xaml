@@ -16,12 +16,12 @@
         <Button Content="Save Map" HorizontalAlignment="Left" Height="33" Margin="866,27,0,0" VerticalAlignment="Top" Width="90" Click="Save_Map"/>
         <Button Content="Reset Map" HorizontalAlignment="Left" Height="33" Margin="961,27,0,0" VerticalAlignment="Top" Width="90" Click="Reset_Map"/>
         <Button Content="Clear Map" HorizontalAlignment="Left" Height="33" Margin="1056,27,0,0" VerticalAlignment="Top" Width="90" Click="Clear_Map"/>
-        <TextBox x:Name="DisplayTextBox" Height="314" Margin="771,65,9.6,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
-        <TextBox x:Name="SolutionTextBox" Height="25" Margin="771,384,9.6,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <TextBox x:Name="DisplayTextBox" Height="462" Margin="771,65,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+        <TextBox x:Name="SolutionTextBox" Height="25" Margin="771,532,9,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
 
         <v:MapControl x:Name="Map" Margin="44,27,657.6,51.4"></v:MapControl>
 
-        <v:SolutionsControl x:Name="Solutions" Margin="771,414,9.6,51.4"></v:SolutionsControl>
+        <v:SolutionsControl x:Name="Solutions" Margin="771,562,10,51"></v:SolutionsControl>
 
     </Grid>
 
