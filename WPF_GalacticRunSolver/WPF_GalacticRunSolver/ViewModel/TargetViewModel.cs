@@ -1,0 +1,90 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+using WPF_GalacticRunSolver.Model;
+
+namespace WPF_GalacticRunSolver.ViewModel
+{
+    public class TargetViewModel : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+
+        public TargetViewModel(Target target)
+        {
+            _Target = target;
+            _IncrementColor = new RelayCommand(IncrementColor);
+            _DecrementColor = new RelayCommand(DecrementColor);
+        }
+
+        public Target _Target { get; }
+
+        public EColor _Color
+        {
+            get
+            {
+                return _Target._Color;
+            }
+            set
+            {
+                if (_Target._Color == value) return;
+                else
+                {
+                    _Target._Color = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Color)));
+                }
+            }
+        }
+
+        public ICommand _IncrementColor { get; }
+        public ICommand _DecrementColor { get; }
+
+        public void IncrementColor()
+        {
+            int type = (int)_Color;
+            type++;
+            if (type >= Enum.GetNames(typeof(EColor)).Length)
+            {
+                type = 0;
+            }
+            _Color = (EColor)type;
+        }
+
+        public void DecrementColor()
+        {
+            int type = (int)_Color;
+            type--;
+            if (type < 0)
+            {
+                type = Enum.GetNames(typeof(EColor)).Length - 1;
+            }
+            _Color = (EColor)type;
+        }
+
+        public Position _Position
+        {
+            get
+            {
+                return _Target._Position;
+            }
+            set
+            {
+                if (_Target._Position == value) return;
+                else
+                {
+                    _Target._Position = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
+                }
+            }
+        }
+
+        public void MoveTo(Position pos)
+        {
+            _Position = pos;
+        }
+
+    }
+}

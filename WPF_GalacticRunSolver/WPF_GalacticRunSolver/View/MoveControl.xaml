@@ -1,0 +1,20 @@
+﻿<UserControl x:Class="WPF_GalacticRunSolver.View.MoveControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPF_GalacticRunSolver"
+             xmlns:localConverters="clr-namespace:WPF_GalacticRunSolver.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="40" d:DesignWidth="40">
+    <Image x:Name="Move"
+         Width="40"
+         Height="40">
+        <Image.Source>
+            <MultiBinding Converter="{x:Static localConverters:MoveToImageConverter.Instance}">
+                <Binding Path="_Color" Mode="OneWay"></Binding>
+                <Binding Path="_Direction" Mode="OneWay"></Binding>
+            </MultiBinding>
+        </Image.Source>
+    </Image>
+</UserControl>
