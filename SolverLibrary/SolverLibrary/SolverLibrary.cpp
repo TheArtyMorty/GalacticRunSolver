@@ -57,11 +57,9 @@ private:
 	}
 
 public:
-	State(RobotSolver::Moves moves, const Map& map)
+	State(RobotSolver::Moves moves, const Map& map) : Robots(map.GetRobots()), Moves(std::move(moves))
 	{
-		Robots = map.GetRobots();
-		Moves = moves;
-		for (const auto& move : moves.GetMoves())
+		for (const auto& move : Moves.GetMoves())
 		{
 			SimulateState(move, map);
 		}
@@ -107,13 +105,14 @@ static bool WasStateAlreadyDone(const std::set<int>& positionsAlreadyDone, const
 	return positionsAlreadyDone.find(key) != positionsAlreadyDone.end();
 }
 
+static constexpr EMoveDirection moveDirections[] = { EMoveDirection::Up, EMoveDirection::Down, EMoveDirection::Left, EMoveDirection::Right };
+
 static std::vector<State> CreateAllStatesFromState(const State& state, const Map& map, std::set<int>& statesAlreadyDone)
 {
 	std::vector<State> states = std::vector<State>();
 	for (const auto& robot : state.Robots)
 	{
-		//if (robot.color == ERobotColor::Yellow) continue;
-		for (const auto& move : { EMoveDirection::Up, EMoveDirection::Down, EMoveDirection::Left, EMoveDirection::Right })
+		for (const auto& move : moveDirections)
 		{
 			State newState = state;
 			newState.Moves.Add({ robot.color, move });
@@ -121,8 +120,8 @@ static std::vector<State> CreateAllStatesFromState(const State& state, const Map
 			
 			if (!WasStateAlreadyDone(statesAlreadyDone, newState))
 			{
-				states.push_back(newState);
 				statesAlreadyDone.insert(newState.ToKey(mapSize));
+				states.push_back(std::move(newState));
 			}
 		}
 	}
@@ -243,7 +242,7 @@ std::vector<Solution> Solver::Solve(const Map& map) const
 	}
 
 	CSolutions CurrentStates;
-	CurrentStates.Add(initialMoves, initialState.Heuristic(map));
+	CurrentStates.Add(std::move(initialMoves), initialState.Heuristic(map));
 
 	std::set<int> statesAlreadyDone{ initialState.ToKey(mapSize) };
 
@@ -277,11 +276,11 @@ std::vector<Solution> Solver::Solve(const Map& map) const
 			{
 				Log(m_logger, "A valid solution in " + std::to_string(sta.Moves.GetMoves().size()) + " has been found.");
 				if (bestSolution == -1) bestSolution = (int)sta.Moves.GetMoves().size();
-				solutions.push_back(sta.Moves);
+				solutions.push_back(std::move(sta.Moves));
 			}
 			else
 			{
-				CurrentStates.Add(sta.Moves, sta.Heuristic(map));
+				CurrentStates.Add(std::move(sta.Moves), sta.Heuristic(map));
 			}
 		}
 	}

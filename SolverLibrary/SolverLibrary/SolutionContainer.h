@@ -11,7 +11,6 @@ namespace RobotSolver
 		std::vector<RobotSolver::Move> moves;
 
 	public:
-		Moves();
 		void Add(RobotSolver::Move move);
 		std::vector<RobotSolver::Move> GetMoves() const;
 	};

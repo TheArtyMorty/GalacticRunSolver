@@ -2,10 +2,6 @@
 
 namespace RobotSolver
 {
-	Moves::Moves()
-	{
-	}
-
 	void Moves::Add(RobotSolver::Move move)
 	{
 		moves.push_back(move);
@@ -28,7 +24,7 @@ namespace RobotSolver
 
 	void CSolutions::Add(Moves newSolution, int h)
 	{
-		m_solutions[h].push(newSolution);
+		m_solutions[h].push(std::move(newSolution));
 	}
 
 	Moves CSolutions::PopFirst()
@@ -38,7 +34,7 @@ namespace RobotSolver
 		{
 			if (!m_solutions[i].empty())
 			{
-				result = m_solutions[i].front();
+				result = std::move(m_solutions[i].front());
 				m_solutions[i].pop();
 				return result;
 			}
