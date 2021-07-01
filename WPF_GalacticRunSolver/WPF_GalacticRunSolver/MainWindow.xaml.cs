@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.IO;
 using WPF_GalacticRunSolver.Utility;
+using System.ComponentModel;
 
 namespace WPF_GalacticRunSolver
 {
@@ -39,7 +40,9 @@ namespace WPF_GalacticRunSolver
         private void LogOnUiThread(string input)
         {
             Application.Current.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Input,
-                    new Action(() => { _log.Text += Environment.NewLine + input; }));
+                    new Action(() => {
+                        _log.Text += Environment.NewLine + input; 
+                    }));
         }
 
         private void LogOnCurrentThread(string input)
@@ -142,8 +145,23 @@ namespace WPF_GalacticRunSolver
         {
             _Map._InitialMap = new Map(_Map._Map);
             ClearSolverDisplay();
+
+            BackgroundWorker worker = new BackgroundWorker();
+            worker.WorkerReportsProgress = false;
+            worker.DoWork += worker_DoWork;
+            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            worker.RunWorkerAsync();
+        }
+
+        void worker_DoWork(object sender, DoWorkEventArgs e)
+        {
             var solutions = SolveMap();
-            DisplaySolutions(solutions);
+            e.Result = solutions;
+        }
+
+        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            DisplaySolutions((List<ManagedSolution>)e.Result);
         }
     }
 }

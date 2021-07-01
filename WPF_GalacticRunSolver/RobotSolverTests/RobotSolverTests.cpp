@@ -6,6 +6,8 @@
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace RobotSolver;
 
+static const std::string mapsFolder = "C://Users//lucm//source//repos//GalacticRunSolver//Maps//";
+
 static constexpr auto BlueRobot = ERobotColor::Blue;
 static constexpr auto GreenRobot = ERobotColor::Green;
 static constexpr auto RedRobot = ERobotColor::Red;
@@ -53,7 +55,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_3_moves_blue_only)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//TestMap.txt");
+			auto solutions = SolveMap(mapsFolder + "TestMap.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 1);
@@ -69,7 +71,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_6_moves_red_only)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//TestMap2_6moves_redOnly.txt");
+			auto solutions = SolveMap(mapsFolder + "TestMap2_6moves_redOnly.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 1);
@@ -88,7 +90,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_7_moves_red_yellow)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//TestMap2.txt");
+			auto solutions = SolveMap(mapsFolder + "TestMap2.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 1);
@@ -108,7 +110,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_7_moves_three_robots)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//Map_6.txt");
+			auto solutions = SolveMap(mapsFolder + "Map_6.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 1);
@@ -128,7 +130,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_2_solutions)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//Map_5.txt");
+			auto solutions = SolveMap(mapsFolder + "Map_5.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 2);
@@ -148,7 +150,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_3_solutions)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//TestMap4_6moves3solutions.txt");
+			auto solutions = SolveMap(mapsFolder + "TestMap4_6moves3solutions.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 3);
@@ -167,7 +169,7 @@ namespace RobotSolverTests
 
 		TEST_METHOD(SolverLibraryTests_10_Moves)
 		{
-			auto solutions = SolveMap("C://Users//lucm//source//repos//RobotSolver//Maps//TestMap5_10moves4solutions.txt");
+			auto solutions = SolveMap(mapsFolder + "TestMap5_10moves4solutions.txt");
 
 			Assert::IsTrue(!solutions.empty());
 			Assert::AreEqual((int)solutions.size(), 4);

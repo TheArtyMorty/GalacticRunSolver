@@ -29,7 +29,7 @@ namespace RobotSolver
 
 	void CSolutions::Add(Moves newSolution, int h)
 	{
-		m_solutions.insert(m_solutions.begin() + m_positions[h], newSolution);
+		m_solutions.insert(m_solutions.end() - m_positions[h], newSolution);
 		for (int i = h; i < maxMovesInSolution; i++)
 		{
 			m_positions[i]++;
@@ -38,8 +38,8 @@ namespace RobotSolver
 
 	Moves CSolutions::PopFirst()
 	{
-		Moves result = m_solutions.front();
-		m_solutions.erase(m_solutions.begin());
+		Moves result = m_solutions.back();
+		m_solutions.erase(m_solutions.end()-1);
 		for (int i = 0; i < maxMovesInSolution; i++)
 		{
 			if (m_positions[i] > 0)

@@ -1,7 +1,7 @@
 #pragma once
-#include "ManagedObject.h"
 #include "../SolverLibrary/SolverLibrary/SolverLibrary.h"
 #include <cliext/list>
+#include <vcclr.h>
 
 using namespace System;
 namespace CLI
@@ -39,30 +39,53 @@ namespace CLI
         Collections::Generic::List<ManagedMove^>^ Moves;
     };
 
-public interface class IManagedLogger
-{
-public:
-    void Log(String^ input);
-};
 
-class LoggerWrapper;
+    public interface class IManagedLogger
+    {
+    public:
+        void Log(String^ input);
+    };
 
-public ref class  ManagedMap : public ManagedObject<RobotSolver::Map>
-{
-public:
-    ManagedMap(String^ filepath);
-};
 
-public ref class ManagedSolver : public ManagedObject<RobotSolver::Solver>
-{
-public:
-    ManagedSolver(int maxMovesSafety, IManagedLogger^ managedLogger);
-    ManagedSolution^ Solve(ManagedMap^ map);
-    Collections::Generic::List<ManagedSolution^>^ GetAllSolutions(ManagedMap^ map);
-    ~ManagedSolver();
-    !ManagedSolver();
 
-private:
-    LoggerWrapper* pMyLogger;
-};
+    class LoggerWrapper final : public RobotSolver::ILogger
+    {
+    public:
+        LoggerWrapper(IManagedLogger^ managedLogger);
+        void Log(std::string input) final;
+    private:
+        gcroot<IManagedLogger^> m_managedLogger;
+    };
+
+
+
+    public ref class  ManagedMap
+    {
+    public:
+        ManagedMap(String^ filepath);
+        RobotSolver::Map* GetMap();
+        ~ManagedMap();
+        !ManagedMap();
+
+    private:
+        RobotSolver::Map* pMyMap;
+    };
+
+
+
+
+    public ref class ManagedSolver
+    {
+    public:
+        ManagedSolver(int maxMovesSafety, IManagedLogger^ managedLogger);
+        Collections::Generic::List<ManagedSolution^>^ GetAllSolutions(ManagedMap^ map);
+        ~ManagedSolver();
+        !ManagedSolver();
+
+    private:
+        LoggerWrapper* pMyLogger;
+        RobotSolver::Solver* pMySolver;
+    };
+
+
 }

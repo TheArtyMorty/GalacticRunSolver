@@ -1,17 +1,9 @@
 #include "ManagedSolver.h"
 #include "ManagedTypeConversionUtilities.h"
-#include <vcclr.h>
 
 namespace CLI
 {
-class LoggerWrapper final : public RobotSolver::ILogger
-{
-public:
-	LoggerWrapper(IManagedLogger^ managedLogger);
-	void Log(std::string input) final;
-private:
-	gcroot<IManagedLogger^> m_managedLogger;
-};
+
 
 // ----------- Logger -------------------------
 LoggerWrapper::LoggerWrapper(IManagedLogger^ managedLogger)
@@ -24,12 +16,38 @@ void LoggerWrapper::Log(std::string input)
 	m_managedLogger->Log(gcnew String(input.c_str()));
 }
 
+
+
+
 // ------------  Map  -------------------
 ManagedMap::ManagedMap(String^ filepath) : 
-	ManagedObject(new RobotSolver::Map(string_to_char_array(filepath)))
+	pMyMap(new RobotSolver::Map(string_to_char_array(filepath)))
 {
-
 }
+
+RobotSolver::Map* ManagedMap::GetMap()
+{
+	return pMyMap;
+}
+
+ManagedMap::~ManagedMap()
+{
+	if (pMyMap != nullptr)
+	{
+		delete pMyMap;
+	}
+}
+ManagedMap::!ManagedMap()
+{
+	if (pMyMap != nullptr)
+	{
+		delete pMyMap;
+	}
+}
+
+
+
+
 
 // ------------- Move ----------------
 ManagedMove::ManagedMove(ERobotColor color, EMoveDirection direction)
@@ -44,6 +62,9 @@ ManagedMove::ManagedMove(RobotSolver::Move move)
 	Move = (CLI::EMoveDirection)move.direction();
 }
 
+
+
+
 // ------------- Solution ----------------
 ManagedSolution::ManagedSolution()
 {
@@ -51,10 +72,13 @@ ManagedSolution::ManagedSolution()
 }
 
 
+
+
+
 // ----------- Solver --------------------
 ManagedSolver::ManagedSolver(int maxMovesSafety, IManagedLogger^ managedLogger):
 	pMyLogger(new LoggerWrapper(managedLogger)),
-	ManagedObject(new RobotSolver::Solver(maxMovesSafety, pMyLogger))
+	pMySolver(new RobotSolver::Solver(maxMovesSafety, pMyLogger))
 {
 }
 
@@ -64,6 +88,10 @@ ManagedSolver::~ManagedSolver()
 	{
 		delete pMyLogger;
 	}
+	if (pMySolver != nullptr)
+	{
+		delete pMySolver;
+	}
 }
 ManagedSolver::!ManagedSolver()
 {
@@ -71,28 +99,17 @@ ManagedSolver::!ManagedSolver()
 	{
 		delete pMyLogger;
 	}
+	if (pMySolver != nullptr)
+	{
+		delete pMySolver;
+	}
 }
    
 // --------------- Solver ----------------------
-ManagedSolution^ ManagedSolver::Solve(ManagedMap^ map)
-{
-	if (auto result = m_Instance->Solve(*map->GetInstance()); !result.empty())
-	{
-		auto firstSolution = result.front();
-		auto solution = gcnew ManagedSolution();
-		for (const auto& move : firstSolution.GetMoves())
-		{
-			solution->Moves->Add(gcnew ManagedMove(move));
-		}
-		return solution;
-	}
-	return gcnew ManagedSolution();
-}
-
 Collections::Generic::List<ManagedSolution^>^ ManagedSolver::GetAllSolutions(ManagedMap^ map)
 {
 	auto solutions = gcnew System::Collections::Generic::List<ManagedSolution^>();
-	if (auto result = m_Instance->Solve(*map->GetInstance()); !result.empty())
+	if (auto result = pMySolver->Solve(*map->GetMap()); !result.empty())
 	{
 		for (auto sol : result)
 		{

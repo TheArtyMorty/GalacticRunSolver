@@ -3,6 +3,7 @@
 #include <map>
 #include <chrono>
 #include <iterator>
+#include <set>
 #include <cmath>
 
 
@@ -100,13 +101,13 @@ public:
 	}
 };
 
-static bool WasStateAlreadyDone(const std::vector<int>& positionsAlreadyDone, const State& state)
+static bool WasStateAlreadyDone(const std::set<int>& positionsAlreadyDone, const State& state)
 {
-	auto it = std::find(positionsAlreadyDone.begin(), positionsAlreadyDone.end(), state.ToKey(mapSize));
-	return it != positionsAlreadyDone.end();
+	auto key = state.ToKey(mapSize);
+	return positionsAlreadyDone.find(key) != positionsAlreadyDone.end();
 }
 
-static std::vector<State> CreateAllStatesFromState(const State& state, const Map& map, std::vector<int>& statesAlreadyDone)
+static std::vector<State> CreateAllStatesFromState(const State& state, const Map& map, std::set<int>& statesAlreadyDone)
 {
 	std::vector<State> states = std::vector<State>();
 	for (const auto& robot : state.Robots)
@@ -117,11 +118,11 @@ static std::vector<State> CreateAllStatesFromState(const State& state, const Map
 			State newState = state;
 			newState.Moves.Add({ robot.color, move });
 			newState.SimulateState({ robot.color, move }, map);
-
+			
 			if (!WasStateAlreadyDone(statesAlreadyDone, newState))
 			{
 				states.push_back(newState);
-				statesAlreadyDone.push_back(newState.ToKey(mapSize));
+				statesAlreadyDone.insert(newState.ToKey(mapSize));
 			}
 		}
 	}
@@ -142,9 +143,11 @@ bool IsSolutionValid(const State& state, const Map& map)
 
 # pragma region Logger_Region
 
+static constexpr bool enableLogger = true;
+
 static void Log(ILogger* pLogger, std::string tolog)
 {
-	if (pLogger != nullptr)
+	if (pLogger != nullptr && enableLogger)
 	{
 		pLogger->Log(tolog);
 	}
@@ -152,7 +155,7 @@ static void Log(ILogger* pLogger, std::string tolog)
 
 static void LogTime(ILogger* pLogger, std::chrono::steady_clock::time_point start)
 {
-	if (pLogger != nullptr)
+	if (pLogger != nullptr && enableLogger)
 	{
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count();
@@ -219,7 +222,7 @@ static void LogAllStates(std::vector<State> const& states, ILogger* logger)
 
 #pragma endregion
 
-std::vector<Solution> Solver::Solve(const Map& map)
+std::vector<Solution> Solver::Solve(const Map& map) const
 {
 	auto initialStart = std::chrono::high_resolution_clock::now();
 	mapSize = map.GetMapSize();
@@ -242,7 +245,7 @@ std::vector<Solution> Solver::Solve(const Map& map)
 	CSolutions CurrentStates;
 	CurrentStates.Add(initialMoves, initialState.Heuristic(map));
 
-	std::vector<int> statesAlreadyDone{ initialState.ToKey(mapSize) };
+	std::set<int> statesAlreadyDone{ initialState.ToKey(mapSize) };
 
 	std::vector<Solution> solutions = std::vector<Solution>{};
 	int bestSolution = -1;
@@ -288,7 +291,7 @@ std::vector<Solution> Solver::Solve(const Map& map)
 	return solutions;
 }
 
-std::vector<Solution> Solver::Solve(std::string mapPath)
+std::vector<Solution> Solver::Solve(std::string mapPath) const
 {
 	const auto theMap = Map(mapPath);
 	return Solve(theMap);
