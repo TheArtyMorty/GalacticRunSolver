@@ -69,8 +69,9 @@ int main()
         "TestMap2.txt",
         "TestMap2_6moves_redOnly.txt",
         "TestMap4_6moves3solutions.txt",
-        "TestMap5_10moves4solutions.txt",*/
-        "TestMap6_11moves.txt",
+        "TestMap5_10moves4solutions.txt",
+        "TestMap6_11moves.txt",*/
+        "HardMap1_14moves.txt",
     };
 
     auto myLogger = MyConsoleLogger{};

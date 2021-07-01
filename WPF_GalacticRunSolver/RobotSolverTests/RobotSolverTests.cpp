@@ -189,5 +189,56 @@ namespace RobotSolverTests
 
 			CompareSolutions(moves, expectedMoves);
 		}
+
+		TEST_METHOD(SolverLibraryTests_11_Moves)
+		{
+			auto solutions = SolveMap(mapsFolder + "TestMap6_11moves.txt");
+
+			Assert::IsTrue(!solutions.empty());
+			Assert::AreEqual((int)solutions.size(), 2);
+
+			auto moves = solutions.front().GetMoves();
+			auto expectedMoves = std::vector<Move>{
+				Move(YellowRobot, Down),
+				Move(YellowRobot, Right),
+				Move(YellowRobot, Down),
+				Move(RedRobot, Right),
+				Move(GreenRobot, Right),
+				Move(RedRobot, Up),
+				Move(RedRobot, Left),
+				Move(YellowRobot, Right),
+				Move(RedRobot, Down),
+				Move(YellowRobot, Left),
+				Move(YellowRobot, Down) };
+
+			CompareSolutions(moves, expectedMoves);
+		}
+
+		TEST_METHOD(SolverLibraryTests_Hard_14_Moves)
+		{
+			auto solutions = SolveMap(mapsFolder + "HardMap1_14moves.txt");
+
+			Assert::IsTrue(!solutions.empty());
+			Assert::AreEqual((int)solutions.size(), 1);
+
+			auto moves = solutions.front().GetMoves();
+			auto expectedMoves = std::vector<Move>{
+				Move(RedRobot, Up),
+				Move(RedRobot, Left),
+				Move(RedRobot, Down),
+				Move(GreenRobot, Left),
+				Move(RedRobot, Up),
+				Move(RedRobot, Left),
+				Move(BlueRobot, Left),
+				Move(BlueRobot, Up),
+				Move(BlueRobot, Left),
+				Move(RedRobot, Down),
+				Move(RedRobot, Right),
+				Move(RedRobot, Up),
+				Move(RedRobot, Left),
+				Move(RedRobot, Down) };
+
+			CompareSolutions(moves, expectedMoves);
+		}
 	};
 }

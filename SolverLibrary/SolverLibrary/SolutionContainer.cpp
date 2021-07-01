@@ -23,28 +23,24 @@ namespace RobotSolver
 
 	CSolutions::CSolutions()
 	{
-		m_solutions = std::vector<Moves>();
-		m_positions = std::vector<int>(maxMovesInSolution, 0);
+		m_solutions = std::vector<std::queue<Moves>>(maxMovesInSolution, std::queue<Moves>());
 	}
 
 	void CSolutions::Add(Moves newSolution, int h)
 	{
-		m_solutions.insert(m_solutions.end() - m_positions[h], newSolution);
-		for (int i = h; i < maxMovesInSolution; i++)
-		{
-			m_positions[i]++;
-		}
+		m_solutions[h].push(newSolution);
 	}
 
 	Moves CSolutions::PopFirst()
 	{
-		Moves result = m_solutions.back();
-		m_solutions.erase(m_solutions.end()-1);
+		Moves result{};
 		for (int i = 0; i < maxMovesInSolution; i++)
 		{
-			if (m_positions[i] > 0)
+			if (!m_solutions[i].empty())
 			{
-				m_positions[i]--;
+				result = m_solutions[i].front();
+				m_solutions[i].pop();
+				return result;
 			}
 		}
 		return result;
@@ -52,6 +48,13 @@ namespace RobotSolver
 
 	bool CSolutions::Empty() const
 	{
-		return m_solutions.empty();
+		for (int i = 0; i < maxMovesInSolution; i++)
+		{
+			if (!m_solutions[i].empty())
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }

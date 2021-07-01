@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <queue>
 #include "Map.h"
 
 namespace RobotSolver
@@ -25,7 +26,6 @@ namespace RobotSolver
 		bool Empty() const;
 
 	private:
-		std::vector<Moves> m_solutions;
-		std::vector<int> m_positions;
+		std::vector<std::queue<Moves>> m_solutions;
 	};
 }
