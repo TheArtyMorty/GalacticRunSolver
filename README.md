@@ -38,11 +38,8 @@ It should be much faster, and without having made any real comparisons with my p
 The current solver works fine with any map with a solution in 10 moves or less.
 However the number of states to calculate still grow exponentially, and I am not able to solve in reasonable time maps of 14 moves.
 
-I'm currently stuck at this point, with the following room for improvement :
-- Improve my solver to calculate faster
-- Make sure I implemented the A-star algorythm properly. 
-- Change the algorythm for a better one?
-... ?
+Update : After performance investigation, I was able to go much faster :
+The 14 moves map now solves in 7 seconds. This could (and will need to) be improved, but that's an already very acceptable speed.
 
 ## Projects
 
@@ -72,8 +69,5 @@ Connection to GalacticRun website
 -- Have a textbox to enter the url, then load the map from that url (Easy)
 - Step 2 :
 -- Connect to the browser (get the url from the brower) and possibility to provide inputs (solution) to the browser directly (difficult)
-
-Solver Improvements
-- see the solver section
 
 Any proposal is welcomed :).
