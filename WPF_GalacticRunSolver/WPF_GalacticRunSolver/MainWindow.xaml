@@ -25,7 +25,7 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Url : " Grid.Column="0"></TextBlock>
-                            <TextBox Name="UrlTextBox" Text="Enter your url..." Grid.Column="1"></TextBox>
+                            <TextBox Name="UrlTextBox" Text="Enter your url..." Grid.Column="1" GotMouseCapture="OnMouseClickMapUrl" KeyDown="OnKeyDownMapUrl"></TextBox>
                         </Grid>
                         <MenuItem Header="Load from url" Click="Load_Map_From_URL"/>
                     </MenuItem>

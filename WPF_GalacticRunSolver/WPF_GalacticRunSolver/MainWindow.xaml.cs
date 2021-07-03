@@ -63,6 +63,9 @@ namespace WPF_GalacticRunSolver
         }
     }
 
+
+
+
     public partial class MainWindow : Window
     {
         public MainWindow(MapViewModel mapvm)
@@ -127,6 +130,20 @@ namespace WPF_GalacticRunSolver
             _Map = new MapViewModel(16);
             this.Map.DataContext = _Map;
         }
+
+        private void OnMouseClickMapUrl(object sender, RoutedEventArgs e)
+        {
+            UrlTextBox.SelectAll();
+        }
+
+        private void OnKeyDownMapUrl(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                Load_Map_From_URL(sender, e);
+            }
+        }
+
 
         private void ClearSolverDisplay()
         {
