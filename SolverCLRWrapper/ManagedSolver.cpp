@@ -1,5 +1,6 @@
 #include "ManagedSolver.h"
 #include "ManagedTypeConversionUtilities.h"
+#include <iostream>
 
 namespace CLI
 {
@@ -8,7 +9,13 @@ namespace CLI
 // ----------- Logger -------------------------
 LoggerWrapper::LoggerWrapper(IManagedLogger^ managedLogger)
 {
+	std::wcout << L"logger wrapper was created." << std::endl;
 	m_managedLogger = managedLogger;
+}
+
+LoggerWrapper::~LoggerWrapper()
+{
+	std::wcout << L"logger wrapper was deleted." << std::endl;
 }
 
 void LoggerWrapper::Log(std::string input)
@@ -34,6 +41,7 @@ ManagedMap::~ManagedMap()
 {
 	if (pMyMap != nullptr)
 	{
+		std::wcout << L"Managed map was deleted." << std::endl;
 		delete pMyMap;
 	}
 }
@@ -41,6 +49,7 @@ ManagedMap::!ManagedMap()
 {
 	if (pMyMap != nullptr)
 	{
+		std::wcout << L"Managed map was finalized." << std::endl;
 		delete pMyMap;
 	}
 }
@@ -86,10 +95,12 @@ ManagedSolver::~ManagedSolver()
 {
 	if (pMyLogger != nullptr)
 	{
+		std::wcout << L"Managed solver deleted triggers logger delete." << std::endl;
 		delete pMyLogger;
 	}
 	if (pMySolver != nullptr)
 	{
+		std::wcout << L"Managed solver was deleted." << std::endl;
 		delete pMySolver;
 	}
 }

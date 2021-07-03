@@ -28,6 +28,12 @@ namespace WPF_GalacticRunSolver.ViewModel
             }
         }
 
+        public MapViewModel(Map map)
+        {
+            _Map = map;
+            _InitialMap = map;
+        }
+
         public MapViewModel(int mapSize)
         {
             _Map = new Map(mapSize);

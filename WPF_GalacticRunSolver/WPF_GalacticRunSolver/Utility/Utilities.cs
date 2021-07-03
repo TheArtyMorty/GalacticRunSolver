@@ -57,6 +57,12 @@ namespace WPF_GalacticRunSolver.Utility
             var boardAsString = GalacticRunBoardFromUrl.GetBoardFromBoardID(id).GetString();
             return GetMapFromUrlBoardString(boardAsString);
         }
+
+        public static bool IsValidMapUrl(string url)
+        {
+            var splittedUrl = url.Split('/');
+            return splittedUrl.Length > 1;
+        }
     }
 
     public static class GalacticRunBoardFromUrl

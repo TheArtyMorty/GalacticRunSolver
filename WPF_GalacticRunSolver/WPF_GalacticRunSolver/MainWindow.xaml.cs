@@ -20,6 +20,7 @@ using Microsoft.Win32;
 using System.IO;
 using WPF_GalacticRunSolver.Utility;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace WPF_GalacticRunSolver
 {
@@ -32,6 +33,7 @@ namespace WPF_GalacticRunSolver
     {
         public MyWPFLogger(TextBox log)
         {
+            Debug.WriteLine("The WPF Logger was created.");
             _log = log;
         }
 
@@ -54,6 +56,11 @@ namespace WPF_GalacticRunSolver
         {
             LogOnUiThread(string.Copy(input));
         }
+
+        ~MyWPFLogger()
+        {
+            Debug.WriteLine("The WPF Logger was deleted.");
+        }
     }
 
     public partial class MainWindow : Window
@@ -73,6 +80,10 @@ namespace WPF_GalacticRunSolver
 
         public MapViewModel _Map = new MapViewModel(16);
 
+        ManagedMap _managedMap;
+
+        ManagedSolver _managedSolver;
+
         private void Load_Map(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -83,6 +94,16 @@ namespace WPF_GalacticRunSolver
                 _Map = new MapViewModel(openFileDialog.FileName);
                 this.Map.DataContext = _Map;
             }
+        }
+
+        private void Load_Map_From_URL(object sender, RoutedEventArgs e)
+        {
+            string url = UrlTextBox.Text;
+            if (Utilities.IsValidMapUrl(url))
+            {
+                _Map = new MapViewModel(Utilities.GetMapFromWeburl(url));
+                this.Map.DataContext = _Map;
+            }  
         }
 
         private void Save_Map(object sender, RoutedEventArgs e)
@@ -116,12 +137,12 @@ namespace WPF_GalacticRunSolver
 
         private List<ManagedSolution> SolveMap()
         {
-            ManagedSolver solver = new ManagedSolver(10, m_Logger);
+            _managedSolver = new ManagedSolver(30, m_Logger);
             //Save map to temp file that will be deleted
             string tempFileName = System.IO.Path.GetTempFileName();
             _Map.SaveMap(tempFileName);
-            ManagedMap map = new ManagedMap(tempFileName);
-            var solutions = solver.GetAllSolutions(map);
+            _managedMap = new ManagedMap(tempFileName);
+            var solutions = _managedSolver.GetAllSolutions(_managedMap);
             File.Delete(tempFileName);
             return solutions;
         }

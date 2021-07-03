@@ -13,18 +13,29 @@
 
         <Image Grid.RowSpan="2" Stretch="None" Source="Images/background.png" VerticalAlignment="Top" HorizontalAlignment="Center"/>
 
-        <DockPanel Margin="0,0,0,742" Height="27">
-            <Menu DockPanel.Dock="Top" Height="27">
-                <MenuItem Header="_Map" Height="28" Width="55">
+        <DockPanel Margin="0,0,0,742" Height="20" RenderTransformOrigin="0.499,-0.05">
+            <Menu DockPanel.Dock="Top" Height="20">
+                <MenuItem Header="_Map" Height="20" Width="70">
                     <MenuItem Header="_New" Click="Clear_Map"/>
                     <MenuItem Header="_Open" Click="Load_Map"/>
+                    <MenuItem Header="Open from url">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Url : " Grid.Column="0"></TextBlock>
+                            <TextBox Name="UrlTextBox" Text="Enter your url..." Grid.Column="1"></TextBox>
+                        </Grid>
+                        <MenuItem Header="Load from url" Click="Load_Map_From_URL"/>
+                    </MenuItem>
                     <MenuItem Header="_Export" Click="Save_Map"/>
                     <Separator />
                     <MenuItem Header="_Reset" Click="Reset_Map"/>
                     <MenuItem Header="_Solve" Click="Solve_Map"/>
                 </MenuItem>
             </Menu>
-            <TextBox AcceptsReturn="True" />
+            
         </DockPanel>
 
         <TextBox x:Name="DisplayTextBox" Height="462" Margin="771,65,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>

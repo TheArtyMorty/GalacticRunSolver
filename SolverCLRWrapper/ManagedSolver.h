@@ -52,6 +52,7 @@ namespace CLI
     {
     public:
         LoggerWrapper(IManagedLogger^ managedLogger);
+        ~LoggerWrapper();
         void Log(std::string input) final;
     private:
         gcroot<IManagedLogger^> m_managedLogger;
