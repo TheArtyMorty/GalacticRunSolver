@@ -34,6 +34,10 @@
                     <MenuItem Header="_Reset" Click="Reset_Map"/>
                     <MenuItem Header="_Solve" Click="Solve_Map"/>
                 </MenuItem>
+                <MenuItem Header="_Connection" Height="20" Width="70">
+                    <MenuItem Header="_Send solution to browser" Click="Send_Solution"/>
+                    <MenuItem Header="C_onnect / Solve / Send" Click="Connect_Solve_Send"/>
+                </MenuItem>
             </Menu>
             
         </DockPanel>

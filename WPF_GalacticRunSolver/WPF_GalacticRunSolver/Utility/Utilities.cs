@@ -7,6 +7,11 @@ using System.Threading.Tasks;
 using System.Net.Http;
 using System.Text.Json;
 using WPF_GalacticRunSolver.Model;
+using System.Windows.Forms;
+using System.Runtime.InteropServices;
+using System.Diagnostics;
+using System.Threading;
+using WPF_GalacticRunSolver.ViewModel;
 
 namespace WPF_GalacticRunSolver.Utility
 {
@@ -61,7 +66,131 @@ namespace WPF_GalacticRunSolver.Utility
         public static bool IsValidMapUrl(string url)
         {
             var splittedUrl = url.Split('/');
-            return splittedUrl.Length > 1;
+            if (splittedUrl.Length == 1)
+            {
+                return false;
+            }
+            else
+            {
+                try
+                {
+                    var id = splittedUrl.Last();
+                    var boardAsString = GalacticRunBoardFromUrl.GetBoardFromBoardID(id).GetString();
+                }
+                catch(Exception)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        private static RobotViewModel GetInitialRobotFromMap(MapViewModel map)
+        {
+            return map._Robots.Where(r => r._Color == map._Target._Color).First();
+        }
+
+        private static void TabToProperRobot(FirefoxWrapper firefox, MapViewModel map, EColor targetColor, ref RobotViewModel currentRobot)
+        {
+            List<RobotViewModel> tabOrderedRobots = map._Robots.ToList();
+            tabOrderedRobots.Sort();
+
+            int currentPos = 0;
+            int targetPos = 0;
+            int i = 0;
+            foreach (RobotViewModel robot in tabOrderedRobots)
+            {
+                if (robot._Color == targetColor) targetPos = i;
+                if (robot._Color == currentRobot._Color) currentPos = i;
+                i++;
+            }
+
+            for (int j = 0; j< (targetPos - currentPos + 4)%4; j++)
+            {
+                firefox.SendKey(0x09); // tab
+                Thread.Sleep(10);
+            }
+
+            currentRobot = tabOrderedRobots[targetPos];
+        }
+
+        public async static void SendSolutionToFirefox(SolutionViewModel solution, MapViewModel map)
+        {
+            FirefoxWrapper firefox = new FirefoxWrapper();
+            firefox.SendKey(0x20); // space
+
+            RobotViewModel currentRobot = GetInitialRobotFromMap(map);
+
+            foreach (MoveViewModel move in solution._Moves)
+            {
+                if (currentRobot._Color != (EColor)move._Color)
+                {
+                    TabToProperRobot(firefox, map, (EColor)move._Color, ref currentRobot);
+                }
+
+                switch(move._Direction)
+                {
+                    case CLI.EMoveDirection.Left:
+                        firefox.SendKey(0x25);
+                        break;
+                    case CLI.EMoveDirection.Up:
+                        firefox.SendKey(0x26);
+                        break;
+                    case CLI.EMoveDirection.Right:
+                        firefox.SendKey(0x27);
+                        break;
+                    case CLI.EMoveDirection.Down:
+                        firefox.SendKey(0x28);
+                        break;
+                }
+
+                await map.PlayMove(move, 0);
+
+                Thread.Sleep(10);
+            }
+        }
+    }
+
+    public class FirefoxWrapper
+    {
+        [DllImport("user32.dll")]
+        private static extern IntPtr SendMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+        // the keystroke signals. you can look them up at the msdn pages
+        private static uint WM_KEYDOWN = 0x100, WM_KEYUP = 0x101;
+
+        // the reference to the firefox process
+        private Process firefoxProcess;
+
+        public FirefoxWrapper()
+        {
+            Process[] firefoxProcesses = Process.GetProcessesByName("firefox");
+            foreach (Process firefox in firefoxProcesses)
+            {
+                if (firefox.MainWindowHandle == IntPtr.Zero)// the firefox process must have a window
+                    continue;
+                firefoxProcess = firefox; //now you have a handle to the main firefox (either a new one or the one that was already open).
+                return;
+            }
+        }
+
+        public void SendKey(int key)
+        {
+            try
+            {
+                if (firefoxProcess.MainWindowHandle != IntPtr.Zero)
+                {
+                    // send the keydown signal
+                    SendMessage(firefoxProcess.MainWindowHandle, WM_KEYDOWN, (IntPtr)key, IntPtr.Zero);
+                    // give the process some time to "realize" the keystroke
+                    Thread.Sleep(30); //On my system it works fine without this Sleep.
+                                      // send the keyup signal
+                    SendMessage(firefoxProcess.MainWindowHandle, WM_KEYUP, (IntPtr)key, IntPtr.Zero);
+                }
+            }
+            catch (Exception) //without the GetProcessesByName you'd get an exception.
+            {
+            }
         }
     }
 

@@ -80,14 +80,14 @@ namespace WPF_GalacticRunSolver.ViewModel
             }
         }
 
-        private async Task PlayMove(MoveViewModel move)
+        public async Task PlayMove(MoveViewModel move, int delay = 25)
         {
             var robot = _Robots.Where(r => r._Color == (EColor)move._Color).First()._Robot;
             var increment = GetMoveIncrement(move);
 
             while (_Map.CanRobotMove(robot, move._Direction))
             {
-                await Task.Delay(25);
+                await Task.Delay(delay);
                 robot.Move(increment);
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
             }

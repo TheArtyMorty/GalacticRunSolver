@@ -104,9 +104,33 @@ namespace WPF_GalacticRunSolver
             string url = UrlTextBox.Text;
             if (Utilities.IsValidMapUrl(url))
             {
+                ClearSolverDisplay();
                 _Map = new MapViewModel(Utilities.GetMapFromWeburl(url));
                 this.Map.DataContext = _Map;
             }  
+            else
+            {
+                MessageBox.Show("Could not load map from this url...", "Invalid URL", MessageBoxButton.OK);
+            }
+        }
+
+        private void Send_Solution(object sender, RoutedEventArgs e)
+        {
+            if (Solutions.DataContext != null)
+            {
+                SolutionsViewModel solutions = Solutions.DataContext as SolutionsViewModel;
+                if (solutions._Solutions.Count != 0)
+                {
+                    Reset_Map(sender, e);
+                    Utilities.SendSolutionToFirefox(solutions._Solutions.First(), _Map);
+                }
+            }
+        }
+
+        private void Connect_Solve_Send(object sender, RoutedEventArgs e)
+        {
+            Load_Map_From_URL(sender, e);
+            Solve(true);
         }
 
         private void Save_Map(object sender, RoutedEventArgs e)
@@ -179,7 +203,8 @@ namespace WPF_GalacticRunSolver
             }
         }
 
-        private void Solve_Map(object sender, RoutedEventArgs e)
+
+        private void Solve(bool sendToBrowser = false)
         {
             _Map._InitialMap = new Map(_Map._Map);
             ClearSolverDisplay();
@@ -188,7 +213,13 @@ namespace WPF_GalacticRunSolver
             worker.WorkerReportsProgress = false;
             worker.DoWork += worker_DoWork;
             worker.RunWorkerCompleted += worker_RunWorkerCompleted;
+            if (sendToBrowser) worker.RunWorkerCompleted += worker_SendAfterCompleted;
             worker.RunWorkerAsync();
+        }
+
+        private void Solve_Map(object sender, RoutedEventArgs e)
+        {
+            Solve();
         }
 
         void worker_DoWork(object sender, DoWorkEventArgs e)
@@ -200,6 +231,11 @@ namespace WPF_GalacticRunSolver
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             DisplaySolutions((List<ManagedSolution>)e.Result);
+        }
+
+        void worker_SendAfterCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Send_Solution(sender, null);
         }
     }
 }
