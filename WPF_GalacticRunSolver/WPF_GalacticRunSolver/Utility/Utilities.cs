@@ -12,6 +12,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Threading;
 using WPF_GalacticRunSolver.ViewModel;
+using System.Drawing;
 
 namespace WPF_GalacticRunSolver.Utility
 {
@@ -85,6 +86,146 @@ namespace WPF_GalacticRunSolver.Utility
             return true;
         }
 
+        public static Map GetMapFromImage(Bitmap image)
+        {
+            int size = 16;
+            Map result = new Map(size);
+            
+            Bitmap mapImage = GetCroppedImageFromImage(image);
+            int width = (mapImage.Width-1) / size;
+            int height = width;
+
+            Color wall = Color.White;
+
+            for (int i = 0; i< size; i++)
+            {
+                for (int j = 0; j < size; j++)
+                {
+                    bool leftWall = false;
+                    bool rightWall = false;
+                    bool topWall = false;
+                    bool bottomWall = false;
+
+                    var pixel = mapImage.GetPixel(j*width, i * height + height / 2);
+                    var nextpixel = mapImage.GetPixel(j*width+1, i * height + height / 2);
+                    var previouspixel = pixel;
+                    if (j > 0) previouspixel = mapImage.GetPixel(j*width-1, i * height + height / 2);
+                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    {
+                        leftWall = true;
+                    }
+
+                    pixel = mapImage.GetPixel((j+1) * width, i * height + height / 2);
+                    if (j < size-1) nextpixel = mapImage.GetPixel((j + 1) * width + 1, i * height + height / 2);
+                    else nextpixel = pixel;
+                    previouspixel = mapImage.GetPixel((j+1) * width - 1, i * height + height / 2);
+                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    {
+                        rightWall = true;
+                    }
+                    
+                    pixel = mapImage.GetPixel(j*width + width / 2, i * height);
+                    nextpixel = mapImage.GetPixel(j * width + width / 2, i * height + 1);
+                    previouspixel = pixel;
+                    if (i > 0) previouspixel = mapImage.GetPixel(j * width + width / 2, i * height - 1);
+                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    {
+                        topWall = true;
+                    }
+
+                    pixel = mapImage.GetPixel(j * width + width / 2, (i+1) * height);
+                    if (i < size-1) nextpixel = mapImage.GetPixel(j * width + width / 2, (i+1) * height + 1);
+                    else nextpixel = pixel;
+                    previouspixel = mapImage.GetPixel(j * width + width / 2, (i + 1) * height - 1);
+                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    {
+                        bottomWall = true;
+                    }
+
+                    if (leftWall && topWall)
+                    {
+                        result._Cases[i][j]._WallType = EWallType.TopLeft;
+                    }
+                    else if (leftWall && bottomWall)
+                    {
+                        result._Cases[i][j]._WallType = EWallType.BottomLeft;
+                    }
+                    else if (rightWall && topWall)
+                    {
+                        result._Cases[i][j]._WallType = EWallType.TopRight;
+                    }
+                    else if (rightWall && bottomWall)
+                    {
+                        result._Cases[i][j]._WallType = EWallType.BottomRight;
+                    }
+
+                }
+            }
+
+            return result;
+        }
+
+
+        private static Bitmap GetCroppedImageFromImage(Bitmap image)
+        {
+            bool wasFirstWallFound = false;
+            Color firstPixelColor = image.GetPixel(0, image.Height / 2);
+            int leftx=0;
+            int rightx=image.Width;
+            int topy=0;
+            int bottomy=image.Height;
+            for (int i = 0; i < image.Width && !wasFirstWallFound; i++)
+            {
+                var pixel = image.GetPixel(i, image.Height / 2);
+                if (pixel != firstPixelColor)
+                {
+                    wasFirstWallFound = true;
+                    leftx = i;
+                }
+            }
+
+            wasFirstWallFound = false;
+            firstPixelColor = image.GetPixel(image.Width / 2, 0);
+            for (int i = 0; i < image.Height && !wasFirstWallFound; i++)
+            {
+                var pixel = image.GetPixel(image.Width/2, i);
+                if (pixel != firstPixelColor)
+                {
+                    wasFirstWallFound = true;
+                    topy = i;
+                }
+            }
+
+            wasFirstWallFound = false;
+            firstPixelColor = image.GetPixel(image.Width - 1, image.Height / 2);
+            for (int i = 1; i < image.Width && !wasFirstWallFound; i++)
+            {
+                var pixel = image.GetPixel(image.Width-i, image.Height/2);
+                if (pixel != firstPixelColor)
+                {
+                    wasFirstWallFound = true;
+                    rightx = image.Width - i+1;
+                }
+            }
+
+            wasFirstWallFound = false;
+            firstPixelColor = image.GetPixel(image.Width / 2, image.Height-1);
+            for (int i = 1; i < image.Height && !wasFirstWallFound; i++)
+            {
+                var pixel = image.GetPixel(image.Width / 2, image.Height-i);
+                if (pixel != firstPixelColor)
+                {
+                    wasFirstWallFound = true;
+                    bottomy = image.Height - i+1;
+                }
+            }
+
+            Bitmap result = image.Clone(new Rectangle(leftx, topy, rightx - leftx, bottomy - topy), image.PixelFormat);
+            image.Save("C:\\Users\\lucm\\Desktop\\logs\\test.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            result.Save("C:\\Users\\lucm\\Desktop\\logs\\test_cropped.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+
+            return result;
+        }
 
         private static RobotViewModel GetInitialRobotFromMap(MapViewModel map)
         {

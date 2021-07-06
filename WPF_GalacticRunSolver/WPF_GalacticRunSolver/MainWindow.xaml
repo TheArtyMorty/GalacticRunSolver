@@ -1,4 +1,5 @@
 ﻿<Window x:Class="WPF_GalacticRunSolver.MainWindow"
+        x:Name="MainWaindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -37,6 +38,29 @@
                 <MenuItem Header="_Connection" Height="20" Width="70">
                     <MenuItem Header="_Send solution to browser" Click="Send_Solution"/>
                     <MenuItem Header="C_onnect / Solve / Send" Click="Connect_Solve_Send"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Top Left : " Grid.Column="0"></TextBlock>
+                        <TextBlock Text="{Binding ElementName=MainWaindow, Path=TopLeftCorner._X}" Grid.Column="1"></TextBlock>
+                        <TextBlock Text=", " Grid.Column="2"></TextBlock>
+                        <TextBlock Text="{Binding ElementName=MainWaindow, Path=TopLeftCorner._Y}" Grid.Column="3"></TextBlock>
+                        <TextBlock Text="  Bottom Right : " Grid.Column="4"></TextBlock>
+                        <TextBlock Text="{Binding ElementName=MainWaindow, Path=BottomRightCorner._X}" Grid.Column="5"></TextBlock>
+                        <TextBlock Text=", " Grid.Column="6"></TextBlock>
+                        <TextBlock Text="{Binding ElementName=MainWaindow, Path=BottomRightCorner._Y}" Grid.Column="7"></TextBlock>
+                    </Grid>
+                    <MenuItem Header="Set Top Left Corner" Click="Set_Top_Left_Map_Corner"/>
+                    <MenuItem Header="Set Bottom Right Corner" Click="Set_Bottom_Right_Map_Corner"/>
+                    <MenuItem Header="Recognize Map From Area" Click="RecognizeTest"/>
                 </MenuItem>
             </Menu>
             

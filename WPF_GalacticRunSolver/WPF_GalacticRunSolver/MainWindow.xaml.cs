@@ -21,6 +21,9 @@ using System.IO;
 using WPF_GalacticRunSolver.Utility;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Timers;
 
 namespace WPF_GalacticRunSolver
 {
@@ -64,7 +67,40 @@ namespace WPF_GalacticRunSolver
     }
 
 
+    public class ScreenPosition : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
+        public ScreenPosition(int x = 0, int y = 0)
+        {
+            _Position = new System.Drawing.Point(x, y);
+        }
+
+        public System.Drawing.Point _Position { get; set; }
+
+        public string _X
+        {
+            get
+            {
+                return _Position.X.ToString();
+            }
+        }
+
+        public string _Y
+        {
+            get
+            {
+                return _Position.Y.ToString();
+            }
+        }
+
+        public void SetNewPosition(System.Drawing.Point point)
+        {
+            _Position = point;
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
+        }
+    }
 
     public partial class MainWindow : Window
     {
@@ -131,6 +167,46 @@ namespace WPF_GalacticRunSolver
         {
             Load_Map_From_URL(sender, e);
             Solve(true);
+        }
+        
+        private void RecognizeTest(object sender, RoutedEventArgs e)
+        {
+            Clear_Map(sender, e);
+
+            System.Drawing.Size size = new System.Drawing.Size(
+                Math.Abs(BottomRightCorner._Position.X - TopLeftCorner._Position.X),
+                Math.Abs(BottomRightCorner._Position.Y - TopLeftCorner._Position.Y));
+            Bitmap memoryImage = new Bitmap(size.Width, size.Height);
+            Graphics test = Graphics.FromImage(memoryImage);
+            test.CopyFromScreen(TopLeftCorner._Position.X, TopLeftCorner._Position.Y, 0, 0, size);
+
+            _Map = new MapViewModel(Utilities.GetMapFromImage(memoryImage));
+            this.Map.DataContext = _Map;
+        }
+
+        public ScreenPosition TopLeftCorner { get; set; } = new ScreenPosition(290, 165);
+        public ScreenPosition BottomRightCorner { get; set; } = new ScreenPosition(1105, 984);
+
+
+        private Timer timer;
+        private void Set_Top_Left_Map_Corner(object sender, RoutedEventArgs e)
+        {
+            timer = new Timer(5000); //Interval is the amount of time in millis before it fires
+            timer.Elapsed += (s, args) => OnTick(s, args, TopLeftCorner);
+            timer.Start();
+        }
+        
+        private void Set_Bottom_Right_Map_Corner(object sender, RoutedEventArgs e)
+        {
+            timer = new Timer(5000); //Interval is the amount of time in millis before it fires
+            timer.Elapsed += (s, args) => OnTick(s, args, BottomRightCorner);
+            timer.Start();
+        }
+
+        private void OnTick(object source, ElapsedEventArgs e, ScreenPosition thePoint)
+        {
+            thePoint.SetNewPosition(System.Windows.Forms.Cursor.Position);
+            timer.Stop();
         }
 
         private void Save_Map(object sender, RoutedEventArgs e)
