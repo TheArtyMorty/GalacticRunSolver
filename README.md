@@ -1,7 +1,7 @@
 # GalacticRunSolver
 
 My attempt at solving galactic run (ricochet robots online) maps.
-- Project is still under development (see Backlog section)
+- Project is almosted finished (can we ever be?) :)
 
 ## Presentation
 
@@ -9,7 +9,7 @@ Galactic Run is an online adaptation of the boardgame "Ricochet Robots" (Rasende
 It provides cool functionnalities and an online versus mode : https://galactic.run/
 
 We have been playing this cool online game with friends, and have been struggling several times to get the perfect solutions.
-I decided to start this solver as a personnal project (better solvers already exists) to improve my coding skills.
+I decided to start this solver as a personal project (better solvers already exists) to improve my coding skills.
 
 So far, the UI looks like this : 
 ![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/blob/main/Documentation/ReadMe_Global.png)
@@ -24,6 +24,12 @@ You also have options to save and load your maps (as txt files) on the top right
 Then, whenever you want, you can solve the map.
 This will log the process, and when the solutions have been found, they are displayed on the bottom right corner.
 You can play solutions graphically (play button) to see the robots movements.
+
+Update :
+- You can now get the map from an URL (works with puzzles)
+- You can also recognize the map from a screen section (works with versus game mode)
+- Implemented a "bot" that can recognize the map, solve and play the solution for you. 
+-- Obviously, this wasn't the point of my project, but it's very fun to see the bot solve a 11 moves map in less than a second.
 
 ## Solver
 
@@ -40,6 +46,9 @@ However the number of states to calculate still grow exponentially, and I am not
 
 Update : After performance investigation, I was able to go much faster :
 The 14 moves map now solves in 7 seconds. This could (and will need to) be improved, but that's an already very acceptable speed.
+
+Update 2: After some investigation, with the A-Star algorythm, the 19 moves map is solved in about 1 minute. 
+This was my initial goal so I'm pretty happy with the result.
 
 ## Projects
 
@@ -64,10 +73,8 @@ WPF_GalacticRunSolver :
 
 ## Backlog
 
-Connection to GalacticRun website
-- Step 1 : 
--- Have a textbox to enter the url, then load the map from that url (Easy)
-- Step 2 :
--- Connect to the browser (get the url from the brower) and possibility to provide inputs (solution) to the browser directly (difficult)
+-Bot 
+-- Improve the map recognition from the screen area (still fails sometimes)
+-- Improve the area selection to be more user friendly.
 
 Any proposal is welcomed :).

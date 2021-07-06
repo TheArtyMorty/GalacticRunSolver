@@ -168,7 +168,13 @@ namespace WPF_GalacticRunSolver
             Load_Map_From_URL(sender, e);
             Solve(true);
         }
-        
+
+        private void Bot_Solve(object sender, RoutedEventArgs e)
+        {
+            RecognizeTest(sender, e);
+            Solve(true);
+        }
+
         private void RecognizeTest(object sender, RoutedEventArgs e)
         {
             Clear_Map(sender, e);

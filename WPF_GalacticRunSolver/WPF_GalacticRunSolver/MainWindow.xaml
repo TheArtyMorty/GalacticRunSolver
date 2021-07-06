@@ -16,7 +16,7 @@
 
         <DockPanel Margin="0,0,0,742" Height="20" RenderTransformOrigin="0.499,-0.05">
             <Menu DockPanel.Dock="Top" Height="20">
-                <MenuItem Header="_Map" Height="20" Width="70">
+                <MenuItem Header="_Map" Height="20" Width="50">
                     <MenuItem Header="_New" Click="Clear_Map"/>
                     <MenuItem Header="_Open" Click="Load_Map"/>
                     <MenuItem Header="Open from url">
@@ -61,6 +61,9 @@
                     <MenuItem Header="Set Top Left Corner" Click="Set_Top_Left_Map_Corner"/>
                     <MenuItem Header="Set Bottom Right Corner" Click="Set_Bottom_Right_Map_Corner"/>
                     <MenuItem Header="Recognize Map From Area" Click="RecognizeTest"/>
+                </MenuItem>
+                <MenuItem Header="Super_Bot" Height="20" Width="70">
+                    <MenuItem Header="Bot_Solve" Click="Bot_Solve"/>
                 </MenuItem>
             </Menu>
             

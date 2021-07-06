@@ -86,6 +86,17 @@ namespace WPF_GalacticRunSolver.Utility
             return true;
         }
 
+        private static bool AreColorsEqual(Color c1, Color c2)
+        {
+            if (c1.ToArgb() == c2.ToArgb()) return true;
+            int result = 0;
+            result += Math.Abs(c2.A - c1.A);
+            result += Math.Abs(c2.R - c1.R);
+            result += Math.Abs(c2.G - c1.G);
+            result += Math.Abs(c2.B - c1.B);
+            return result < 75 ;
+        }
+
         public static Map GetMapFromImage(Bitmap image)
         {
             int size = 16;
@@ -96,6 +107,20 @@ namespace WPF_GalacticRunSolver.Utility
             int height = width;
 
             Color wall = Color.White;
+            Color redRobot = Color.FromArgb(255,116,32,65); //Color.FromArgb(255, 191, 35, 91);
+            Color greenRobot = Color.FromArgb(255, 41, 141, 103); //Color.FromArgb(255, 67, 217, 154);
+            Color blueRobot = Color.FromArgb(255, 22, 65, 119); //Color.FromArgb(255, 36, 96, 185);
+            Color yellowRobot = Color.FromArgb(255, 117, 102, 46); //Color.FromArgb(255, 195, 155, 62);
+
+            Color HredRobot = Color.FromArgb(255, 191, 35, 91);
+            Color HgreenRobot = Color.FromArgb(255, 67, 217, 154);
+            Color HblueRobot = Color.FromArgb(255, 36, 96, 185);
+            Color HyellowRobot = Color.FromArgb(255, 195, 155, 62);
+
+            Color redTarget = Color.FromArgb(255, 255, 68, 135);
+            Color greenTarget = Color.FromArgb(255, 100, 249, 186);
+            Color blueTarget = Color.FromArgb(255, 100, 160, 251);
+            Color yellowTarget = Color.FromArgb(255, 255, 192, 68);
 
             for (int i = 0; i< size; i++)
             {
@@ -110,7 +135,7 @@ namespace WPF_GalacticRunSolver.Utility
                     var nextpixel = mapImage.GetPixel(j*width+1, i * height + height / 2);
                     var previouspixel = pixel;
                     if (j > 0) previouspixel = mapImage.GetPixel(j*width-1, i * height + height / 2);
-                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    if (AreColorsEqual(pixel, wall) || AreColorsEqual(nextpixel, wall) || AreColorsEqual(previouspixel, wall))
                     {
                         leftWall = true;
                     }
@@ -119,7 +144,7 @@ namespace WPF_GalacticRunSolver.Utility
                     if (j < size-1) nextpixel = mapImage.GetPixel((j + 1) * width + 1, i * height + height / 2);
                     else nextpixel = pixel;
                     previouspixel = mapImage.GetPixel((j+1) * width - 1, i * height + height / 2);
-                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    if (AreColorsEqual(pixel, wall) || AreColorsEqual(nextpixel, wall) || AreColorsEqual(previouspixel, wall))
                     {
                         rightWall = true;
                     }
@@ -128,7 +153,7 @@ namespace WPF_GalacticRunSolver.Utility
                     nextpixel = mapImage.GetPixel(j * width + width / 2, i * height + 1);
                     previouspixel = pixel;
                     if (i > 0) previouspixel = mapImage.GetPixel(j * width + width / 2, i * height - 1);
-                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    if (AreColorsEqual(pixel, wall) || AreColorsEqual(nextpixel, wall) || AreColorsEqual(previouspixel, wall))
                     {
                         topWall = true;
                     }
@@ -137,7 +162,7 @@ namespace WPF_GalacticRunSolver.Utility
                     if (i < size-1) nextpixel = mapImage.GetPixel(j * width + width / 2, (i+1) * height + 1);
                     else nextpixel = pixel;
                     previouspixel = mapImage.GetPixel(j * width + width / 2, (i + 1) * height - 1);
-                    if (pixel.ToArgb() == wall.ToArgb() || nextpixel.ToArgb() == wall.ToArgb() || previouspixel.ToArgb() == wall.ToArgb())
+                    if (AreColorsEqual(pixel, wall) || AreColorsEqual(nextpixel, wall) || AreColorsEqual(previouspixel, wall))
                     {
                         bottomWall = true;
                     }
@@ -159,6 +184,44 @@ namespace WPF_GalacticRunSolver.Utility
                         result._Cases[i][j]._WallType = EWallType.BottomRight;
                     }
 
+                    Color centerPixel = mapImage.GetPixel(j * width + width / 2, i * height + height / 2);
+
+                    if (AreColorsEqual(centerPixel, redRobot) || AreColorsEqual(centerPixel, HredRobot))
+                    {
+                        result._Robots.Where(r => r._Color == EColor.Red).First()._Position = new Position(j, i);
+                    }
+                    else if (AreColorsEqual(centerPixel, yellowRobot) || AreColorsEqual(centerPixel, HyellowRobot))
+                    {
+                        result._Robots.Where(r => r._Color == EColor.Yellow).First()._Position = new Position(j, i);
+                    }
+                    else if (AreColorsEqual(centerPixel, greenRobot) || AreColorsEqual(centerPixel, HgreenRobot))
+                    {
+                        result._Robots.Where(r => r._Color == EColor.Green).First()._Position = new Position(j, i);
+                    }
+                    else if (AreColorsEqual(centerPixel, blueRobot) || AreColorsEqual(centerPixel, HblueRobot))
+                    {
+                        result._Robots.Where(r => r._Color == EColor.Blue).First()._Position = new Position(j, i);
+                    }
+                    else if (AreColorsEqual(centerPixel, redTarget))
+                    {
+                        result._Target._Position = new Position(j, i);
+                        result._Target._Color = EColor.Red;
+                    }
+                    else if (AreColorsEqual(centerPixel, yellowTarget))
+                    {
+                        result._Target._Position = new Position(j, i);
+                        result._Target._Color = EColor.Yellow;
+                    }
+                    else if (AreColorsEqual(centerPixel, greenTarget))
+                    {
+                        result._Target._Position = new Position(j, i);
+                        result._Target._Color = EColor.Green;
+                    }
+                    else if (AreColorsEqual(centerPixel, blueTarget))
+                    {
+                        result._Target._Position = new Position(j, i);
+                        result._Target._Color = EColor.Blue;
+                    }
                 }
             }
 
@@ -221,8 +284,8 @@ namespace WPF_GalacticRunSolver.Utility
             }
 
             Bitmap result = image.Clone(new Rectangle(leftx, topy, rightx - leftx, bottomy - topy), image.PixelFormat);
-            image.Save("C:\\Users\\lucm\\Desktop\\logs\\test.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
-            result.Save("C:\\Users\\lucm\\Desktop\\logs\\test_cropped.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            image.Save(System.AppDomain.CurrentDomain.BaseDirectory + "test.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            result.Save(System.AppDomain.CurrentDomain.BaseDirectory + "test_cropped.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
 
             return result;
         }
