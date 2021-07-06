@@ -93,6 +93,9 @@
     <Compile Include="Converters\PositionToMarginConverter.cs" />
     <Compile Include="Converters\RobotColorToImageConverter.cs" />
     <Compile Include="Converters\TargetColorToImageConverter.cs" />
+    <Compile Include="MapArea.xaml.cs">
+      <DependentUpon>MapArea.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Utility\Utilities.cs" />
     <Compile Include="ViewModel\CaseViewModel.cs" />
     <Compile Include="ViewModel\MapViewModel.cs" />
@@ -136,6 +139,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MapArea.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CaseControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

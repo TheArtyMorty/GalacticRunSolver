@@ -31,7 +31,6 @@ namespace WPF_GalacticRunSolver
                 //create a new map
                 _appMap = new MapViewModel(16);
             }
-            _appMap._Map = Utilities.GetMapFromWeburl("https://galactic.run/p/8740979892824434");
             MainWindow wnd = new MainWindow(_appMap);
             wnd.Show();
         }

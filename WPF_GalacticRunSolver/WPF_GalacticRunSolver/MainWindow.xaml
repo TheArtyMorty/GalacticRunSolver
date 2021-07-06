@@ -35,14 +35,10 @@
                     <MenuItem Header="_Reset" Click="Reset_Map"/>
                     <MenuItem Header="_Solve" Click="Solve_Map"/>
                 </MenuItem>
-                <MenuItem Header="_Connection" Height="20" Width="70">
+                <MenuItem Header="_Connection" Height="20" Width="90">
                     <MenuItem Header="_Send solution to browser" Click="Send_Solution"/>
-                    <MenuItem Header="C_onnect / Solve / Send" Click="Connect_Solve_Send"/>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
@@ -58,12 +54,22 @@
                         <TextBlock Text=", " Grid.Column="6"></TextBlock>
                         <TextBlock Text="{Binding ElementName=MainWaindow, Path=BottomRightCorner._Y}" Grid.Column="7"></TextBlock>
                     </Grid>
-                    <MenuItem Header="Set Top Left Corner" Click="Set_Top_Left_Map_Corner"/>
-                    <MenuItem Header="Set Bottom Right Corner" Click="Set_Bottom_Right_Map_Corner"/>
+                    <MenuItem Header="Set Map Area" Click="Set_Area"/>
                     <MenuItem Header="Recognize Map From Area" Click="RecognizeTest"/>
                 </MenuItem>
-                <MenuItem Header="Super_Bot" Height="20" Width="70">
-                    <MenuItem Header="Bot_Solve" Click="Bot_Solve"/>
+                <MenuItem Header="_Bot (V1)" Height="20" Width="70">
+                    <MenuItem Header="Solve by screenshot !" Click="Bot_Solve"/>
+                </MenuItem>
+                <MenuItem Header="_Bot (V2)" Height="20" Width="70">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Game ID : " Grid.Column="0"></TextBlock>
+                        <TextBox Name="GameID" Text="..." Grid.Column="1"></TextBox>
+                    </Grid>
+                    <MenuItem Header="Connect to Game" Click="Bot_Solve"/>
                 </MenuItem>
             </Menu>
             

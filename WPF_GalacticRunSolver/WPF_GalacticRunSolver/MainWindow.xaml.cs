@@ -113,7 +113,12 @@ namespace WPF_GalacticRunSolver
             this.Map.DataContext = _Map;
 
             m_Logger = new MyWPFLogger(DisplayTextBox);
+
+            m_mapArea = new MapArea(this);
+            m_mapArea.Hide();
         }
+
+        MapArea m_mapArea;
 
         MyWPFLogger m_Logger;
 
@@ -148,6 +153,11 @@ namespace WPF_GalacticRunSolver
             {
                 MessageBox.Show("Could not load map from this url...", "Invalid URL", MessageBoxButton.OK);
             }
+        }
+
+        private void Set_Area(object sender, RoutedEventArgs e)
+        {
+            m_mapArea.StartSelection();
         }
 
         private void Send_Solution(object sender, RoutedEventArgs e)
