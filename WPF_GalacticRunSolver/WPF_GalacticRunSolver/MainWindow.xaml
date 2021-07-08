@@ -67,9 +67,17 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Game ID : " Grid.Column="0"></TextBlock>
-                        <TextBox Name="GameID" Text="..." Grid.Column="1"></TextBox>
+                        <TextBox Name="GameID" Text="631195" Grid.Column="1"></TextBox>
                     </Grid>
-                    <MenuItem Header="Connect to Game" Click="Bot_Solve"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Bot Name : " Grid.Column="0"></TextBlock>
+                        <TextBox Name="BotName" Text="Galactic Bot" Grid.Column="1"></TextBox>
+                    </Grid>
+                    <MenuItem Header="Connect to Game" Click="Bot_ConnectToGame"/>
                 </MenuItem>
             </Menu>
             

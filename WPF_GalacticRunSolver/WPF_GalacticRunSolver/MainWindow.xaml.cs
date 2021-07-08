@@ -5,25 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WPF_GalacticRunSolver.Model;
 using WPF_GalacticRunSolver.ViewModel;
 using CLI;
-using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.IO;
 using WPF_GalacticRunSolver.Utility;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Imaging;
-using System.Timers;
+using WPF_GalacticRunSolver.Bot;
 
 namespace WPF_GalacticRunSolver
 {
@@ -128,15 +120,25 @@ namespace WPF_GalacticRunSolver
 
         ManagedSolver _managedSolver;
 
+        public void LoadMap(Map map)
+        {
+            ClearSolverDisplay();
+            _Map = new MapViewModel(map);
+            this.Map.DataContext = _Map;
+        }
+
+        public void SolveAndSend()
+        {
+            Solve(true);
+        }
+
         private void Load_Map(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Text File | *.txt";
             if (openFileDialog.ShowDialog() == true)
             {
-                ClearSolverDisplay();
-                _Map = new MapViewModel(openFileDialog.FileName);
-                this.Map.DataContext = _Map;
+                LoadMap(new Map(openFileDialog.FileName));
             }
         }
 
@@ -145,9 +147,7 @@ namespace WPF_GalacticRunSolver
             string url = UrlTextBox.Text;
             if (Utilities.IsValidMapUrl(url))
             {
-                ClearSolverDisplay();
-                _Map = new MapViewModel(Utilities.GetMapFromWeburl(url));
-                this.Map.DataContext = _Map;
+                LoadMap(Utilities.GetMapFromWeburl(url));
             }  
             else
             {
@@ -173,10 +173,9 @@ namespace WPF_GalacticRunSolver
             }
         }
 
-        private void Connect_Solve_Send(object sender, RoutedEventArgs e)
+        private void Bot_ConnectToGame(object sender, RoutedEventArgs e)
         {
-            Load_Map_From_URL(sender, e);
-            Solve(true);
+            Bot.Bot theBot = new Bot.Bot(this, BotName.Text, GameID.Text);
         }
 
         private void Bot_Solve(object sender, RoutedEventArgs e)
@@ -187,8 +186,6 @@ namespace WPF_GalacticRunSolver
 
         private void RecognizeTest(object sender, RoutedEventArgs e)
         {
-            Clear_Map(sender, e);
-
             System.Drawing.Size size = new System.Drawing.Size(
                 Math.Abs(BottomRightCorner._Position.X - TopLeftCorner._Position.X),
                 Math.Abs(BottomRightCorner._Position.Y - TopLeftCorner._Position.Y));
@@ -196,34 +193,12 @@ namespace WPF_GalacticRunSolver
             Graphics test = Graphics.FromImage(memoryImage);
             test.CopyFromScreen(TopLeftCorner._Position.X, TopLeftCorner._Position.Y, 0, 0, size);
 
-            _Map = new MapViewModel(Utilities.GetMapFromImage(memoryImage));
-            this.Map.DataContext = _Map;
+            LoadMap(Utilities.GetMapFromImage(memoryImage));
         }
 
         public ScreenPosition TopLeftCorner { get; set; } = new ScreenPosition(290, 165);
         public ScreenPosition BottomRightCorner { get; set; } = new ScreenPosition(1105, 984);
 
-
-        private Timer timer;
-        private void Set_Top_Left_Map_Corner(object sender, RoutedEventArgs e)
-        {
-            timer = new Timer(5000); //Interval is the amount of time in millis before it fires
-            timer.Elapsed += (s, args) => OnTick(s, args, TopLeftCorner);
-            timer.Start();
-        }
-        
-        private void Set_Bottom_Right_Map_Corner(object sender, RoutedEventArgs e)
-        {
-            timer = new Timer(5000); //Interval is the amount of time in millis before it fires
-            timer.Elapsed += (s, args) => OnTick(s, args, BottomRightCorner);
-            timer.Start();
-        }
-
-        private void OnTick(object source, ElapsedEventArgs e, ScreenPosition thePoint)
-        {
-            thePoint.SetNewPosition(System.Windows.Forms.Cursor.Position);
-            timer.Stop();
-        }
 
         private void Save_Map(object sender, RoutedEventArgs e)
         {
