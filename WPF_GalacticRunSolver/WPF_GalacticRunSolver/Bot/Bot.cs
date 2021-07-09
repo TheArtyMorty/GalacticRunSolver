@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using WPF_GalacticRunSolver.Model;
 
+
 namespace WPF_GalacticRunSolver.Bot
 {
     public class Bot
@@ -36,7 +37,7 @@ namespace WPF_GalacticRunSolver.Bot
             _gameId = gameId;
 
             _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(0.5);
+            _timer.Interval = TimeSpan.FromSeconds(refreshTimerForDiscoveringMap);
             _timer.Tick += OnTimedEvent;
             _timer.Start();
         }
@@ -46,8 +47,12 @@ namespace WPF_GalacticRunSolver.Bot
         JsonElement _localId;
         string _gameId;
 
+        const double refreshTimerForDiscoveringMap = 1.0;
+        const double refreshTimerForSendingSolution = 0.2;
+
         DispatcherTimer _timer;
         bool _mapLoaded = false;
+        bool _mapSolved = false;
         bool _solutionSent = true;
 
         private void OnTimedEvent(Object source, EventArgs e)
@@ -62,17 +67,25 @@ namespace WPF_GalacticRunSolver.Bot
             {
                 case EGameState.RoundInProgress:
                     _timer.Stop();
-                    LoadMap(info);
+                    //LoadMap(info);
                     SendSolution();
+                    _timer.Interval = TimeSpan.FromSeconds(refreshTimerForSendingSolution);
                     _timer.Start();
                     break;
                 case EGameState.RoundStarting:
                     _timer.Stop();
                     LoadMap(info);
+                    SolveMap();
+                    _timer.Interval = TimeSpan.FromSeconds(refreshTimerForSendingSolution);
                     _timer.Start();
                     break;
                 case EGameState.RoundFinished:
                     _mapLoaded = false;
+                    break;
+                case EGameState.RoundFinishing:
+                    _timer.Stop();
+                    _timer.Interval = TimeSpan.FromSeconds(refreshTimerForDiscoveringMap);
+                    _timer.Start();
                     break;
             }
         }
@@ -85,15 +98,26 @@ namespace WPF_GalacticRunSolver.Bot
                 Map map = info.GetMap();
                 _parent.LoadMap(map);
                 _solutionSent = false;
+                _mapSolved = false;
+            }
+        }
+
+
+        private void SolveMap()
+        {
+            if (!_mapSolved)
+            {
+                _mapSolved = true;
+                _parent.Solve();
             }
         }
 
         private void SendSolution()
         {
+            SolveMap();
             if (!_solutionSent)
             {
-                _solutionSent = true;
-                _parent.SolveAndSend();
+                _solutionSent = _parent.Send();
             }
         }
 

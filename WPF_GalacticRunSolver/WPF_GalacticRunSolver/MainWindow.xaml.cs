@@ -132,6 +132,26 @@ namespace WPF_GalacticRunSolver
             Solve(true);
         }
 
+        public void Solve()
+        {
+            Solve(false);
+        }
+
+        public bool Send()
+        {
+            if (Solutions.DataContext != null)
+            {
+                SolutionsViewModel solutions = Solutions.DataContext as SolutionsViewModel;
+                if (solutions._Solutions.Count != 0)
+                {
+                    Reset_Map(null, null);
+                    Utilities.SendSolutionToFirefox(solutions._Solutions.First(), _Map);
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private void Load_Map(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
