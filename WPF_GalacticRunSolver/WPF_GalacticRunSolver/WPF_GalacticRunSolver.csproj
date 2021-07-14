@@ -88,6 +88,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Bot\Bot.cs" />
+    <Compile Include="Bot\BotUtils.cs" />
     <Compile Include="Bot\GameInfo.cs" />
     <Compile Include="Converters\CaseTypeToImageConverter.cs" />
     <Compile Include="Converters\MoveToImageConverter.cs" />

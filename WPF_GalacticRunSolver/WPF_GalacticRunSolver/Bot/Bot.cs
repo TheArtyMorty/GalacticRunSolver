@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+using System.ComponentModel;
 using System.Net.Http;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Threading;
 using WPF_GalacticRunSolver.Model;
-
+using WPF_GalacticRunSolver.ViewModel;
 
 namespace WPF_GalacticRunSolver.Bot
 {
-    public class Bot
+    public class Bot : INotifyPropertyChanged
     {
-        public Bot(MainWindow main, string name, string gameId)
+        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+
+        public Bot(MainWindow main)
         {
+            _gameInfo = new GameInfo("");
+            _connectionStatus.SetGameInfo(_gameInfo);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_connectionStatus)));
+            _gameId = null;
+
             //Anonymous Sign In
             HttpContent c = new StringContent("");
             var t = Task.Run(() => BotUtils.PostURI(new Uri("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyCx4Ea4ZOS8_XaEodY9Eckcom2uKOhObFI"), c));
@@ -26,26 +31,43 @@ namespace WPF_GalacticRunSolver.Bot
 
             _idToken = root.GetProperty("idToken");
             _localId = root.GetProperty("localId");
-            _gameId = null;
-            _parent = main;
+        }
 
+        public void SetParent(MainWindow main)
+        {
+            _parent = main;
+        }
+
+        public void ConnectToGame(string gameId, string name)
+        {
             //Initialize Bot
             SetDisplayName(name); //GetUserInfo();
 
-            //ConnectToGame(gameId);
-            //SendMessage("Hello world !");
-            _gameId = gameId;
+            JoinGame(gameId);
+            SendMessage("Hello world !");
 
-            _timer = new DispatcherTimer();
-            _timer.Interval = TimeSpan.FromSeconds(refreshTimerForDiscoveringMap);
-            _timer.Tick += OnTimedEvent;
-            _timer.Start();
+            _gameInfo = GetGameInfo();
+
+            var t = Task.Run(() => BotUtils.GetURI(new Uri(
+                String.Format("https://galactic-run.firebaseio.com/events/{0}.json?auth={1}", _gameId.ToString(), _idToken))));
+            t.Wait();
+
+            if (_connectionStatus.IsConnected())
+            {
+                _timer = new DispatcherTimer();
+                _timer.Interval = TimeSpan.FromSeconds(refreshTimerForDiscoveringMap);
+                _timer.Tick += OnTimedEvent;
+                _timer.Start();
+            }
         }
+
+        public CConnectionStatus _connectionStatus { get; set; } = new CConnectionStatus();
 
         MainWindow _parent;
         JsonElement _idToken;
         JsonElement _localId;
         string _gameId;
+        GameInfo _gameInfo;
 
         const double refreshTimerForDiscoveringMap = 1.0;
         const double refreshTimerForSendingSolution = 0.2;
@@ -57,35 +79,40 @@ namespace WPF_GalacticRunSolver.Bot
 
         private void OnTimedEvent(Object source, EventArgs e)
         {
-            GameInfo info = GetGameInfo();
-            HandleGameState(info);
+            _gameInfo = GetGameInfo();
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_connectionStatus)));
+            HandleGameState();
         }
 
-        private void HandleGameState(GameInfo info)
+        private void HandleGameState()
         {
-            switch (info.GetGameState())
+            switch (_gameInfo.GetGameState())
             {
                 case EGameState.RoundInProgress:
                     _timer.Stop();
-                    //LoadMap(info);
+                    LoadMap(_gameInfo);
                     SendSolution();
                     _timer.Interval = TimeSpan.FromSeconds(refreshTimerForSendingSolution);
                     _timer.Start();
                     break;
                 case EGameState.RoundStarting:
                     _timer.Stop();
-                    LoadMap(info);
+                    LoadMap(_gameInfo);
                     SolveMap();
                     _timer.Interval = TimeSpan.FromSeconds(refreshTimerForSendingSolution);
                     _timer.Start();
                     break;
                 case EGameState.RoundFinished:
-                    _mapLoaded = false;
-                    break;
-                case EGameState.RoundFinishing:
                     _timer.Stop();
                     _timer.Interval = TimeSpan.FromSeconds(refreshTimerForDiscoveringMap);
                     _timer.Start();
+                    CheckIfIWonOnce();
+                    _mapLoaded = false;
+                    break;
+                case EGameState.RoundFinishing:
+                    break;
+                case EGameState.GameFinished:
+                    _timer.Stop();
                     break;
             }
         }
@@ -99,6 +126,7 @@ namespace WPF_GalacticRunSolver.Bot
                 _parent.LoadMap(map);
                 _solutionSent = false;
                 _mapSolved = false;
+                _checkWon = false;
             }
         }
 
@@ -117,203 +145,259 @@ namespace WPF_GalacticRunSolver.Bot
             SolveMap();
             if (!_solutionSent)
             {
-                _solutionSent = _parent.Send();
+                SolutionViewModel solution = _parent.GetFirstSolution();
+                if (solution != null)
+                {
+                    _solutionSent = true;
+                    SendSolutionWithEvent(solution);
+                }
+            }
+        }
+
+        private bool _checkWon = false;
+        private void CheckIfIWonOnce()
+        {
+            if (!_checkWon)
+            {
+                _checkWon = true;
+                _gameInfo = GetGameInfo();
+                bool IWon = _gameInfo.GetRoundWinnerId() == _localId.GetString();
+                if (IWon)
+                {
+                    Taunt();
+                }
             }
         }
 
 
+        private List<string> taunts = new List<string>
+        {
+            "Ez",
+            "That was close... almost !",
+            "Should I go easier on you?",
+            "You did your best... I'm sure.",
+            "I'M NOT A ROBOT !",
+            "Never gonna give you up...",
+        };
+
+        private void Taunt()
+        {
+            Random rnd = new Random();
+            SendMessage(taunts[rnd.Next(0, taunts.Count - 1)]);
+        }
+
         private void SetDisplayName(string name)
         {
-            HttpContent c = new StringContent("{ \"uid\": \"" + _localId.ToString() + "\", \"displayName\": \"" + name + "\", \"photoURL\": \"\"}");
+            HttpContent data = new StringContent(new JsonDisplayName(_localId.ToString(), name, "").AsJson());
             var t = Task.Run(() => BotUtils.PatchUri(new Uri(
-                "https://galactic-run.firebaseio.com/users/" + _localId.ToString() + ".json?auth=" + _idToken),
-                c));
+                String.Format("https://galactic-run.firebaseio.com/users/{0}.json?auth={1}", _localId.ToString(), _idToken)),
+                data));
             t.Wait();
         }
 
         private void GetUserInfo()
         {
             var t = Task.Run(() => BotUtils.GetURI(new Uri(
-                "https://galactic-run.firebaseio.com/users/" + _localId.ToString() + ".json?auth=" + _idToken)));
+                String.Format("https://galactic-run.firebaseio.com/users/{0}.json?auth={1}", _localId.ToString(), _idToken))));
             t.Wait();
         }
 
-        private void ConnectToGame(string gameID)
+        private void JoinGame(string gameID)
         {
-            HttpContent c = new StringContent("{ \"type\": \"PlayerJoined\", \"uid\": \"" + _localId.ToString() + "\", \"id\": \"\"}");
-            string eventId = "-KUY6wIoxwYFJbKhYuxA"; //FirebasePushIDGenerator.GeneratePushID();
+            _gameId = gameID;
+
+            //Add player
+            //HttpContent data = new StringContent("{\"" + _localId.ToString() +"\"}");
+            //var t = Task.Run(() => BotUtils.PatchUri(new Uri(
+            //    String.Format("https://galactic-run.firebaseio.com/games/{0}/players/{1}.json?auth={2}", gameID, _localId.ToString(), _idToken)), data));
+            //t.Wait();
+            
+            //Add event player joined
+            string eventId = FirebasePushIDGenerator.GeneratePushID();
+            HttpContent eventData = new StringContent(new JsonEvent("PlayerJoined", _localId.ToString(), eventId).AsJson());
+            var t2 = Task.Run(() => BotUtils.PatchUri(new Uri(
+                String.Format("https://galactic-run.firebaseio.com/events/{0}/{1}.json?auth={2}", gameID, eventId, _idToken)), eventData));
+            t2.Wait();
+
+            //Add player 2 ?
+            string updatedGameData = GetGameInfo().GetGameDataAfterAddingPlayer(_localId.ToString());
+            HttpContent gameData = new StringContent(updatedGameData);
+            var t3 = Task.Run(() => BotUtils.PatchUri(new Uri(
+                String.Format("https://galactic-run.firebaseio.com/games/{0}.json?auth={1}", gameID, _idToken)), gameData));
+            t3.Wait();
+        }
+
+        private void SendSolutionWithEvent(SolutionViewModel solution)
+        {
+            //Send event
+            string eventId = FirebasePushIDGenerator.GeneratePushID(); ;
+            HttpContent data = new StringContent(new JsonEvent("SequenceSubmitted", _localId.ToString(), eventId, "", "Optimal", solution).AsJson());
             var t = Task.Run(() => BotUtils.PatchUri(new Uri(
-                "https://galactic-run.firebaseio.com/events/" +gameID +"/" + eventId + ".json?auth=" + _idToken),
-                c));
+                    String.Format("https://galactic-run.firebaseio.com/events/{0}/{1}.json?auth={2}", _gameId, eventId, _idToken)), data));
             t.Wait();
-            if (t.Result != "")
-            {
-                _gameId = gameID;
-            }
+
+            //Update game with solution
+            string updatedGameData = GetGameInfo().GetGameDataAfterSendingSolution(new JsonSolution(_localId.ToString(), solution).AsJson(), _localId.ToString());
+            HttpContent gameData = new StringContent(updatedGameData);
+            var t2 = Task.Run(() => BotUtils.PatchUri(new Uri(
+                String.Format("https://galactic-run.firebaseio.com/games/{0}.json?auth={1}", _gameId, _idToken)), gameData));
+            t2.Wait();
         }
 
         private GameInfo GetGameInfo()
         {
+            GameInfo result = new GameInfo("");
             if (_gameId != null)
             { 
-                string eventId = FirebasePushIDGenerator.GeneratePushID(); //"-KUY6wJ4amFnKQlcEgiJ"; 
+                string eventId = FirebasePushIDGenerator.GeneratePushID();
                 var t = Task.Run(() => BotUtils.GetURI(new Uri(
-                    "https://galactic-run.firebaseio.com/games/" + _gameId + ".json?auth=" + _idToken)));
+                    String.Format("https://galactic-run.firebaseio.com/games/{0}.json?auth={1}", _gameId, _idToken))));
                 t.Wait();
 
-                return new GameInfo(t.Result);
+                result = new GameInfo(t.Result);
             }
-            return null;
+
+            _connectionStatus.SetGameInfo(result);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_connectionStatus)));
+            return result;
         }
 
         private void SendMessage(string message)
         {
             if (_gameId != null)
             {
-                HttpContent c = new StringContent("{\"type\": \"Message\", \"id\": \"\", \"uid\": \"" + _localId.ToString() + "\", \"message\": \"" + message + "\"}");
-                string eventId = "zKUY6wJ4amFnKQlcEgiJ"; // FirebasePushIDGenerator.GeneratePushID();; 
+                string eventId = FirebasePushIDGenerator.GeneratePushID(); ;
+                HttpContent messageData = new StringContent(new JsonEvent("Message", _localId.ToString(), eventId, message).AsJson());
+
                 var t = Task.Run(() => BotUtils.PatchUri(new Uri(
-                    "https://galactic-run.firebaseio.com/events/" + _gameId + "/" + eventId + ".json?auth=" + _idToken),
-                    c));
+                    String.Format("https://galactic-run.firebaseio.com/events/{0}/{1}.json?auth={2}", _gameId, eventId, _idToken)), messageData));
                 t.Wait();
             }
         }
     }
 
 
-
-    public static class BotUtils
+    public class JsonEvent
     {
-        public static async Task<string> PatchUri(Uri u, HttpContent c)
+        public JsonEvent(string eventType, string userId, string eventId, string messageContent = "", string solutionState = "", SolutionViewModel solution = null)
         {
-            var method = new HttpMethod("PATCH");
-            var request = new HttpRequestMessage(method, u)
+            type = eventType;
+            uid = userId;
+            id = eventId;
+            message = messageContent;
+            state = solutionState;
+            moves = new List<JsonMove>();
+            if (solution != null)
             {
-                Content = c
-            };
-
-            var response = string.Empty;
-            using (var client = new HttpClient())
-            {
-                HttpResponseMessage result = await client.SendAsync(request);
-                if (result.IsSuccessStatusCode)
+                foreach (MoveViewModel move in solution._Moves)
                 {
-                    response = await result.Content.ReadAsStringAsync();
+                    moves.Insert(0, new JsonMove(move));
                 }
             }
-            return response;
         }
 
-        public static async Task<string> PostURI(Uri u, HttpContent c)
-        {
-            var response = string.Empty;
-            using (var client = new HttpClient())
-            {
-                HttpResponseMessage result = await client.PostAsync(u, c);
-                if (result.IsSuccessStatusCode)
-                {
-                    response = await result.Content.ReadAsStringAsync();
-                }
-            }
-            return response;
-        }
+        public string type { get; set; } = "";
+        public string id { get; set; } = "";
+        public string uid { get; set; } = "";
+        public string message { get; set; } = "";
+        public string state { get; set; } = "";
+        public List<JsonMove> moves { get; set; }
 
-        public static async Task<string> GetURI(Uri u)
+        public string AsJson()
         {
-            var response = string.Empty;
-            using (var client = new HttpClient())
-            {
-                HttpResponseMessage result = await client.GetAsync(u);
-                if (result.IsSuccessStatusCode)
-                {
-                    response = await result.Content.ReadAsStringAsync();
-                }
-            }
-            return response;
+            return JsonSerializer.Serialize(this);
         }
     }
 
-
-    public static class FirebasePushIDGenerator
+    public class JsonDisplayName
     {
-        /**
-         * Fancy ID generator that creates 20-character string identifiers with the following properties:
-         *
-         * 1. They're based on timestamp so that they sort *after* any existing ids.
-         * 2. They contain 72-bits of random data after the timestamp so that IDs won't collide with other clients' IDs.
-         * 3. They sort *lexicographically* (so the timestamp is converted to characters that will sort properly).
-         * 4. They're monotonically increasing.  Even if you generate more than one in the same timestamp, the
-         *    latter ones will sort after the former ones.  We do this by using the previous random bits
-         *    but "incrementing" them by 1 (only in the case of a timestamp collision).
-         */
-        // Modeled after base64 web-safe chars, but ordered by ASCII.
-        const string PUSH_CHARS = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz";
-
-        // Timestamp of last push, used to prevent local collisions if you push twice in one ms.
-        private static long lastPushTime = 0;
-
-        // We generate 72-bits of randomness which get turned into 12 characters and appended to the
-        // timestamp to prevent collisions with other clients.  We store the last characters we
-        // generated because in the event of a collision, we'll use those same characters except
-        // "incremented" by one.
-        private static char[] lastRandChars = new char[12];
-
-        // Random number generator
-        private static Random rng = new Random();
-
-        public static string GeneratePushID()
+        public JsonDisplayName(string userId, string name, string photo)
         {
-            var now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            Console.WriteLine("now=" + now);
-
-            var duplicateTime = (now == lastPushTime);
-            lastPushTime = now;
-
-            var timeStampChars = new char[8];
-            for (var i = 7; i >= 0; i--)
-            {
-                timeStampChars[i] = PUSH_CHARS[(int)(now % 64)];
-                now = now >> 6;
-            }
-            if (now != 0) throw new Exception("We should have converted the entire timestamp.");
-
-            var id = string.Join(string.Empty, timeStampChars);
-
-            if (!duplicateTime)
-            {
-                for (var i = 0; i < 12; i++)
-                {
-                    lastRandChars[i] = (char)rng.Next(0, 63);
-                }
-            }
-            else
-            {
-                // If the timestamp hasn't changed since last push, use the same random number, except incremented by 1.
-                int i;
-                for (i = 11; i >= 0 && lastRandChars[i] == 63; i--)
-                {
-                    lastRandChars[i] = (char)0;
-                }
-                lastRandChars[i]++;
-            }
-            for (var i = 0; i < 12; i++)
-            {
-                id += PUSH_CHARS[lastRandChars[i]];
-            }
-            if (id.Length != 20) throw new Exception("Length should be 20.");
-
-            return id;
+            uid = userId;
+            displayName = name;
+            photoURL = photo;
         }
 
-        public static long ConvertPushID(string id)
+        public string uid { get; set; } = "";
+        public string displayName { get; set; } = "";
+        public string photoURL { get; set; } = "";
+
+        public string AsJson()
         {
-            var timestamp = 0L;
-            for (var i = 0; i < 8; i++)
+            return JsonSerializer.Serialize(this);
+        }
+    }
+
+    
+    public class JsonSolution
+    {
+        public JsonSolution(string userId, SolutionViewModel solution)
+        {
+            moves = new List<JsonMove>();
+            if (solution != null)
             {
-                var n = PUSH_CHARS.IndexOf(id[i]);
-                timestamp = (timestamp << 6) + n;
+                foreach (MoveViewModel move in solution._Moves)
+                {
+                    moves.Insert(0, new JsonMove(move));
+                }
             }
-            return timestamp;
+
+            timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds();
+            uid = userId;
+        }
+
+        public List<JsonMove> moves { get; set; }
+        public long timestamp { get; set; }
+
+        public string uid { get; set; } = "";
+
+        public string AsJson()
+        {
+            return JsonSerializer.Serialize(this);
+        }
+    }
+
+    public class JsonMove
+    {
+        public JsonMove(MoveViewModel move)
+        {
+            color = GetStringFromColor(move._Color);
+            direction = GetStringFromDirection(move._Direction);
+        }
+
+        public string color { get; set; } = "";
+        public string direction { get; set; } = "";
+
+        public static string GetStringFromColor(CLI.ERobotColor color)
+        {
+            switch (color)
+            {
+                case CLI.ERobotColor.Blue:
+                    return "Blue";
+                case CLI.ERobotColor.Red:
+                    return "Red";
+                case CLI.ERobotColor.Green:
+                    return "Green";
+                case CLI.ERobotColor.Yellow:
+                default:
+                    return "Yellow";
+            }
+        }
+
+        public static string GetStringFromDirection(CLI.EMoveDirection direction)
+        {
+            switch (direction)
+            {
+                case CLI.EMoveDirection.Up:
+                    return "Up";
+                case CLI.EMoveDirection.Down:
+                    return "Down";
+                case CLI.EMoveDirection.Left:
+                    return "Left";
+                case CLI.EMoveDirection.Right:
+                default:
+                    return "Right";
+            }
         }
     }
 }

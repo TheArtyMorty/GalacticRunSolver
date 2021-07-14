@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using WPF_GalacticRunSolver.Model;
 
@@ -15,38 +16,115 @@ namespace WPF_GalacticRunSolver.Bot
         RoundFinishing, 
         RoundFinished,
         GameFinished,
+        Invalid,
     }
 
     public class GameInfo
     {
         public GameInfo(string jsonInfo)
         {
-            _json = jsonInfo;
+            if (jsonInfo != "")
+            {
+                _doc = JsonDocument.Parse(jsonInfo).RootElement;
+            }
         }
 
-        string _json { get; }
+        JsonElement _doc { get; }
 
-        public string GetUnparsedInfo()
+        public JsonElement GetBoard()
         {
-            return _json;
+            return _doc.GetProperty("round").GetProperty("board");
         }
 
-        public string GetBoard()
+        public string GetGameDataAfterAddingPlayer(string playerId)
         {
-            return JsonDeserializer.GetJsonElementByName(_json, "board");
+            string players = _doc.GetProperty("players").ToString();
+            players = players.Remove(players.Length - 1);
+            string newPlayer = ",\"" + playerId + "\":\"" + playerId + "\"";
+            string withNewPlayer = players + newPlayer;
+
+            string data = _doc.ToString();
+            return data.Replace(players, withNewPlayer);
         }
 
-        public string GetBoardId()
+        public string GetGameDataAfterSendingSolution(string bestSolution, string userId)
         {
-            return JsonDeserializer.GetJsonElementByName(_json, "boardId");
+            string result = _doc.ToString();
+            //Add best move
+            JsonElement round = _doc.GetProperty("round");
+            JsonElement best;
+            if (round.TryGetProperty("best", out best))
+            {
+                result = result.Replace(best.ToString(), bestSolution);
+            }
+            else
+            {
+                result = result.Replace("round\":{\"board\":", "round\":{\"best\":"+ bestSolution + ", \"board\":");
+            }
+            //Add to score
+            int numberOfWins = 0;
+            JsonElement scores;
+            string mapId = round.GetProperty("id").GetString();
+            string newScore = "\"" + mapId + "\":\"" + userId + "\"";
+            if (_doc.TryGetProperty("scores", out scores))
+            {
+                string scoresAsString = scores.ToString();
+                numberOfWins = scoresAsString.Select((c, i) => scoresAsString.Substring(i)).Count(sub => sub.StartsWith(userId));
+                scoresAsString = scoresAsString.Remove(scoresAsString.Length - 1);
+                result = result.Replace(scoresAsString, scoresAsString + "," + newScore);
+            }
+            else
+            {
+                string newScores = ",\"scores\":{" + newScore + "}";
+                result = result.Replace(",\"state\":{\"state\":", newScores + ",\"state\":{\"state\":");
+            }
+            numberOfWins++;
+            //Change status to done
+            JsonElement state = _doc.GetProperty("state");
+            string currentState = state.GetProperty("state").GetString();
+            int numberOfWinsNeeded = _doc.GetProperty("config").GetProperty("numberOfRoundsToWin").GetInt32();
+            if (numberOfWins >= numberOfWinsNeeded)
+            {
+                result = result.Replace("\"state\":\"" + currentState, "\"state\":\"GameFinished");
+            }
+            else
+            {
+                result = result.Replace("\"state\":\"" + currentState, "\"state\":\"RoundFinished");
+            }
+            result = result.Replace("\"state\":\"" + currentState, "\"state\":\"RoundFinished");
+            string timestamp = state.GetProperty("timestamp").GetDouble().ToString();
+            result = result.Replace("\"timestamp\":" + timestamp, "\"timestamp\":" + ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeSeconds().ToString());
+            return result;
         }
 
-        public string GetConfig()
+        public string GetRoundWinnerId()
         {
-            return JsonDeserializer.GetJsonElementByName(_json, "config");
+            JsonElement scores = _doc.GetProperty("scores");
+            JsonElement mapId = _doc.GetProperty("round").GetProperty("id");
+            return scores.GetProperty(mapId.GetString()).GetString();
         }
 
-
+        public static string StateToString(EGameState state)
+        {
+            switch (state)
+            {
+                case EGameState.GameNotStarted:
+                    return "Game Not Started";
+                case EGameState.RoundStarting:
+                    return "Round Starting";
+                case EGameState.RoundInProgress:
+                    return "Round In Progress";
+                case EGameState.RoundFinishing:
+                    return "Round Finishing";
+                case EGameState.RoundFinished:
+                    return "Round Finished";
+                case EGameState.GameFinished:
+                    return "Game Finished";
+                case EGameState.Invalid:
+                default:
+                    return "Invalid Game ID...";
+            }
+        }
         private static EGameState StringToState(string state)
         {
             switch (state)
@@ -62,13 +140,19 @@ namespace WPF_GalacticRunSolver.Bot
                 case "RoundFinished":
                     return EGameState.RoundFinished;
                 case "GameFinished":
-                default:
                     return EGameState.GameFinished;
+                default:
+                    return EGameState.Invalid;
             }
         }
         public EGameState GetGameState()
         {
-            return StringToState(JsonDeserializer.GetJsonElementByName(JsonDeserializer.GetJsonElementByName(_json, "state"), "state"));
+            string state = "";
+            if (_doc.ValueKind != JsonValueKind.Undefined && _doc.ValueKind != JsonValueKind.Null)
+            {
+                state = _doc.GetProperty("state").GetProperty("state").GetString();
+            }
+            return StringToState(state);
         }
 
         static List<string> robotColors = new List<string>{ "blue", "red", "green", "yellow" };
@@ -92,32 +176,32 @@ namespace WPF_GalacticRunSolver.Bot
 
         public Map GetMap()
         {
-            string board = GetBoard();
-            int size = Int32.Parse(JsonDeserializer.GetJsonElementByName(JsonDeserializer.GetJsonElementByName(board, "boardSize"),"h"));
+            JsonElement board = GetBoard();
+            int size = board.GetProperty("boardSize").GetProperty("h").GetInt32();
 
             Map result = new Map(size);
 
             //Robots
-            string robots = JsonDeserializer.GetJsonElementByName(board, "robots");
-            foreach (string color in robotColors)
+            JsonElement robots = board.GetProperty("robots");
+            foreach (string key in robotColors)
             {
-                string robotString = JsonDeserializer.GetJsonElementByName(robots, color);
-                string pos = JsonDeserializer.GetJsonElementByName(robotString, "point");
-                string c = JsonDeserializer.GetJsonElementByName(robotString, "color");
-                int x = Int32.Parse(JsonDeserializer.GetJsonElementByName(pos, "x"));
-                int y = Int32.Parse(JsonDeserializer.GetJsonElementByName(pos, "y"));
+                JsonElement robot = robots.GetProperty(key);
+                JsonElement point = robot.GetProperty("point");
+                int x = point.GetProperty("x").GetInt32();
+                int y = point.GetProperty("y").GetInt32();
+                string color = robot.GetProperty("color").GetString();
 
-                Robot robot = result._Robots.Where(r => r._Color == GetColorFromString(c)).First();
-                robot._Position = new Position(x, y);
+                Robot robotModel = result._Robots.Where(r => r._Color == GetColorFromString(color)).First();
+                robotModel._Position = new Position(x, y);
             }
 
             //Target
             {
-                string target = JsonDeserializer.GetJsonElementByName(board, "target");
-                string pos = JsonDeserializer.GetJsonElementByName(target, "point");
-                int x = Int32.Parse(JsonDeserializer.GetJsonElementByName(pos, "x"));
-                int y = Int32.Parse(JsonDeserializer.GetJsonElementByName(pos, "y"));
-                string color = JsonDeserializer.GetJsonElementByName(target, "color");
+                JsonElement target = board.GetProperty("target");
+                JsonElement point = target.GetProperty("point");
+                int x = point.GetProperty("x").GetInt32();
+                int y = point.GetProperty("y").GetInt32();
+                string color = target.GetProperty("color").GetString();
 
                 result._Target._Color = GetColorFromString(color);
                 result._Target._Position = new Position(x, y);
@@ -125,119 +209,19 @@ namespace WPF_GalacticRunSolver.Bot
 
             //Cases
             {
-                string walls = JsonDeserializer.GetJsonElementByName(board, "walls");
-                List<string> positions = JsonDeserializer.GetMultipleJsonElementsByName(walls, "point");
-                List<string> type = JsonDeserializer.GetMultipleJsonElementsByName(walls, "wall");
-                for (int i = 0; i < positions.Count; i++)
+                JsonElement walls = board.GetProperty("walls");
+                foreach(JsonElement wall in walls.EnumerateArray())
                 {
-                    int x = Int32.Parse(JsonDeserializer.GetJsonElementByName(positions[i], "x"));
-                    int y = Int32.Parse(JsonDeserializer.GetJsonElementByName(positions[i], "y"));
+                    JsonElement point = wall.GetProperty("point");
+                    int x = point.GetProperty("x").GetInt32();
+                    int y = point.GetProperty("y").GetInt32();
+                    string wallType = wall.GetProperty("wall").GetString();
 
-                    result._Cases[y][x]._WallType = StringToWallType(type[i]);
+                    result._Cases[y][x]._WallType = StringToWallType(wallType);
                 }
             }
 
             return result;
-        }
-    }
-
-
-
-    public static class JsonDeserializer
-    {
-        public static List<string> GetMultipleJsonElementsByName(string json, string name)
-        {
-            List<string> result = new List<string>();
-            int startOfElement = json.IndexOf(name);
-            while ( startOfElement > -1)
-            {
-                result.Add(GetJsonElementByName(json, name));
-                json = json.Substring(startOfElement + name.Length);
-                startOfElement = json.IndexOf(name);
-            }
-
-            return result;
-        }
-
-        public static string GetJsonElementByName(string json, string name)
-        {
-            int startOfElement = json.IndexOf(name);
-            if (startOfElement > -1)
-            {
-                string cropped = json.Substring(startOfElement + name.Length + 2);
-                bool isStringElement = (cropped[0] == '"');
-                bool isMultiElement = (cropped[0] == '{');
-                bool isMultiArray = (cropped[0] == '[');
-                bool isNumber = (cropped[0] >= '0' && cropped[0] <= '9');
-                if (isStringElement)
-                {
-                    int endOfElement = cropped.Substring(1).IndexOf('"');
-                    return cropped.Substring(1, endOfElement);
-                }
-                else if (isMultiElement)
-                {
-                    int numberOfOpenBracket = 0;
-                    int i = 1;
-                    bool done = false;
-                    while (!done)
-                    {
-                        char c = cropped[i];
-                        switch (c)
-                        {
-                            case '{':
-                                numberOfOpenBracket++;
-                                break;
-                            case '}':
-                                numberOfOpenBracket--;
-                                done = numberOfOpenBracket < 0;
-                                break;
-                            default:
-                                break;
-                        }
-                        i++;
-                    }
-                    return cropped.Substring(1, i-2);
-                }
-                else if (isMultiArray)
-                {
-                    int numberOfOpenBracket = 0;
-                    int i = 1;
-                    bool done = false;
-                    while (!done)
-                    {
-                        char c = cropped[i];
-                        switch (c)
-                        {
-                            case '[':
-                                numberOfOpenBracket++;
-                                break;
-                            case ']':
-                                numberOfOpenBracket--;
-                                done = numberOfOpenBracket < 0;
-                                break;
-                            default:
-                                break;
-                        }
-                        i++;
-                    }
-                    return cropped.Substring(1, i - 2);
-                }
-                else if (isNumber)
-                {
-                    int i = 1;
-                    while (i < cropped.Length && cropped[i] >= '0' && cropped[i] <= '9')
-                    {
-                        i++;
-                    }
-                    return cropped.Substring(0, i);
-                }
-                else
-                {
-                    throw new Exception("Json case not handled :p");
-                }
-                
-            }
-            return "";
         }
     }
 }

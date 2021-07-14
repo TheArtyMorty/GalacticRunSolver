@@ -108,18 +108,25 @@ namespace WPF_GalacticRunSolver
 
             m_mapArea = new MapArea(this);
             m_mapArea.Hide();
+
+            _theBot.SetParent(this);
         }
 
-        MapArea m_mapArea;
 
-        MyWPFLogger m_Logger;
+        #region Members
+        MapArea m_mapArea;
+        public ScreenPosition TopLeftCorner { get; set; } = new ScreenPosition(290, 165);
+        public ScreenPosition BottomRightCorner { get; set; } = new ScreenPosition(1105, 984);
 
         public MapViewModel _Map = new MapViewModel(16);
 
         ManagedMap _managedMap;
-
         ManagedSolver _managedSolver;
+        MyWPFLogger m_Logger;
 
+        public Bot.Bot _theBot { get; set; } = new Bot.Bot(null);
+
+        #endregion
         public void LoadMap(Map map)
         {
             ClearSolverDisplay();
@@ -127,29 +134,22 @@ namespace WPF_GalacticRunSolver
             this.Map.DataContext = _Map;
         }
 
-        public void SolveAndSend()
-        {
-            Solve(true);
-        }
-
         public void Solve()
         {
             Solve(false);
         }
 
-        public bool Send()
+        public SolutionViewModel GetFirstSolution()
         {
             if (Solutions.DataContext != null)
             {
                 SolutionsViewModel solutions = Solutions.DataContext as SolutionsViewModel;
                 if (solutions._Solutions.Count != 0)
                 {
-                    Reset_Map(null, null);
-                    Utilities.SendSolutionToFirefox(solutions._Solutions.First(), _Map);
-                    return true;
+                    return solutions._Solutions.First();
                 }
             }
-            return false;
+            return null;
         }
 
         private void Load_Map(object sender, RoutedEventArgs e)
@@ -162,13 +162,37 @@ namespace WPF_GalacticRunSolver
             }
         }
 
+        private void Bot_ConnectToGame(object sender, RoutedEventArgs e)
+        {
+            _theBot.ConnectToGame(GameID.Text, BotName.Text);
+        }
+
+        private void Bot_Solve(object sender, RoutedEventArgs e)
+        {
+            RecognizeTest(sender, e);
+            Solve(true);
+        }
+
+        private void RecognizeTest(object sender, RoutedEventArgs e)
+        {
+            System.Drawing.Size size = new System.Drawing.Size(
+                Math.Abs(BottomRightCorner._Position.X - TopLeftCorner._Position.X),
+                Math.Abs(BottomRightCorner._Position.Y - TopLeftCorner._Position.Y));
+            Bitmap memoryImage = new Bitmap(size.Width, size.Height);
+            Graphics test = Graphics.FromImage(memoryImage);
+            test.CopyFromScreen(TopLeftCorner._Position.X, TopLeftCorner._Position.Y, 0, 0, size);
+
+            LoadMap(Utilities.GetMapFromImage(memoryImage));
+        }
+
+
         private void Load_Map_From_URL(object sender, RoutedEventArgs e)
         {
             string url = UrlTextBox.Text;
             if (Utilities.IsValidMapUrl(url))
             {
                 LoadMap(Utilities.GetMapFromWeburl(url));
-            }  
+            }
             else
             {
                 MessageBox.Show("Could not load map from this url...", "Invalid URL", MessageBoxButton.OK);
@@ -192,33 +216,6 @@ namespace WPF_GalacticRunSolver
                 }
             }
         }
-
-        private void Bot_ConnectToGame(object sender, RoutedEventArgs e)
-        {
-            Bot.Bot theBot = new Bot.Bot(this, BotName.Text, GameID.Text);
-        }
-
-        private void Bot_Solve(object sender, RoutedEventArgs e)
-        {
-            RecognizeTest(sender, e);
-            Solve(true);
-        }
-
-        private void RecognizeTest(object sender, RoutedEventArgs e)
-        {
-            System.Drawing.Size size = new System.Drawing.Size(
-                Math.Abs(BottomRightCorner._Position.X - TopLeftCorner._Position.X),
-                Math.Abs(BottomRightCorner._Position.Y - TopLeftCorner._Position.Y));
-            Bitmap memoryImage = new Bitmap(size.Width, size.Height);
-            Graphics test = Graphics.FromImage(memoryImage);
-            test.CopyFromScreen(TopLeftCorner._Position.X, TopLeftCorner._Position.Y, 0, 0, size);
-
-            LoadMap(Utilities.GetMapFromImage(memoryImage));
-        }
-
-        public ScreenPosition TopLeftCorner { get; set; } = new ScreenPosition(290, 165);
-        public ScreenPosition BottomRightCorner { get; set; } = new ScreenPosition(1105, 984);
-
 
         private void Save_Map(object sender, RoutedEventArgs e)
         {

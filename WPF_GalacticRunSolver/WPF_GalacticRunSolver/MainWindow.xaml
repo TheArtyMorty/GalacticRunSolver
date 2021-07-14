@@ -44,6 +44,9 @@
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Top Left : " Grid.Column="0"></TextBlock>
                         <TextBlock Text="{Binding ElementName=MainWaindow, Path=TopLeftCorner._X}" Grid.Column="1"></TextBlock>
@@ -67,8 +70,12 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Game ID : " Grid.Column="0"></TextBlock>
-                        <TextBox Name="GameID" Text="631195" Grid.Column="1"></TextBox>
+                        <TextBox Name="GameID" Text="142954" Grid.Column="1"></TextBox>
                     </Grid>
+                    <TextBlock 
+                        Text="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Message}"
+                        Foreground="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Color}">
+                    </TextBlock>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
