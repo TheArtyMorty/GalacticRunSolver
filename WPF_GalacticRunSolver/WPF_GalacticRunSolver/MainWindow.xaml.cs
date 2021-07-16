@@ -38,7 +38,8 @@ namespace WPF_GalacticRunSolver
         {
             Application.Current.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Input,
                     new Action(() => {
-                        _log.Text += Environment.NewLine + input; 
+                        _log.Text += Environment.NewLine + input;
+                        _log.ScrollToEnd();
                     }));
         }
 

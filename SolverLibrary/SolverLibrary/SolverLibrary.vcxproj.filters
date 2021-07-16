@@ -32,12 +32,6 @@
     <ClCompile Include="SolverLibrary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SolverLibraryV1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SolverLibraryV2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SolutionContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

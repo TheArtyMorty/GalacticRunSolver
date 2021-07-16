@@ -8,7 +8,8 @@
         xmlns:local="clr-namespace:WPF_GalacticRunSolver"
         xmlns:v="clr-namespace:WPF_GalacticRunSolver.View"
         mc:Ignorable="d"
-        Title="Galactic Run Solver" Height="800" Width="1400">
+        Title="Galactic Run Solver" Height="800" Width="1400"
+        ResizeMode="NoResize">
 
     <Grid>
 
@@ -64,26 +65,43 @@
                     <MenuItem Header="Solve by screenshot !" Click="Bot_Solve"/>
                 </MenuItem>
                 <MenuItem Header="_Bot (V2)" Height="20" Width="70">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Game ID : " Grid.Column="0"></TextBlock>
-                        <TextBox Name="GameID" Text="142954" Grid.Column="1"></TextBox>
-                    </Grid>
-                    <TextBlock 
-                        Text="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Message}"
-                        Foreground="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Color}">
-                    </TextBlock>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Bot Name : " Grid.Column="0"></TextBlock>
-                        <TextBox Name="BotName" Text="Galactic Bot" Grid.Column="1"></TextBox>
-                    </Grid>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Game ID : " Grid.Column="0"></TextBlock>
+                                <TextBox Name="GameID" Text="..." Grid.Column="1"></TextBox>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                    
+                    <MenuItem IsEnabled="False" IsHitTestVisible="False">
+                        <MenuItem.Header>
+                            <Grid>
+                                <TextBlock 
+                                    Text="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Message}"
+                                    Foreground="{Binding ElementName=MainWaindow, Path=_theBot._connectionStatus._Color}">
+                                </TextBlock>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Bot Name : " Grid.Column="0"  IsEnabled="False" IsHitTestVisible="False"></TextBlock>
+                                <TextBox Name="BotName" Text="Galactic Bot" Grid.Column="1" IsEnabled="True" IsHitTestVisible="True"></TextBox>
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+
                     <MenuItem Header="Connect to Game" Click="Bot_ConnectToGame"/>
                 </MenuItem>
             </Menu>

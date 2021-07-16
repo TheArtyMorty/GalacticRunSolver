@@ -176,8 +176,11 @@ namespace WPF_GalacticRunSolver.Bot
             "That was close... almost !",
             "Should I go easier on you?",
             "You did your best... I'm sure.",
-            "I'M NOT A ROBOT !",
+            "I am not a robot.",
             "Never gonna give you up...",
+            "You almose won this one.",
+            "Are you even trying?",
+            "gg no re",
         };
 
         private void Taunt()
@@ -205,12 +208,6 @@ namespace WPF_GalacticRunSolver.Bot
         private void JoinGame(string gameID)
         {
             _gameId = gameID;
-
-            //Add player
-            //HttpContent data = new StringContent("{\"" + _localId.ToString() +"\"}");
-            //var t = Task.Run(() => BotUtils.PatchUri(new Uri(
-            //    String.Format("https://galactic-run.firebaseio.com/games/{0}/players/{1}.json?auth={2}", gameID, _localId.ToString(), _idToken)), data));
-            //t.Wait();
             
             //Add event player joined
             string eventId = FirebasePushIDGenerator.GeneratePushID();
@@ -219,12 +216,15 @@ namespace WPF_GalacticRunSolver.Bot
                 String.Format("https://galactic-run.firebaseio.com/events/{0}/{1}.json?auth={2}", gameID, eventId, _idToken)), eventData));
             t2.Wait();
 
-            //Add player 2 ?
-            string updatedGameData = GetGameInfo().GetGameDataAfterAddingPlayer(_localId.ToString());
-            HttpContent gameData = new StringContent(updatedGameData);
-            var t3 = Task.Run(() => BotUtils.PatchUri(new Uri(
-                String.Format("https://galactic-run.firebaseio.com/games/{0}.json?auth={1}", gameID, _idToken)), gameData));
-            t3.Wait();
+            if (t2.Result != "")
+            {
+                //Add player
+                string updatedGameData = GetGameInfo().GetGameDataAfterAddingPlayer(_localId.ToString());
+                HttpContent gameData = new StringContent(updatedGameData);
+                var t3 = Task.Run(() => BotUtils.PatchUri(new Uri(
+                    String.Format("https://galactic-run.firebaseio.com/games/{0}.json?auth={1}", gameID, _idToken)), gameData));
+                t3.Wait();
+            }
         }
 
         private void SendSolutionWithEvent(SolutionViewModel solution)

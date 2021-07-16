@@ -1,7 +1,6 @@
 # GalacticRunSolver
 
 My attempt at solving galactic run (ricochet robots online) maps.
-- Project is almosted finished (can we ever be?) :)
 
 ## Presentation
 
@@ -9,9 +8,9 @@ Galactic Run is an online adaptation of the boardgame "Ricochet Robots" (Rasende
 It provides cool functionnalities and an online versus mode : https://galactic.run/
 
 We have been playing this cool online game with friends, and have been struggling several times to get the perfect solutions.
-I decided to start this solver as a personal project (better solvers already exists) to improve my coding skills.
+I decided to start this solver as a personal project (other solvers already exists) to improve my coding skills.
 
-So far, the UI looks like this : 
+The final result looks like this : 
 ![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/blob/main/Documentation/ReadMe_Global.png)
 
 You have the board on the left, which is customizable :
@@ -19,17 +18,11 @@ You have the board on the left, which is customizable :
 - you can change a wall type by Left/Right clicking (loop through all wall types : Top Left, Top Right, Bottom Right, Bottom Left, Nothing)
 - you can change the target color by double-clicking 
 
-You also have options to save and load your maps (as txt files) on the top right side.
+You have a lot of menu options, to save/open maps, or even load them from urls.
 
 Then, whenever you want, you can solve the map.
 This will log the process, and when the solutions have been found, they are displayed on the bottom right corner.
 You can play solutions graphically (play button) to see the robots movements.
-
-Update :
-- You can now get the map from an URL (works with puzzles)
-- You can also recognize the map from a screen section (works with versus game mode)
-- Implemented a "bot" that can recognize the map, solve and play the solution for you. 
--- Obviously, this wasn't the point of my project, but it's very fun to see the bot solve a 11 moves map in less than a second.
 
 ## Solver
 
@@ -49,6 +42,24 @@ The 14 moves map now solves in 7 seconds. This could (and will need to) be impro
 
 Update 2: After some investigation, with the A-Star algorythm, the 19 moves map is solved in about 1 minute. 
 This was my initial goal so I'm pretty happy with the result.
+
+## Bot
+
+I have also implemented a bot that can play the online game. 
+This wasn't the original point of the project, but since I was there, I decided to give it a go.
+
+![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/blob/main/Documentation/ReadMe_Bot1.png)
+
+How does the bot works : 
+Once the bot is connected to the game, nothing is needed anymore. It will frequently ask the database for the game state, and react accordingly.
+If the game is started, it will load the map and start solving (this actually happen as soon as the round is starting, so the bot start solving while the players are still in the countdown mode).
+Then, when the solution is found (usually before the countdown even finished), the bot send the solution and win the round. 
+It also "taunt" you with a random taunt sentence. This is the most valuable feature.
+
+![Banner](https://github.com/TheArtyMorty/GalacticRunSolver/blob/main/Documentation/ReadMe_Bot2.png)
+
+Obviously, unless for a bot battle or making fun of my brother, there isn't much use for this bot.
+But it was fun to implement and discover the networking calls (also json).
 
 ## Projects
 
@@ -70,11 +81,4 @@ SolverCLRWrapper :
 
 WPF_GalacticRunSolver :
 - The c# WPF UI for the solver. 
-
-## Backlog
-
--Bot 
--- Improve the map recognition from the screen area (still fails sometimes)
--- Improve the area selection to be more user friendly.
-
-Any proposal is welcomed :).
+- Actually also contains the bot.
