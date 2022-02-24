@@ -13,61 +13,19 @@
         <vm:SolverViewModel />
     </ContentPage.BindingContext>
 
-    <AbsoluteLayout Margin="20">
-        <StackLayout x:Name="ItemsListView"
-                BindableLayout.ItemsSource="{Binding testItems}"
-                Orientation="Vertical"
-                Spacing="{Binding Source={x:Static local:App.CellSpacing}}"
-                AbsoluteLayout.LayoutBounds="5, 5"
-                AbsoluteLayout.LayoutFlags="None">
-            <BindableLayout.ItemTemplate>
-                <DataTemplate>
-                    <StackLayout x:Name="ItemsListView"
-                        BindableLayout.ItemsSource="{Binding}"
-                        Orientation="Horizontal"
-                        Spacing="{Binding Source={x:Static local:App.CellSpacing}}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate>
-                                <controls:CaseControl></controls:CaseControl>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </StackLayout>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
-        </StackLayout>
+    <AbsoluteLayout>
 
-        <controls:TargetControl BindingContext="{Binding testTarget}" 
-                                AbsoluteLayout.LayoutBounds="{Binding _Position, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
-
-        <controls:RobotControl BindingContext="{Binding testRobots[0]}" 
-                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
-        <controls:RobotControl BindingContext="{Binding testRobots[1]}" 
-                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
-        <controls:RobotControl BindingContext="{Binding testRobots[2]}"
-                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
-        <controls:RobotControl BindingContext="{Binding testRobots[3]}"
-                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
-
+        <controls:MapControl BindingContext="{Binding theMap}"></controls:MapControl>
         
         <StackLayout x:Name="SolverArea"
                 Orientation="Vertical"
                 AbsoluteLayout.LayoutBounds="25, 400">
-            <Button Text="Solve !" Command="{Binding _TEST}"/>
+            
+            <Button Text="Solve !" Command="{Binding _SolveMap}"/>
 
             <StackLayout x:Name="SolutionsArea"
                 Orientation="Vertical"
-                BindableLayout.ItemsSource="{Binding testSolutions}"
-                AbsoluteLayout.LayoutBounds="25, 400">
+                BindableLayout.ItemsSource="{Binding testSolutions}">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>
                         <controls:SolutionControl></controls:SolutionControl>

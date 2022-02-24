@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SolverApp.ViewModels"
+             xmlns:local="clr-namespace:SolverApp"
+             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
+             xmlns:localConverters="clr-namespace:SolverApp.Converters"
+             x:Class="SolverApp.Views.Controls.MapControl">
+
+    <ContentView.Content>
+        <AbsoluteLayout Margin="20">
+
+            <StackLayout x:Name="ItemsListView"
+                BindableLayout.ItemsSource="{Binding _Cases}"
+                Orientation="Vertical"
+                Spacing="{Binding Source={x:Static local:App.CellSpacing}}"
+                AbsoluteLayout.LayoutBounds="5, 5"
+                AbsoluteLayout.LayoutFlags="None">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate>
+                        <StackLayout x:Name="ItemsListView"
+                        BindableLayout.ItemsSource="{Binding}"
+                        Orientation="Horizontal"
+                        Spacing="{Binding Source={x:Static local:App.CellSpacing}}">
+                            <BindableLayout.ItemTemplate>
+                                <DataTemplate>
+                                    <controls:CaseControl></controls:CaseControl>
+                                </DataTemplate>
+                            </BindableLayout.ItemTemplate>
+                        </StackLayout>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </StackLayout>
+
+            <controls:TargetControl BindingContext="{Binding _Target}" 
+                                AbsoluteLayout.LayoutBounds="{Binding _Position, 
+                    Mode=OneWay, 
+                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
+
+            <controls:RobotControl BindingContext="{Binding _Robots[0]}" 
+                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
+                    Mode=OneWay, 
+                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
+            <controls:RobotControl BindingContext="{Binding _Robots[1]}" 
+                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
+                    Mode=OneWay, 
+                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
+            <controls:RobotControl BindingContext="{Binding _Robots[2]}"
+                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
+                    Mode=OneWay, 
+                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
+            <controls:RobotControl BindingContext="{Binding _Robots[3]}"
+                               AbsoluteLayout.LayoutBounds="{Binding Path=_Position, 
+                    Mode=OneWay, 
+                    Converter={x:Static localConverters:PositionToLayoutBoundsConverter.Instance}}"/>
+
+        </AbsoluteLayout>
+    </ContentView.Content>
+</ContentView>

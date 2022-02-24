@@ -20,7 +20,7 @@
     <ContentView.GestureRecognizers>
         <TapGestureRecognizer 
              Command="{Binding Path=_IncrementColor}"
-             NumberOfTapsRequired="3" />
+             NumberOfTapsRequired="2" />
         <DragGestureRecognizer CanDrag="True" DragStarting="OnDragStarting"/>
     </ContentView.GestureRecognizers>
 </ContentView>
