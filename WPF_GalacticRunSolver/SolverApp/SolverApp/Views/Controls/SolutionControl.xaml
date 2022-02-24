@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
+             xmlns:vm="clr-namespace:SolverApp.ViewModels"
+             xmlns:local="clr-namespace:SolverApp"
+             xmlns:localConverters="clr-namespace:SolverApp.Converters"
+             x:Class="SolverApp.Views.Controls.SolutionControl">
+
+    <ContentView.Content>
+        <StackLayout x:Name="SolutionViewer"
+                        BindableLayout.ItemsSource="{Binding _Moves}"
+                        Orientation="Horizontal"
+                        Spacing="5">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate>
+                    <controls:MoveControl></controls:MoveControl>
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </StackLayout>
+    </ContentView.Content>
+</ContentView>

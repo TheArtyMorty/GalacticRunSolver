@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SolverApp.ViewModels"
+             xmlns:local="clr-namespace:SolverApp"
+             xmlns:localConverters="clr-namespace:SolverApp.Converters"
+             x:Class="SolverApp.Views.Controls.MoveControl">
+
+    <ContentView.Content>
+        <Image x:Name="Move"
+                 WidthRequest="{Binding Source={x:Static local:App.MoveSize}}"
+                 HeightRequest="{Binding Source={x:Static local:App.MoveSize}}"
+               Source="{Binding 
+                    Path=_Color,
+                    Mode=OneWay,
+                    Converter={x:Static localConverters:MoveToImageConverter.Instance}}"
+               Rotation="{Binding 
+                    Path=_Direction,
+                    Mode=OneWay,
+                    Converter={x:Static localConverters:MoveDirectionToRotationConverter.Instance}}">
+        </Image>
+    </ContentView.Content>
+</ContentView>

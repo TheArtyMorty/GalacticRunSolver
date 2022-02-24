@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:SolverApp.ViewModels"
+             xmlns:local="clr-namespace:SolverApp"
+             xmlns:localConverters="clr-namespace:SolverApp.Converters"
+             x:Class="SolverApp.Views.Controls.CaseControl">
+    
+    <ContentView.Content>
+      <StackLayout>
+            <Image x:Name="Case"    
+                WidthRequest="{Binding Source={x:Static local:App.CellSize}}"
+                HeightRequest="{Binding Source={x:Static local:App.CellSize}}"
+                Source="{Binding 
+                    Path=_WallType,
+                    Mode=OneWay,
+                    Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}">
+            </Image>
+        </StackLayout>
+  </ContentView.Content>
+    <ContentView.GestureRecognizers>
+        <TapGestureRecognizer
+                        Command="{Binding Path=_IncrementWallType}"
+                        NumberOfTapsRequired="1" />
+        <TapGestureRecognizer
+                        Command="{Binding Path=_DecrementWallType}"
+                        NumberOfTapsRequired="2" />
+        <DropGestureRecognizer AllowDrop="True" Drop="OnDrop" DropCommandParameter=""/>
+    </ContentView.GestureRecognizers>
+</ContentView>
