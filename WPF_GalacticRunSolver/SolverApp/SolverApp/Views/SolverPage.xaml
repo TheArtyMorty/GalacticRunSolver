@@ -16,25 +16,26 @@
     <AbsoluteLayout>
 
         <controls:MapControl BindingContext="{Binding theMap}"></controls:MapControl>
-        
-        <StackLayout x:Name="SolverArea"
-                Orientation="Vertical"
-                AbsoluteLayout.LayoutBounds="25, 400">
-            
-            <Button Text="Solve !" Command="{Binding _SolveMap}"/>
 
-            <StackLayout x:Name="SolutionsArea"
+        <ScrollView AbsoluteLayout.LayoutBounds="25, 400, 300, 150">
+            <StackLayout x:Name="SolverArea"
+                Orientation="Vertical">
+                <Button Text="Solve !" Command="{Binding _SolveMap}"/>
+                
+                <StackLayout x:Name="SolutionsArea"
                 Orientation="Vertical"
                 BindableLayout.ItemsSource="{Binding testSolutions}">
-                <BindableLayout.ItemTemplate>
-                    <DataTemplate>
-                        <controls:SolutionControl></controls:SolutionControl>
-                    </DataTemplate>
-                </BindableLayout.ItemTemplate>
-            </StackLayout>
-        </StackLayout>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <controls:SolutionControl></controls:SolutionControl>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
 
-        
+                <Label Text="{Binding _Log}" TextColor="White"></Label>
+            </StackLayout>
+        </ScrollView>
+
     </AbsoluteLayout>
 
 </ContentPage>

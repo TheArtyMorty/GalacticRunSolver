@@ -59,6 +59,37 @@ namespace SolverApp.Models
 
         public int X {get; set; }
         public int Y { get; set; }
+
+        public bool Equals(Position p)
+        {
+            if (p is null)
+            {
+                return false;
+            }
+            else if (Object.ReferenceEquals(this, p))
+            {
+                return true;
+            }
+            else if (this.GetType() != p.GetType())
+            {
+                return false;
+            }
+            else return (X == p.X) && (Y == p.Y);
+        }
+        public static bool operator==(Position lhs, Position rhs)
+        {
+            if (lhs is null)
+            {
+                if (rhs is null)
+                {
+                    return true;
+                }
+                return false;
+            }
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(Position lhs, Position rhs) => !(lhs == rhs);
     }
 
     public class Case
@@ -140,6 +171,61 @@ namespace SolverApp.Models
     public class Map
     {
         #region constructors
+
+        public Tuple<int, int> NextCell(int x, int y, EMoveDirection direction)
+        {
+            switch (direction)
+            {
+                case EMoveDirection.Down:
+                    return new Tuple<int, int> (x,y + 1);
+                case EMoveDirection.Up:
+                    return new Tuple<int, int>(x,y - 1);
+                case EMoveDirection.Left:
+                    return new Tuple<int, int>(x - 1,y);
+                case EMoveDirection.Right:
+                default:
+                    return new Tuple<int, int>(x + 1,y);
+            }
+        }
+
+        public void InitializeHeuristic()
+        {
+            //Initialize heuristic
+            int initValue = _Size * _Size;
+            for (int i = 0; i < _Size; i++)
+            {
+                var line = new List<int>();
+                for (int j = 0; j < _Size; j++)
+                {
+                    line.Add(initValue);
+                }
+                _Heuristic.Add(line);
+            }
+            _Heuristic[_Target._Position.Y][_Target._Position.X] = 0;
+
+            Queue<Tuple<int, int>> previousCells = new Queue<Tuple<int, int>>();
+            previousCells.Enqueue(new Tuple<int, int>(_Target._Position.X, _Target._Position.Y));
+
+            while (previousCells.Count() > 0)
+            {
+                var cell = previousCells.Dequeue();
+                var nextCellHValue = _Heuristic[cell.Item2][cell.Item1] + 1;
+
+                foreach (var move in new List<EMoveDirection>{ EMoveDirection.Up, EMoveDirection.Right, EMoveDirection.Down, EMoveDirection.Left })
+                {
+                    var current = cell;
+                    var next = NextCell(current.Item1, current.Item2, move);
+                    while (IsMoveValid(_Cases[current.Item2][current.Item1], move, true) &&
+                           _Heuristic[next.Item2][next.Item1] >= nextCellHValue)
+                    {
+                        _Heuristic[next.Item2][next.Item1] = nextCellHValue;
+                        previousCells.Enqueue(next);
+                        current = next;
+                        next = NextCell(current.Item1, current.Item2, move);
+                    }
+                }
+            }
+        }
         public Map(int mapSize)
         {
             _Size = mapSize;
@@ -220,6 +306,8 @@ namespace SolverApp.Models
         public ObservableCollection<Robot> _Robots { get; } = new ObservableCollection<Robot> { };
         public Target _Target { get; set; }
         public ObservableCollection<ObservableCollection<Case>> _Cases { get; } = new ObservableCollection<ObservableCollection<Case>> { };
+
+        public List<List<int>> _Heuristic { get; set; } = new List<List<int>> { };
         #endregion  
 
         public void Export(string filepath)
@@ -251,54 +339,74 @@ namespace SolverApp.Models
             System.IO.File.WriteAllLines(filepath, lines);
         }
 
-        private bool IsEmpty(Case c)
+        public bool IsEmpty(Case c)
         {
             return _Robots.Where(r => r._Position.X == c._Position.X && r._Position.Y == c._Position.Y).Count() == 0;
         }
 
-        public bool CanRobotMove(Robot robot, EMoveDirection move)
+        public bool IsMoveValid(Case A, EMoveDirection move, bool ignoreRobots = false)
         {
-            Case A = _Cases[robot._Position.Y][robot._Position.X];
             switch (move)
             {
                 case EMoveDirection.Up:
                     {
                         if (A._WallType == EWallType.TopLeft || A._WallType == EWallType.TopRight) return false;
                         if (A._Position.Y == 0) return false;
-                        Case B = _Cases[robot._Position.Y - 1][robot._Position.X];
+                        Case B = _Cases[A._Position.Y - 1][A._Position.X];
                         if (B._WallType == EWallType.BottomLeft || B._WallType == EWallType.BottomRight) return false;
-                        if (!IsEmpty(B)) return false;
+                        if (!ignoreRobots && !IsEmpty(B)) return false;
                         break;
                     }
                 case EMoveDirection.Down:
                     {
                         if (A._WallType == EWallType.BottomRight || A._WallType == EWallType.BottomLeft) return false;
-                        if (A._Position.Y == _Size-1) return false;
-                        Case B = _Cases[robot._Position.Y + 1][robot._Position.X];
+                        if (A._Position.Y == _Size - 1) return false;
+                        Case B = _Cases[A._Position.Y + 1][A._Position.X];
                         if (B._WallType == EWallType.TopLeft || B._WallType == EWallType.TopRight) return false;
-                        if (!IsEmpty(B)) return false;
+                        if (!ignoreRobots && !IsEmpty(B)) return false;
                         break;
                     }
                 case EMoveDirection.Left:
                     {
                         if (A._WallType == EWallType.TopLeft || A._WallType == EWallType.BottomLeft) return false;
                         if (A._Position.X == 0) return false;
-                        Case B = _Cases[robot._Position.Y][robot._Position.X - 1];
+                        Case B = _Cases[A._Position.Y][A._Position.X - 1];
                         if (B._WallType == EWallType.BottomRight || B._WallType == EWallType.TopRight) return false;
-                        if (!IsEmpty(B)) return false;
+                        if (!ignoreRobots && !IsEmpty(B)) return false;
                         break;
                     }
                 case EMoveDirection.Right:
                     {
                         if (A._WallType == EWallType.TopRight || A._WallType == EWallType.BottomRight) return false;
-                        if (A._Position.X == _Size-1) return false;
-                        Case B = _Cases[robot._Position.Y][robot._Position.X + 1];
+                        if (A._Position.X == _Size - 1) return false;
+                        Case B = _Cases[A._Position.Y][A._Position.X + 1];
                         if (B._WallType == EWallType.BottomLeft || B._WallType == EWallType.TopLeft) return false;
-                        if (!IsEmpty(B)) return false;
+                        if (!ignoreRobots && !IsEmpty(B)) return false;
                         break;
                     }
             }
             return true;
+        }
+
+        //public bool CanRobotMove(Robot robot, EMoveDirection move)
+        //{
+        //    Case A = _Cases[robot._Position.Y][robot._Position.X];
+        //    return IsMoveValid(A, move);
+        //}
+
+        public int GetHeuristicOfPosition(Position position)
+        {
+            return _Heuristic[position.Y][position.X];
+        }
+
+        public List<Robot> GetRobots()
+        {
+            var result = new List<Robot>();
+            foreach(var r in _Robots)
+            {
+                result.Add(new Robot(r));
+            }
+            return result;
         }
     }
 }

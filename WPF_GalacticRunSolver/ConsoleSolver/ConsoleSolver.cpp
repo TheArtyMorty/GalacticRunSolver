@@ -65,13 +65,13 @@ int main()
 {
     auto path = "C://Users//lucm//source//repos//GalacticRunSolver//Maps//";
     auto maps = std::vector<std::string>{
-        /*"TestMap.txt",
-        "TestMap2.txt",
+        "TestMap.txt",
+        /*"TestMap2.txt",
         "TestMap2_6moves_redOnly.txt",
         "TestMap4_6moves3solutions.txt",
         "TestMap5_10moves4solutions.txt",
-        "TestMap6_11moves.txt",*/
-        "HardMap1_14moves.txt",
+        "TestMap6_11moves.txt",
+        "HardMap1_14moves.txt",*/
     };
 
     auto myLogger = MyConsoleLogger{};
