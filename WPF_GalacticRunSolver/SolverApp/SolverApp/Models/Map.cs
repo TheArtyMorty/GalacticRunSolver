@@ -172,25 +172,52 @@ namespace SolverApp.Models
     {
         #region constructors
 
+        static EMoveDirection[] moveDirections = { EMoveDirection.Up, EMoveDirection.Down, EMoveDirection.Left, EMoveDirection.Right };
+
         public Tuple<int, int> NextCell(int x, int y, EMoveDirection direction)
         {
             switch (direction)
             {
                 case EMoveDirection.Down:
-                    return new Tuple<int, int> (x,y + 1);
+                    return new Tuple<int, int>(x, y + 1);
                 case EMoveDirection.Up:
-                    return new Tuple<int, int>(x,y - 1);
+                    return new Tuple<int, int>(x, y - 1);
                 case EMoveDirection.Left:
-                    return new Tuple<int, int>(x - 1,y);
+                    return new Tuple<int, int>(x - 1, y);
                 case EMoveDirection.Right:
                 default:
-                    return new Tuple<int, int>(x + 1,y);
+                    return new Tuple<int, int>(x + 1, y);
             }
         }
 
         public void InitializeHeuristic()
         {
+            //Initialize accessibles
+            _AccessiblesCells.Clear();
+            for (int i = 0; i < _Size; i++)
+            {
+                var line = new List<Dictionary<EMoveDirection, Queue<Case>>>();
+                for (int j = 0; j < _Size; j++)
+                {
+                    var movesPerDirection = new Dictionary<EMoveDirection, Queue<Case>>();
+                    foreach (EMoveDirection dir in moveDirections)
+                    {
+                        var moves = new Queue<Case>();
+                        var current = new Tuple<int, int>(j, i);
+                        while (IsMoveValid(_Cases[current.Item2][current.Item1], dir, true))
+                        {
+                            var next = NextCell(current.Item1, current.Item2, dir);
+                            moves.Enqueue(_Cases[next.Item2][next.Item1]);
+                            current = next;
+                        }
+                        movesPerDirection.Add(dir, moves);
+                    }
+                    line.Add(movesPerDirection);
+                }
+                _AccessiblesCells.Add(line);
+            }
             //Initialize heuristic
+            _Heuristic.Clear();
             int initValue = _Size * _Size;
             for (int i = 0; i < _Size; i++)
             {
@@ -211,7 +238,7 @@ namespace SolverApp.Models
                 var cell = previousCells.Dequeue();
                 var nextCellHValue = _Heuristic[cell.Item2][cell.Item1] + 1;
 
-                foreach (var move in new List<EMoveDirection>{ EMoveDirection.Up, EMoveDirection.Right, EMoveDirection.Down, EMoveDirection.Left })
+                foreach (var move in moveDirections)
                 {
                     var current = cell;
                     var next = NextCell(current.Item1, current.Item2, move);
@@ -231,8 +258,8 @@ namespace SolverApp.Models
             _Size = mapSize;
             _Robots.Clear();
             _Robots.Add(new Robot(EColor.Red, new Position(0, 0)));
-            _Robots.Add(new Robot(EColor.Green, new Position(0, mapSize-1)));
-            _Robots.Add(new Robot(EColor.Blue, new Position(mapSize-1, mapSize-1)));
+            _Robots.Add(new Robot(EColor.Green, new Position(0, mapSize - 1)));
+            _Robots.Add(new Robot(EColor.Blue, new Position(mapSize - 1, mapSize - 1)));
             _Robots.Add(new Robot(EColor.Yellow, new Position(mapSize - 1, 0)));
             _Target = new Target();
             for (int i = 0; i < mapSize; i++)
@@ -249,15 +276,15 @@ namespace SolverApp.Models
         {
             _Size = map._Size;
             _Robots = new ObservableCollection<Robot>();
-            foreach(Robot r in map._Robots)
+            foreach (Robot r in map._Robots)
             {
                 _Robots.Add(new Robot(r));
             }
-            _Cases = new ObservableCollection<ObservableCollection<Case>> ();
-            foreach(ObservableCollection<Case> row in map._Cases)
+            _Cases = new ObservableCollection<ObservableCollection<Case>>();
+            foreach (ObservableCollection<Case> row in map._Cases)
             {
                 var newRow = new ObservableCollection<Case>();
-                foreach(Case c in row)
+                foreach (Case c in row)
                 {
                     newRow.Add(new Case(c));
                 }
@@ -308,6 +335,8 @@ namespace SolverApp.Models
         public ObservableCollection<ObservableCollection<Case>> _Cases { get; } = new ObservableCollection<ObservableCollection<Case>> { };
 
         public List<List<int>> _Heuristic { get; set; } = new List<List<int>> { };
+
+        public List<List<Dictionary<EMoveDirection, Queue<Case>>>> _AccessiblesCells { get; set; } = new List<List<Dictionary<EMoveDirection, Queue<Case>>>>{};
         #endregion  
 
         public void Export(string filepath)

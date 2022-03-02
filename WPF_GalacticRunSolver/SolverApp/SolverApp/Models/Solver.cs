@@ -18,25 +18,50 @@ public abstract class ILogger
 		public List<Robot> Robots;
 		public List<Move> Moves;
 
-		bool IsEmpty(Position p)
-		{
-			return !Robots.Any(r => r._Position == p);
-		}
-
 		Case GetEndPosition(Map map, Robot robot, EMoveDirection direction)
 		{
-			var current = new Position(robot._Position);
-			var next = map.NextCell(current.X, current.Y, direction);
-			while (map.IsMoveValid(map._Cases[current.Y][current.X], direction, true) && IsEmpty(new Position(next.Item1, next.Item2)))
+			var pos = robot._Position;
+			var accessiblesCells = map._AccessiblesCells[pos.Y][pos.X][direction];
+			if (accessiblesCells.Count > 0)
             {
-				current.X = next.Item1;
-				current.Y = next.Item2;
-				next = map.NextCell(current.X, current.Y, direction);
-			}
-			return map._Cases[current.Y][current.X];
-		}
+				var lastCell = accessiblesCells.Last();
+				var firstCell = accessiblesCells.First();
+				var minX = Math.Min(firstCell._Position.X, lastCell._Position.X);
+				var maxX = Math.Max(firstCell._Position.X, lastCell._Position.X);
+				var minY = Math.Min(firstCell._Position.Y, lastCell._Position.Y);
+				var maxY = Math.Max(firstCell._Position.Y, lastCell._Position.Y);
+				var robotsInTrajectory = Robots.Where(r =>
+				r._Position.X <= maxX &&
+				r._Position.X >= minX &&
+				r._Position.Y <= maxY &&
+				r._Position.Y >= minY);
+				if (robotsInTrajectory.Count() == 0)
+                {
+					return map._Cases[lastCell._Position.Y][lastCell._Position.X];
+                }
+				else
+                {
+                    switch (direction)
+                    {
+                        case EMoveDirection.Up:
+							return map._Cases[robotsInTrajectory.OrderByDescending(r => r._Position.Y).First()._Position.Y + 1][pos.X];
+                        case EMoveDirection.Right:
+							return map._Cases[pos.Y][robotsInTrajectory.OrderByDescending(r => r._Position.X).Last()._Position.X - 1];
+						case EMoveDirection.Down:
+							return map._Cases[robotsInTrajectory.OrderByDescending(r => r._Position.Y).Last()._Position.Y - 1][pos.X];
+						case EMoveDirection.Left:
+                        default:
+							return map._Cases[pos.Y][robotsInTrajectory.OrderByDescending(r => r._Position.X).First()._Position.X + 1];
+					}
+                }
+            }
+            else
+            {
+				return map._Cases[pos.Y][pos.X];
+            }
+        }
 
-		private void Initialize(List<Move> moves, Map map)
+        private void Initialize(List<Move> moves, Map map)
         {
 			foreach (var move in moves)
 			{
@@ -86,7 +111,7 @@ public abstract class ILogger
 		{
 			return map.GetHeuristicOfPosition(Robots.Find(r => r._Color == map._Target._Color)._Position) + Moves.Count;
 		}
-	};
+    };
 
 
 public static class Solver
