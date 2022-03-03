@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using Xamarin.Forms;
 
@@ -37,13 +38,27 @@ namespace SolverApp.ViewModels
 
         public SolverViewModel()
         {
-            theMap = new MapViewModel(16);
-
-            _SolveMap = new Command(SolveMap);
-
-            testSolutions = new ObservableCollection<SolutionViewModel>();
-
             logger = new AppLogger(BackwardLogValue, () => _Log = "");
+            theMap = new MapViewModel(16);
+            _SolveMap = new Command(SolveMap);
+        }
+
+        public MapViewModel _map;
+        public MapViewModel theMap { 
+            get 
+            { 
+                return _map; 
+            } 
+            set
+            {
+                if (_map == value) return;
+                else
+                {
+                    _map = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(theMap)));
+                    Clear();
+                }
+            }
         }
 
         void BackwardLogValue(string value)
@@ -53,9 +68,7 @@ namespace SolverApp.ViewModels
             _Log += currentContent;
         }
 
-        public ObservableCollection<SolutionViewModel> testSolutions { get; set; }
-
-        public MapViewModel theMap { get; set; }
+        public ObservableCollection<SolutionViewModel> _Solutions { get; set; }
 
         private AppLogger logger;
 
@@ -76,10 +89,17 @@ namespace SolverApp.ViewModels
             }
         }
 
+        private void Clear()
+        {
+            logger.Clear();
+            _Solutions = new ObservableCollection<SolutionViewModel>();
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
+        }
+
         public Command _SolveMap { get; }
         public void SolveMap()
         {
-            testSolutions = new ObservableCollection<SolutionViewModel>();
+            Clear();
             BackgroundWorker worker = new BackgroundWorker();
             worker.WorkerReportsProgress = false;
             worker.DoWork += worker_DoWork;
@@ -99,8 +119,8 @@ namespace SolverApp.ViewModels
             ObservableCollection<SolutionViewModel> result = new ObservableCollection<SolutionViewModel>
                 (workerResult.Select(solution => new SolutionViewModel(solution)));
 
-            testSolutions = result;
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(testSolutions)));
+            _Solutions = result;
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
         }
     }
 }

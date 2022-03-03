@@ -18,47 +18,74 @@ public abstract class ILogger
 		public List<Robot> Robots;
 		public List<Move> Moves;
 
-		Case GetEndPosition(Map map, Robot robot, EMoveDirection direction)
+		Position GetEndPosition(Map map, Robot robot, EMoveDirection direction)
 		{
 			var pos = robot._Position;
-			var accessiblesCells = map._AccessiblesCells[pos.Y][pos.X][direction];
-			if (accessiblesCells.Count > 0)
+			var max = map._AccessiblesCells[pos.Y][pos.X][direction];
+            switch (direction)
             {
-				var lastCell = accessiblesCells.Last();
-				var firstCell = accessiblesCells.First();
-				var minX = Math.Min(firstCell._Position.X, lastCell._Position.X);
-				var maxX = Math.Max(firstCell._Position.X, lastCell._Position.X);
-				var minY = Math.Min(firstCell._Position.Y, lastCell._Position.Y);
-				var maxY = Math.Max(firstCell._Position.Y, lastCell._Position.Y);
-				var robotsInTrajectory = Robots.Where(r =>
-				r._Position.X <= maxX &&
-				r._Position.X >= minX &&
-				r._Position.Y <= maxY &&
-				r._Position.Y >= minY);
-				if (robotsInTrajectory.Count() == 0)
+                case EMoveDirection.Up:
                 {
-					return map._Cases[lastCell._Position.Y][lastCell._Position.X];
-                }
-				else
-                {
-                    switch (direction)
+					if (max == pos.Y) return map._Cases[pos.Y][pos.X]._Position;
+					else
                     {
-                        case EMoveDirection.Up:
-							return map._Cases[robotsInTrajectory.OrderByDescending(r => r._Position.Y).First()._Position.Y + 1][pos.X];
-                        case EMoveDirection.Right:
-							return map._Cases[pos.Y][robotsInTrajectory.OrderByDescending(r => r._Position.X).Last()._Position.X - 1];
-						case EMoveDirection.Down:
-							return map._Cases[robotsInTrajectory.OrderByDescending(r => r._Position.Y).Last()._Position.Y - 1][pos.X];
-						case EMoveDirection.Left:
-                        default:
-							return map._Cases[pos.Y][robotsInTrajectory.OrderByDescending(r => r._Position.X).First()._Position.X + 1];
+						foreach (var r in Robots)
+                        {
+							if (r._Color == robot._Color) continue; //do not consider moving robot
+							if (r._Position.X != pos.X) continue; //not on same column
+							if (r._Position.Y >= pos.Y) continue; //below moving robot
+							max = Math.Max(r._Position.Y+1, max);
+                        }
+						return map._Cases[max][pos.X]._Position;
+                    }
+				}
+                case EMoveDirection.Right:
+				{
+					if (max == pos.X) return map._Cases[pos.Y][pos.X]._Position;
+					else
+					{
+						foreach (var r in Robots)
+						{
+							if (r._Color == robot._Color) continue; //do not consider moving robot
+							if (r._Position.Y != pos.Y) continue; //not on same line
+							if (r._Position.X <= pos.X) continue; //left of moving robot
+							max = Math.Min(r._Position.X-1, max);
+						}
+						return map._Cases[pos.Y][max]._Position;
 					}
-                }
-            }
-            else
-            {
-				return map._Cases[pos.Y][pos.X];
-            }
+				}
+				case EMoveDirection.Down:
+				{
+					if (max == pos.Y) return map._Cases[pos.Y][pos.X]._Position;
+					else
+					{
+						foreach (var r in Robots)
+						{
+							if (r._Color == robot._Color) continue; //do not consider moving robot
+							if (r._Position.X != pos.X) continue; //not on same column
+							if (r._Position.Y <= pos.Y) continue; //above moving robot
+							max = Math.Min(r._Position.Y-1, max);
+						}
+						return map._Cases[max][pos.X]._Position;
+					}
+				}
+				case EMoveDirection.Left:
+                default:
+				{
+					if (max == pos.X) return map._Cases[pos.Y][pos.X]._Position;
+					else
+					{
+						foreach (var r in Robots)
+						{
+							if (r._Color == robot._Color) continue; //do not consider moving robot
+							if (r._Position.Y != pos.Y) continue; //not on same line
+							if (r._Position.X >= pos.X) continue; //right of moving robot
+							max = Math.Max(r._Position.X+1, max);
+						}
+						return map._Cases[pos.Y][max]._Position;
+					}
+				}
+			}
         }
 
         private void Initialize(List<Move> moves, Map map)
@@ -91,8 +118,7 @@ public abstract class ILogger
 		public void SimulateState(Move move, Map map)
 		{
 			var robot = Robots.Find(r => r._Color == move.color);
-			var endCell = GetEndPosition(map, robot, move.direction);
-			robot._Position = endCell._Position;
+			robot._Position = GetEndPosition(map, robot, move.direction);
 		}
 
 		public long ToKey(int mapSize)

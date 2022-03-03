@@ -24,7 +24,7 @@
                 
                 <StackLayout x:Name="SolutionsArea"
                 Orientation="Vertical"
-                BindableLayout.ItemsSource="{Binding testSolutions}">
+                BindableLayout.ItemsSource="{Binding _Solutions}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
                             <controls:SolutionControl></controls:SolutionControl>

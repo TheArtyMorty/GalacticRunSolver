@@ -45,9 +45,9 @@ namespace SolverApp.ViewModels
         public void Reset()
         {
             _Map = new Map(_InitialMap);
-            //PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
-            //PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
         }
 
         public async void PlaySolution(Solution solution)

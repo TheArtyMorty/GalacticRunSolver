@@ -196,21 +196,32 @@ namespace SolverApp.Models
             _AccessiblesCells.Clear();
             for (int i = 0; i < _Size; i++)
             {
-                var line = new List<Dictionary<EMoveDirection, Queue<Case>>>();
+                var line = new List<Dictionary<EMoveDirection, int>>();
                 for (int j = 0; j < _Size; j++)
                 {
-                    var movesPerDirection = new Dictionary<EMoveDirection, Queue<Case>>();
+                    var movesPerDirection = new Dictionary<EMoveDirection, int>();
                     foreach (EMoveDirection dir in moveDirections)
                     {
-                        var moves = new Queue<Case>();
+                        var max = 0;
                         var current = new Tuple<int, int>(j, i);
                         while (IsMoveValid(_Cases[current.Item2][current.Item1], dir, true))
                         {
                             var next = NextCell(current.Item1, current.Item2, dir);
-                            moves.Enqueue(_Cases[next.Item2][next.Item1]);
                             current = next;
                         }
-                        movesPerDirection.Add(dir, moves);
+                        switch (dir)
+                        {
+                            case EMoveDirection.Up:
+                            case EMoveDirection.Down:
+                                max = current.Item2;
+                                break;
+                            case EMoveDirection.Right:
+                            case EMoveDirection.Left:
+                            default:
+                                max = current.Item1;
+                                break;
+                        }
+                        movesPerDirection.Add(dir, max);
                     }
                     line.Add(movesPerDirection);
                 }
@@ -336,7 +347,7 @@ namespace SolverApp.Models
 
         public List<List<int>> _Heuristic { get; set; } = new List<List<int>> { };
 
-        public List<List<Dictionary<EMoveDirection, Queue<Case>>>> _AccessiblesCells { get; set; } = new List<List<Dictionary<EMoveDirection, Queue<Case>>>>{};
+        public List<List<Dictionary<EMoveDirection, int>>> _AccessiblesCells { get; set; } = new List<List<Dictionary<EMoveDirection, int>>>{};
         #endregion  
 
         public void Export(string filepath)
