@@ -21,9 +21,12 @@ namespace SolverApp
         public async void SaveMap(object sender, EventArgs e)
         {
             string result = await DisplayPromptAsync("Save file as...", "fileName");
-            var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
-            string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".txt");
-            solverVM.theMap.SaveMap(_fileName);
+            if (result != null && result.Length > 0)
+            {
+                var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
+                string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".txt");
+                solverVM.theMap.SaveMap(_fileName);
+            }
             this.FlyoutIsPresented = false;
         }
 

@@ -12,8 +12,8 @@ namespace SolverApp.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var position = (Position)value;
-            int x = position.X * (App.CellSize + App.CellSpacing) + App.TopLeftSpace;
-            int y = position.Y * (App.CellSize + App.CellSpacing) + App.TopLeftSpace;
+            int x = position.X * (App.CellSize + App.CellSpacing);
+            int y = position.Y * (App.CellSize + App.CellSpacing);
             var layoutBounds = new Rectangle(x, y, App.CellSize, App.CellSize);
             return layoutBounds;
         }

@@ -13,11 +13,17 @@
         <vm:SolverViewModel />
     </ContentPage.BindingContext>
 
-    <AbsoluteLayout>
+    <RelativeLayout Margin="{Binding Source={x:Static local:App.Margin}}">
+        <ScrollView Orientation="Both"
+            RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Constant=0}"
+            RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.6, Constant=0}">
+            <controls:MapControl BindingContext="{Binding theMap}"></controls:MapControl>
+        </ScrollView>
 
-        <controls:MapControl BindingContext="{Binding theMap}"></controls:MapControl>
-
-        <ScrollView AbsoluteLayout.LayoutBounds="25, 400, 300, 150">
+        <ScrollView Orientation="Both"
+                    RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.6, Constant=10}"
+                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Constant=0}"
+                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.4, Constant=0}">
             <StackLayout x:Name="SolverArea"
                 Orientation="Vertical">
                 <Button Text="Solve !" Command="{Binding _SolveMap}"/>
@@ -36,6 +42,6 @@
             </StackLayout>
         </ScrollView>
 
-    </AbsoluteLayout>
+    </RelativeLayout>
 
 </ContentPage>

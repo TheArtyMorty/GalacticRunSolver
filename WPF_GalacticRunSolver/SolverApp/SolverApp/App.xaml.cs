@@ -4,9 +4,9 @@ namespace SolverApp
 {
     public partial class App : Application
     {
-        public const int CellSize = 21;
+        public const int CellSize = 35;
         public const int CellSpacing = 2;
-        public const int TopLeftSpace = 5;
+        public const int Margin = 10;
         public const int MoveSize = 25;
         public App()
         {

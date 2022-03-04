@@ -8,13 +8,11 @@
              x:Class="SolverApp.Views.Controls.MapControl">
 
     <ContentView.Content>
-        <AbsoluteLayout Margin="20">
-
+        <AbsoluteLayout>
             <StackLayout x:Name="ItemsListView"
                 BindableLayout.ItemsSource="{Binding _Cases}"
                 Orientation="Vertical"
                 Spacing="{Binding Source={x:Static local:App.CellSpacing}}"
-                AbsoluteLayout.LayoutBounds="5, 5"
                 AbsoluteLayout.LayoutFlags="None">
                 <BindableLayout.ItemTemplate>
                     <DataTemplate>

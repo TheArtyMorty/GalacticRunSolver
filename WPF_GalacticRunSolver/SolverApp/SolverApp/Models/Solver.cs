@@ -115,6 +115,20 @@ public abstract class ILogger
 			Initialize(moves, map);
 		}
 
+		public State(State other)
+		{
+			Robots = new List<Robot>();
+			foreach (var robot in other.Robots)
+			{
+				Robots.Add(new Robot(robot));
+			}
+			Moves = new List<Move>();
+			foreach (var move in other.Moves)
+			{
+				Moves.Add(new Move(move));
+			}
+		}
+
 		public void SimulateState(Move move, Map map)
 		{
 			var robot = Robots.Find(r => r._Color == move.color);
@@ -156,7 +170,7 @@ public static class Solver
 			{
 				foreach (var direction in moveDirections)
 				{
-					var newState = new State(state.Moves, map);
+					var newState = new State(state);
 					var move = new Move(robot._Color, direction);
 					newState.Moves.Add(move);
 					newState.SimulateState(move, map);
