@@ -18,6 +18,7 @@ namespace WPF_GalacticRunSolver.Converters
             {EColor.Blue, "Images/Blue.png" },
             {EColor.Green, "Images/Green.png" },
             {EColor.Yellow, "Images/Yellow.png" },
+            {EColor.Gray, "Images/Gray.png" },
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

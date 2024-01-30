@@ -32,8 +32,11 @@ namespace CsConsoleSolver
                     Console.Write("Blue ");
                     break;
                 case EColor.Yellow:
-                default:
                     Console.Write("Yellow ");
+                    break;
+                case EColor.Gray:
+                default:
+                    Console.Write("Gray ");
                     break;
             }
             switch (m.direction)
@@ -66,10 +69,12 @@ namespace CsConsoleSolver
 
         static void Main(string[] args)
         {
-            var map = new Map("C:\\Users\\lucm\\source\\repos\\GalacticRunSolver\\Maps\\HardMap1_14moves.txt");
+            var map = new Map("C:\\Github\\GalacticRunSolver\\Maps\\TestMap_5Robots_13Moves.txt");
             var logger = new ConsoleLogger();
 
-            var solutions = Solver.Solve(map,logger);
+            var fakeBW = new System.ComponentModel.BackgroundWorker();
+
+            var solutions = Solver.Solve(map,logger, ref fakeBW);
             foreach (var s in solutions)
             {
                 PrintSolution(s);

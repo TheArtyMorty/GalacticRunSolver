@@ -39,8 +39,15 @@ namespace SolverApp.ViewModels
         public SolverViewModel()
         {
             logger = new AppLogger(BackwardLogValue, () => _Log = "");
-            theMap = new MapViewModel(16);
+            theMap = new MapViewModel(8);
             _SolveMap = new Command(SolveMap);
+
+            //background Worker
+            _worker = new BackgroundWorker();
+            _worker.WorkerSupportsCancellation = true;
+            _worker.WorkerReportsProgress = false;
+            _worker.DoWork += worker_DoWork;
+            _worker.RunWorkerCompleted += worker_RunWorkerCompleted;
         }
 
         public MapViewModel _map;
@@ -97,19 +104,60 @@ namespace SolverApp.ViewModels
         }
 
         public Command _SolveMap { get; }
+
+        BackgroundWorker _worker;
         public void SolveMap()
         {
-            Clear();
-            BackgroundWorker worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = false;
-            worker.DoWork += worker_DoWork;
-            worker.RunWorkerCompleted += worker_RunWorkerCompleted;
-            worker.RunWorkerAsync();
+            if (_worker.IsBusy)
+            {
+                _worker.CancelAsync();
+            }
+            else
+            {
+                Clear();
+                _worker.RunWorkerAsync();
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
+            }
+        }
+
+        public string _SolveButtonText { get { return _worker.IsBusy ? "Stop" : "Solve"; } }
+        public bool _SolveButtonEnabled { get { return !simulationRunning; } }
+
+        public void PlaySolution(Solution solution, Action onFinished)
+        {
+            if (!simulationRunning)
+            {
+                simulationRunning = true;
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
+                foreach (var svm in _Solutions)
+                {
+                    svm.Refresh();
+                }
+                theMap._InitialMap = theMap._Map;
+                _toDo = onFinished;
+                theMap.PlaySolution(solution, OnFinished);
+            }
+        }
+        public void StopSolution()
+        {
+            theMap.StopPlaying();
+        }
+        public bool simulationRunning = false;
+        private Action _toDo;
+        private void OnFinished()
+        {
+            simulationRunning = false;
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
+            foreach (var svm in _Solutions)
+            {
+                svm.Refresh();
+            }
+            _toDo();
         }
 
         void worker_DoWork(object sender, DoWorkEventArgs e)
         {
-            var solutions = Solver.Solve(theMap._Map, logger);
+            var solutions = Solver.Solve(theMap._Map, logger, ref _worker);
             e.Result = solutions;
         }
 
@@ -117,10 +165,11 @@ namespace SolverApp.ViewModels
         {
             var workerResult = (List<Solution>)e.Result;
             ObservableCollection<SolutionViewModel> result = new ObservableCollection<SolutionViewModel>
-                (workerResult.Select(solution => new SolutionViewModel(solution)));
+                (workerResult.Select(solution => new SolutionViewModel(solution, this)));
 
             _Solutions = result;
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
         }
     }
 }

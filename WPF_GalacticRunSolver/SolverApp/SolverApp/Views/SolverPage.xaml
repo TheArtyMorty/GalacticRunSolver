@@ -2,46 +2,42 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SolverApp.Views.SolverPage"
-             xmlns:vm="clr-namespace:SolverApp.ViewModels"
              xmlns:controls="clr-namespace:SolverApp.Views.Controls"
-             xmlns:localConverters="clr-namespace:SolverApp.Converters"
              xmlns:local="clr-namespace:SolverApp"
-             Title="{Binding Title}"
-             BackgroundImageSource="Background.png">
+             BackgroundImageSource="Background.png"
+             NavigationPage.HasNavigationBar="False">
     
-    <ContentPage.BindingContext>
-        <vm:SolverViewModel />
-    </ContentPage.BindingContext>
-
     <RelativeLayout Margin="{Binding Source={x:Static local:App.Margin}}">
         <ScrollView Orientation="Both"
             RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Constant=0}"
             RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.6, Constant=0}">
-            <controls:MapControl BindingContext="{Binding theMap}"></controls:MapControl>
+            <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
         </ScrollView>
 
-        <ScrollView Orientation="Both"
-                    RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.6, Constant=10}"
-                    RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Constant=0}"
-                    RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.4, Constant=0}">
-            <StackLayout x:Name="SolverArea"
-                Orientation="Vertical">
-                <Button Text="Solve !" Command="{Binding _SolveMap}"/>
-                
+        <StackLayout x:Name="SolverArea"
+                     Orientation="Vertical" 
+                     RelativeLayout.YConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.6, Constant=10}"
+                     RelativeLayout.WidthConstraint="{ConstraintExpression Type=RelativeToParent, Property=Width, Constant=0}"
+                     RelativeLayout.HeightConstraint="{ConstraintExpression Type=RelativeToParent, Property=Height, Factor=0.4, Constant=0}">
+            
+            <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}"/>
+
+            <ScrollView Orientation="Vertical">
+                <StackLayout Orientation="Vertical">
                 <StackLayout x:Name="SolutionsArea"
-                Orientation="Vertical"
-                BindableLayout.ItemsSource="{Binding _Solutions}">
+                            Orientation="Vertical"
+                            BindableLayout.ItemsSource="{Binding _Solutions}">
                     <BindableLayout.ItemTemplate>
                         <DataTemplate>
-                            <controls:SolutionControl></controls:SolutionControl>
+                            <controls:SolutionControl/>
                         </DataTemplate>
                     </BindableLayout.ItemTemplate>
                 </StackLayout>
 
-                <Label Text="{Binding _Log}" TextColor="White"></Label>
-            </StackLayout>
-        </ScrollView>
-
+                <Label Text="{Binding _Log}" TextColor="White" Margin="10"/>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
     </RelativeLayout>
 
 </ContentPage>

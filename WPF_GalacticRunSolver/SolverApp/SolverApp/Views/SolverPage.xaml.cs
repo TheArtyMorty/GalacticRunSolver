@@ -14,5 +14,10 @@ namespace SolverApp.Views
             InitializeComponent();           
         }
 
+        public void CreateNewMap()
+        {
+            //TheMapControl.CreateNewMap();
+        }
+
     }
 }

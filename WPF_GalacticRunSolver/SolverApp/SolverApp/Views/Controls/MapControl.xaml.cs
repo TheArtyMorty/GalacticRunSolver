@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolverApp.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,11 @@ namespace SolverApp.Views.Controls
         public MapControl()
         {
             InitializeComponent();
+        }
+
+        public void CreateNewMap(MapViewModel theMap)
+        {
+ 
         }
     }
 }

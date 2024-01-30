@@ -7,17 +7,15 @@
              x:Class="SolverApp.Views.Controls.CaseControl">
     
     <ContentView.Content>
-      <StackLayout>
-            <Image x:Name="Case"    
-                WidthRequest="{Binding Source={x:Static local:App.CellSize}}"
-                HeightRequest="{Binding Source={x:Static local:App.CellSize}}"
-                Source="{Binding 
-                    Path=_WallType,
-                    Mode=OneWay,
-                    Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}">
-            </Image>
-        </StackLayout>
-  </ContentView.Content>
+        <Image x:Name="Case"    
+    WidthRequest="{Binding Source={x:Static local:App.CellSize}}"
+    HeightRequest="{Binding Source={x:Static local:App.CellSize}}"
+    Source="{Binding 
+        Path=_WallType,
+        Mode=OneWay,
+        Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}">
+        </Image>
+    </ContentView.Content>
     <ContentView.GestureRecognizers>
         <TapGestureRecognizer
                         Command="{Binding Path=_IncrementWallType}"

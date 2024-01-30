@@ -18,6 +18,7 @@ namespace WPF_GalacticRunSolver.Converters
             {CLI.ERobotColor.Blue, "Images/ArrowBlue.png" },
             {CLI.ERobotColor.Green, "Images/ArrowGreen.png" },
             {CLI.ERobotColor.Yellow, "Images/ArrowYellow.png" },
+            {CLI.ERobotColor.Gray, "Images/ArrowGray.png" },
         };
 
         private Rotation GetImageRotationFromDirection(CLI.EMoveDirection direction)

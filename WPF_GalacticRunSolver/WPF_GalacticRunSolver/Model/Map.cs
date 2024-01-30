@@ -23,7 +23,8 @@ namespace WPF_GalacticRunSolver.Model
         Red = 0,
         Green,
         Blue,
-        Yellow
+        Yellow,
+        Gray
     }
 
     public static class Utility

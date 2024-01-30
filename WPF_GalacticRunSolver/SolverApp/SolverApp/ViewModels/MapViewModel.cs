@@ -20,7 +20,7 @@ namespace SolverApp.ViewModels
             }
             else
             {
-                _Map = new Map(16);
+                _Map = new Map(8);
                 _InitialMap = new Map(_Map);
             }
         }
@@ -31,9 +31,9 @@ namespace SolverApp.ViewModels
             _InitialMap = map;
         }
 
-        public MapViewModel(int mapSize)
+        public MapViewModel(int mapSize, int robotsCount = 4)
         {
-            _Map = new Map(mapSize);
+            _Map = new Map(mapSize, robotsCount);
             _InitialMap = new Map(_Map);
         }
 
@@ -50,15 +50,28 @@ namespace SolverApp.ViewModels
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
         }
 
-        public async void PlaySolution(Solution solution)
+        public async void PlaySolution(Solution solution, Action onFinished)
         {
             Reset();
             await Task.Delay(300);
             foreach (Move move in solution.moves)
             {
-                //await PlayMove(move);
-                await Task.Delay(200);
+                if (!Cancel)
+                {
+                    await PlayMove(move);
+                    await Task.Delay(200);
+                }
             }
+            Reset();
+            Cancel = false;
+            onFinished();
+        }
+
+        private bool Cancel = false;
+
+        public void StopPlaying()
+        {
+            Cancel = true;
         }
 
         private Position GetMoveIncrement(Move move)
@@ -77,18 +90,18 @@ namespace SolverApp.ViewModels
             }
         }
 
-        //public async Task PlayMove(Move move, int delay = 25)
-        //{
-        //    var robot = _Robots.Where(r => r._Color == (EColor)move.color).First()._Robot;
-        //    var increment = GetMoveIncrement(move);
+        public async Task PlayMove(Move move, int delay = 25)
+        {
+            var robot = _Robots.Where(r => r._Color == move.color).First()._Robot;
+            var increment = GetMoveIncrement(move);
 
-        //    while (_Map.CanRobotMove(robot, move.direction))
-        //    {
-        //        await Task.Delay(delay);
-        //        robot.Move(increment);
-        //        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
-        //    }
-        //}
+            while (_Map.CanRobotMove(robot, move.direction) && !Cancel)
+            {
+                await Task.Delay(delay);
+                robot.Move(increment);
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+            }
+        }
 
         public TargetViewModel _Target
         {

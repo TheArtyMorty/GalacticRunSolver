@@ -12,7 +12,8 @@ namespace CLI
         Red = 0,
         Green,
         Blue,
-        Yellow
+        Yellow,
+        Gray
     };
 
     public enum class EMoveDirection

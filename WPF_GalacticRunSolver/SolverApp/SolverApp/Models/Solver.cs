@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 
@@ -185,7 +186,7 @@ public static class Solver
 			return states;
 		}
 
-		static public List<Solution> Solve(Map inputMap, ILogger logger)
+		static public List<Solution> Solve(Map inputMap, ILogger logger, ref BackgroundWorker worker)
         {
 			//init
 			var map = new Map(inputMap);
@@ -221,6 +222,13 @@ public static class Solver
 
 			while (!CurrentStates.Empty())
 			{
+				//Check Cancellation Token
+				if (worker != null && worker.CancellationPending)
+				{
+                    logger.Log("Calculation interrupted...");
+                    return new List<Solution> { };
+				}
+
 				var state = new State(CurrentStates.PopFirst(), map);
 				var stateH = state.Heuristic(map);
 

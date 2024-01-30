@@ -20,7 +20,8 @@ namespace SolverApp.Models
         Red = 0,
         Green,
         Blue,
-        Yellow
+        Yellow,
+        Gray,
     }
 
     public enum EMoveDirection
@@ -133,6 +134,11 @@ namespace SolverApp.Models
         public Target()
         {
             _Position = new Position(0,5);
+            _Color = EColor.Green;
+        }
+        public Target(int x, int y)
+        {
+            _Position = new Position(x, y);
             _Color = EColor.Green;
         }
         public Target(Target t)
@@ -264,15 +270,15 @@ namespace SolverApp.Models
                 }
             }
         }
-        public Map(int mapSize)
+        public Map(int mapSize, int robotsCount = 4)
         {
             _Size = mapSize;
             _Robots.Clear();
-            _Robots.Add(new Robot(EColor.Red, new Position(0, 0)));
-            _Robots.Add(new Robot(EColor.Green, new Position(0, mapSize - 1)));
-            _Robots.Add(new Robot(EColor.Blue, new Position(mapSize - 1, mapSize - 1)));
-            _Robots.Add(new Robot(EColor.Yellow, new Position(mapSize - 1, 0)));
-            _Target = new Target();
+            for (int i = 0; i < robotsCount; i++)
+            {
+                _Robots.Add(new Robot((EColor)i, new Position(0, i)));
+            }
+            _Target = new Target(mapSize / 2, mapSize / 2);
             for (int i = 0; i < mapSize; i++)
             {
                 ObservableCollection<Case> Column = new ObservableCollection<Case> { };
@@ -428,11 +434,11 @@ namespace SolverApp.Models
             return true;
         }
 
-        //public bool CanRobotMove(Robot robot, EMoveDirection move)
-        //{
-        //    Case A = _Cases[robot._Position.Y][robot._Position.X];
-        //    return IsMoveValid(A, move);
-        //}
+        public bool CanRobotMove(Robot robot, EMoveDirection move)
+        {
+            Case A = _Cases[robot._Position.Y][robot._Position.X];
+            return IsMoveValid(A, move);
+        }
 
         public int GetHeuristicOfPosition(Position position)
         {

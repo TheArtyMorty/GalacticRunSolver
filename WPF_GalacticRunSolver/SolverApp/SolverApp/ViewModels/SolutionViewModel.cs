@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using SolverApp.Models;
+using Xamarin.Essentials;
 
 namespace SolverApp.ViewModels
 {
@@ -60,14 +61,50 @@ namespace SolverApp.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
-        public SolutionViewModel()
+        public ICommand _PlaySolution { get; }
+        public void PlaySolution()
         {
+            _IsPlaying = true;
+            Refresh();
+            _solverVM.PlaySolution(_solution, OnFinished);
+        }
+        private void OnFinished()
+        {
+            _IsPlaying = false;
+            Refresh();
+        }
+        public ICommand _StopSolution { get; }
+        public void StopSolution()
+        {
+            _IsPlaying = false;
+            Refresh();
+            _solverVM.StopSolution();
         }
 
-        public SolutionViewModel(Solution solution)
+        public void Refresh()
         {
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsPlaying)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsNotPlaying)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Enabled)));
+        }
+
+        SolverViewModel _solverVM;
+
+        public bool _IsPlaying { get; set; } = false;
+        public bool _IsNotPlaying { get { return !_IsPlaying; } }
+
+        public bool _Enabled { get { return _IsPlaying || !_solverVM.simulationRunning; } }
+
+        private Solution _solution;
+
+        public SolutionViewModel(Solution solution, SolverViewModel solverVM)
+        {
+            _solution = solution;
             _Moves = new ObservableCollection<MoveViewModel>
                 (solution.moves.Select(move => new MoveViewModel(move)));
+            _solverVM = solverVM;
+            _PlaySolution = new RelayCommand(PlaySolution);
+            _StopSolution = new RelayCommand(StopSolution);
         }
 
         public ObservableCollection<MoveViewModel> moves = new ObservableCollection<MoveViewModel>();

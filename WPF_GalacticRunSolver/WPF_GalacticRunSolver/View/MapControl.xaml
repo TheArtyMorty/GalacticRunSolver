@@ -27,5 +27,6 @@
         <v:RobotControl DataContext="{Binding Path=_Robots[1]}"></v:RobotControl>
         <v:RobotControl DataContext="{Binding Path=_Robots[2]}"></v:RobotControl>
         <v:RobotControl DataContext="{Binding Path=_Robots[3]}"></v:RobotControl>
+        <v:RobotControl DataContext="{Binding Path=_Robots[4]}"></v:RobotControl>
     </Grid>
 </UserControl>

@@ -16,6 +16,7 @@ namespace SolverApp.Converters
             {EColor.Blue, "ArrowBlue.png" },
             {EColor.Green, "ArrowGreen.png" },
             {EColor.Yellow, "ArrowYellow.png" },
+            {EColor.Gray, "ArrowGray.png" },
         };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

@@ -15,46 +15,35 @@ namespace SolverApp
         public AppShell()
         {
             InitializeComponent();
+            var solverVM = new SolverViewModel();
+            SolverPage.BindingContext = solverVM;
+            NewMapPage.BindingContext = new NewMapViewModel(solverVM);
         }
 
+        //public async void SaveMap(object sender, EventArgs e)
+        //{
+        //    string result = await DisplayPromptAsync("Save file as...", "fileName");
+        //    if (result != null && result.Length > 0)
+        //    {
+        //        var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
+        //        string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".txt");
+        //        solverVM.theMap.SaveMap(_fileName);
+        //    }
+        //    this.FlyoutIsPresented = false;
+        //}
 
-        public async void SaveMap(object sender, EventArgs e)
-        {
-            string result = await DisplayPromptAsync("Save file as...", "fileName");
-            if (result != null && result.Length > 0)
-            {
-                var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
-                string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".txt");
-                solverVM.theMap.SaveMap(_fileName);
-            }
-            this.FlyoutIsPresented = false;
-        }
-
-        public async void OpenFromFile(object sender, EventArgs e)
-        {
-            var files = System.IO.Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "*.txt");
-            var fileNames = files.Select(path => System.IO.Path.GetFileName(path)).ToArray();
-            string result = await DisplayActionSheet("Open file...", "cancel", "exit", fileNames);
-            string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result);
-            if (File.Exists(_fileName))
-            {
-                var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
-                solverVM.theMap = new MapViewModel(_fileName);
-            }
-            this.FlyoutIsPresented = false;
-        }
-
-        public void Reset(object sender, EventArgs e)
-        {
-            var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
-            solverVM.theMap = new MapViewModel(16);
-            this.FlyoutIsPresented = false;
-        }
-
-        public void OpenFromURL(object sender, EventArgs e)
-        {
-            //TODO
-            this.FlyoutIsPresented = false;
-        }
+        //public async void OpenFromFile(object sender, EventArgs e)
+        //{
+        //    var files = System.IO.Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "*.txt");
+        //    var fileNames = files.Select(path => System.IO.Path.GetFileName(path)).ToArray();
+        //    string result = await DisplayActionSheet("Open file...", "cancel", "exit", fileNames);
+        //    string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result);
+        //    if (File.Exists(_fileName))
+        //    {
+        //        var solverVM = this.CurrentPage.BindingContext as SolverViewModel;
+        //        solverVM.theMap = new MapViewModel(_fileName);
+        //    }
+        //    this.FlyoutIsPresented = false;
+        //}
     }
 }

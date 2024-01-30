@@ -8,15 +8,34 @@
              x:Class="SolverApp.Views.Controls.SolutionControl">
 
     <ContentView.Content>
-        <StackLayout x:Name="SolutionViewer"
-                        BindableLayout.ItemsSource="{Binding _Moves}"
-                        Orientation="Horizontal"
-                        Spacing="5">
-            <BindableLayout.ItemTemplate>
-                <DataTemplate>
-                    <controls:MoveControl></controls:MoveControl>
-                </DataTemplate>
-            </BindableLayout.ItemTemplate>
-        </StackLayout>
+        
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="75" />
+                    <ColumnDefinition Width="10*" />
+                </Grid.ColumnDefinitions>
+                <Button Text="Play" Grid.Column="0" 
+             Command="{Binding Path=_PlaySolution}" 
+            IsVisible="{Binding Path=_IsNotPlaying}" 
+            IsEnabled="{Binding Path=_Enabled}" />
+                <Button Text="Stop" Grid.Column="0" 
+            Command="{Binding Path=_StopSolution}" 
+            IsVisible="{Binding Path=_IsPlaying}" 
+            IsEnabled="{Binding Path=_Enabled}" />
+            <ScrollView Orientation="Horizontal" WidthRequest="350" Grid.Column="1">
+                <StackLayout x:Name="SolutionViewer"
+                BindableLayout.ItemsSource="{Binding _Moves}"
+                Orientation="Horizontal"
+                Spacing="5"
+                >
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <controls:MoveControl></controls:MoveControl>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+            </ScrollView>
+        </Grid>
+
     </ContentView.Content>
 </ContentView>
