@@ -11,6 +11,9 @@ namespace SolverApp.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
+        static int previousID = 0;
+        private int ID = 0;
+
         public MapViewModel(String path)
         {
             if (System.IO.File.Exists(path))
@@ -23,18 +26,37 @@ namespace SolverApp.ViewModels
                 _Map = new Map(8);
                 _InitialMap = new Map(_Map);
             }
+            ID = previousID++;
+            InitObjects();
         }
 
         public MapViewModel(Map map)
         {
             _Map = map;
-            _InitialMap = map;
+            _InitialMap = new Map(_Map);
+            ID = previousID++;
+            InitObjects();
         }
 
         public MapViewModel(int mapSize, int robotsCount = 4)
         {
             _Map = new Map(mapSize, robotsCount);
             _InitialMap = new Map(_Map);
+            ID = previousID++;
+            InitObjects();
+        }
+
+        private void InitObjects()
+        {
+            _Cases = new ObservableCollection<ObservableCollection<CaseViewModel>>
+                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
+                        row.Select(lacase => new CaseViewModel(lacase)))));
+            _Robots = new ObservableCollection<RobotViewModel>
+                    (_Map._Robots.Select(robot => new RobotViewModel(robot)));
+            _Target = new TargetViewModel(_Map._Target);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
         }
 
         public void SaveMap(string path)
@@ -44,7 +66,20 @@ namespace SolverApp.ViewModels
 
         public void Reset()
         {
-            _Map = new Map(_InitialMap);
+            for (int i = 0; i < _InitialMap._Size; i++)
+            {
+                for (int j = 0; j < _InitialMap._Size; j++)
+                {
+                    _Map._Cases[i][j]._WallType = _InitialMap._Cases[i][j]._WallType;
+                }
+            }
+            for (int i = 0; i < _InitialMap._Robots.Count; i++)
+            {
+                _Robots[i]._Position = _InitialMap._Robots[i]._Position;
+            }
+            _Target._Position = _InitialMap._Target._Position;
+            _Target._Color = _InitialMap._Target._Color;
+            
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
@@ -92,47 +127,22 @@ namespace SolverApp.ViewModels
 
         public async Task PlayMove(Move move, int delay = 25)
         {
-            var robot = _Robots.Where(r => r._Color == move.color).First()._Robot;
+            var robot = _Robots.Where(r => r._Color == move.color).First();
             var increment = GetMoveIncrement(move);
 
-            while (_Map.CanRobotMove(robot, move.direction) && !Cancel)
+            while (_Map.CanRobotMove(robot._Robot, move.direction) && !Cancel)
             {
                 await Task.Delay(delay);
-                robot.Move(increment);
+                robot.IncrementMove(increment);
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
             }
         }
 
-        public TargetViewModel _Target
-        {
-            get
-            {
-                return new TargetViewModel(_Map._Target);
-            }
-        }
+        public TargetViewModel _Target {  get; set; }
 
-        public ObservableCollection<RobotViewModel> _Robots
-        {
-            get
-            {
-                ObservableCollection<RobotViewModel> result =
-                    new ObservableCollection<RobotViewModel>
-                    (_Map._Robots.Select(robot => new RobotViewModel(robot)));
-                return result;
-            }
-        }
+        public ObservableCollection<RobotViewModel> _Robots { get; set; }
 
-        public ObservableCollection<ObservableCollection<CaseViewModel>> _Cases
-        {
-            get
-            {
-                ObservableCollection<ObservableCollection<CaseViewModel>> result =
-                    new ObservableCollection<ObservableCollection<CaseViewModel>>
-                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
-                        row.Select(lacase => new CaseViewModel(lacase)))));
-                return result;
-            }
-        }
+        public ObservableCollection<ObservableCollection<CaseViewModel>> _Cases { get; set; }
 
         public Map _Map {get; set;}
         public Map _InitialMap {get; set;}

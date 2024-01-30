@@ -6,11 +6,11 @@
     <TabBar>
         <Tab Title="Solver"
             Icon="IconOptions.png">
-            <ShellContent x:Name="SolverPage" Route="SolverPage" ContentTemplate="{DataTemplate local:SolverPage}"/>
+            <ShellContent x:Name="ShellSolverPage" Route="SolverPage"/>
         </Tab>
         <Tab Title="New Map"
             Icon="IconPlus.png">
-            <ShellContent x:Name="NewMapPage" Route="NewMapPage" ContentTemplate="{DataTemplate local:NewMapPage}" />
+            <ShellContent x:Name="ShellNewMapPage" Route="NewMapPage"/>
         </Tab>
     </TabBar>
 </Shell>

@@ -15,9 +15,14 @@ namespace SolverApp
         public AppShell()
         {
             InitializeComponent();
-            var solverVM = new SolverViewModel();
-            SolverPage.BindingContext = solverVM;
-            NewMapPage.BindingContext = new NewMapViewModel(solverVM);
+            SolverPage solverPage = new SolverPage();
+            var solverVM = new SolverViewModel(solverPage);
+            solverPage.BindingContext = solverVM;
+            ShellSolverPage.Content = solverPage;
+
+            NewMapPage newMapPage = new NewMapPage();
+            newMapPage.BindingContext = new NewMapViewModel(solverVM);
+            ShellNewMapPage.Content = newMapPage;
         }
 
         //public async void SaveMap(object sender, EventArgs e)

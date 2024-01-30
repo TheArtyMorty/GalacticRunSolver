@@ -1,4 +1,5 @@
 ﻿using SolverApp.Models;
+using SolverApp.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,10 +37,11 @@ namespace SolverApp.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
-        public SolverViewModel()
+        public SolverViewModel(SolverPage solverPage)
         {
+            _solverPage = solverPage;
             logger = new AppLogger(BackwardLogValue, () => _Log = "");
-            theMap = new MapViewModel(8);
+            CreateNewMap(new MapViewModel(8));
             _SolveMap = new Command(SolveMap);
 
             //background Worker
@@ -66,6 +68,13 @@ namespace SolverApp.ViewModels
                     Clear();
                 }
             }
+        }
+
+        private SolverPage _solverPage;
+        public void CreateNewMap(MapViewModel map)
+        {
+            theMap = map;
+            _solverPage.GenerateMap(theMap);
         }
 
         void BackwardLogValue(string value)
@@ -116,6 +125,7 @@ namespace SolverApp.ViewModels
             {
                 Clear();
                 _worker.RunWorkerAsync();
+                theMap._InitialMap = new Map(theMap._Map);
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
             }
         }
@@ -133,7 +143,6 @@ namespace SolverApp.ViewModels
                 {
                     svm.Refresh();
                 }
-                theMap._InitialMap = theMap._Map;
                 _toDo = onFinished;
                 theMap.PlaySolution(solution, OnFinished);
             }

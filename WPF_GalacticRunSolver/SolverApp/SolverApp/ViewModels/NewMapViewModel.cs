@@ -15,7 +15,7 @@ namespace SolverApp.ViewModels
 
         internal void CreateNewMap(int size, int robotCount)
         {
-            _SolverVM.theMap = new MapViewModel(size, robotCount);
+            _SolverVM.CreateNewMap(new MapViewModel(size, robotCount));
         }
     }
 }

@@ -74,7 +74,25 @@ namespace SolverApp.ViewModels
                 {
                     _Target._Position = value;
                     PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
                 }
+            }
+        }
+
+        public int _X
+        {
+            get
+            {
+                return _Target._Position.X;
+            }
+        }
+
+        public int _Y
+        {
+            get
+            {
+                return _Target._Position.Y;
             }
         }
 

@@ -7,15 +7,11 @@
              x:Class="SolverApp.Views.Controls.TargetControl">
 
     <ContentView.Content>
-        <StackLayout>
-            <Image 
-                    WidthRequest="{Binding Source={x:Static local:App.CellSize}}"
-                    HeightRequest="{Binding Source={x:Static local:App.CellSize}}"
-                    Source="{Binding Path=_Color, 
-                    Mode=OneWay, 
-                    Converter={x:Static localConverters:TargetColorToImageConverter.Instance}}">
-            </Image>
-        </StackLayout>
+        <Image 
+        Source="{Binding Path=_Color, 
+        Mode=OneWay, 
+        Converter={x:Static localConverters:TargetColorToImageConverter.Instance}}">
+        </Image>
     </ContentView.Content>
     <ContentView.GestureRecognizers>
         <TapGestureRecognizer 

@@ -11,12 +11,12 @@ namespace SolverApp.Views
     {
         public SolverPage()
         {
-            InitializeComponent();           
+            InitializeComponent();
         }
 
-        public void CreateNewMap()
+        public void GenerateMap(MapViewModel map)
         {
-            //TheMapControl.CreateNewMap();
+            TheMapControl.GenerateMap(map);
         }
 
     }

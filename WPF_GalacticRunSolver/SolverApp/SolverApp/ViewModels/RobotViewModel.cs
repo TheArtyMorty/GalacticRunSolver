@@ -10,9 +10,13 @@ namespace SolverApp.ViewModels
     {
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
 
+        static int idIncrement = 0;
+
+        public int ID = 0;
         public RobotViewModel(Robot robot)
         {
             _Robot = robot;
+            ID = idIncrement++;
         }
 
         public int CompareTo(object obj)
@@ -81,6 +85,11 @@ namespace SolverApp.ViewModels
         public void MoveTo(Position pos)
         {
             _Position = pos;
+        }
+
+        public void IncrementMove(Position increment)
+        {
+            _Position = new Position(_Position.X + increment.X, _Position.Y + increment.Y);
         }
     }
 }
