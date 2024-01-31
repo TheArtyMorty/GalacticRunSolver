@@ -25,7 +25,10 @@
         </Grid>
         
         <ScrollView x:Name="TheMapView" Orientation="Both" Grid.Row="1">
-            <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
+            <Grid Margin="5">
+                <Image Source="{Binding _backgroundPhoto}" BackgroundColor="#20FFFFFF" Opacity="0.4"/>
+                <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
+            </Grid>
         </ScrollView>
 
         <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical">

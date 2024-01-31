@@ -189,5 +189,12 @@ namespace SolverApp.ViewModels
             _ZoomSize = (int)(mapControlWidth + v * mapControlWidth);
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
         }
+        
+        public string _backgroundPhoto {  get; set; }
+        internal void SetBackgroundImage(string photoPath)
+        {
+            _backgroundPhoto = photoPath;
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
+        }
     }
 }

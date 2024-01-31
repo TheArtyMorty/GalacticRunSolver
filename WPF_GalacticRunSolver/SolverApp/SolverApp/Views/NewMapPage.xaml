@@ -5,42 +5,85 @@
              BackgroundImageSource="Background.png"
              NavigationPage.HasNavigationBar="False">
     <ContentPage.Content>
-        <StackLayout VerticalOptions="Center">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <Label Text="Map size : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Center"/>
-                <Picker x:Name="SizePicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="0" SelectedIndexChanged="OnMapSizeChanged">
-                    <Picker.Items>
-                        <x:String>Small</x:String>
-                        <x:String>Normal</x:String>
-                        <x:String>Custom</x:String>
-                    </Picker.Items>
-                </Picker>
-                <Entry x:Name="CustomSize" Text="12" Keyboard="Numeric" Grid.Column="2" BackgroundColor="White"></Entry>
-            </Grid>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <Label Text="Robot Number : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Center"/>
-                <Picker x:Name="RobotCountPicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="2">
-                    <Picker.Items>
-                        <x:String>2</x:String>
-                        <x:String>3</x:String>
-                        <x:String>4</x:String>
-                        <x:String>5</x:String>
-                    </Picker.Items>
-                </Picker>
-            </Grid>
+        <Grid Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5*"/>
+                <RowDefinition Height="4*"/>
+            </Grid.RowDefinitions>
 
-            <Button Text="Create Map" Clicked="CreateMap" Margin="5" CornerRadius="5"/>
-        </StackLayout>
+            <Frame Grid.Row="0" BackgroundColor="#15FFFFFF" CornerRadius="25">
+                <Grid x:Name="Helper">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="4*"/>
+                        <RowDefinition Height="10*"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Text="Creation Helper" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
+                    <StackLayout Grid.Row="1" Margin="5" Orientation="Horizontal" HorizontalOptions="Center">
+                        <Button Text="Take" Grid.Column="1" Clicked="TakePicture" Margin="5"/>
+                        <Button Text="Choose" Grid.Column="3" Clicked="ChoosePicture" Margin="5"/>
+                        <Button Text="Reset" Grid.Column="5" Clicked="Reset" Margin="5"/>
+                    </StackLayout>
+                    <Grid Grid.Row="2" Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image  Grid.Column="1" x:Name="TheBoardPreview" Aspect="AspectFit" BackgroundColor="#20FFFFFF"/>
+                    </Grid>
+                    <Label Grid.Row="3" Text="Preview" TextColor="White" HorizontalOptions="Center" VerticalOptions="Start"/>
+                </Grid>
+            </Frame>
+
+            <Frame Grid.Row="1" BackgroundColor="#15FFFFFF" CornerRadius="25">
+                <Grid x:Name="NewMapSection">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Text="Create New Map" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
+                    <Grid Grid.Row="1" Margin="5,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Map size : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Left"/>
+                        <Picker x:Name="SizePicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="0" SelectedIndexChanged="OnMapSizeChanged">
+                            <Picker.Items>
+                                <x:String>Small</x:String>
+                                <x:String>Normal</x:String>
+                                <x:String>Custom</x:String>
+                            </Picker.Items>
+                        </Picker>
+                        <Entry x:Name="CustomSize" Text="12" Keyboard="Numeric" Grid.Column="2" BackgroundColor="White" Margin="5"></Entry>
+                    </Grid>
+                    <Grid Grid.Row="2" Margin="5,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Text="Robot Number : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Left"/>
+                        <Picker x:Name="RobotCountPicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="2">
+                            <Picker.Items>
+                                <x:String>2</x:String>
+                                <x:String>3</x:String>
+                                <x:String>4</x:String>
+                                <x:String>5</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </Grid>
+                    <Button Text="Create Map" Clicked="CreateMap" Margin="5" CornerRadius="5" Grid.Row="3"/>
+                </Grid>
+            </Frame>
+
+
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

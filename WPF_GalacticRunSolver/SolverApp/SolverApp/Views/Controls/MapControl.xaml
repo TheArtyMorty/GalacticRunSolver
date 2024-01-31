@@ -5,8 +5,11 @@
              x:Class="SolverApp.Views.Controls.MapControl">
 
     <ContentView.Content>
-        <Grid x:Name="MapGrid" ColumnSpacing="2" RowSpacing="2" 
-               WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}"
-               HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}"/>
+        <Frame BackgroundColor="Transparent" BorderColor="White" Padding="0" Margin="5"
+            WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}"
+            HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}">
+            <Grid x:Name="MapGrid" ColumnSpacing="2" RowSpacing="2" />
+        </Frame>
+        
     </ContentView.Content>
 </ContentView>

@@ -17,5 +17,10 @@ namespace SolverApp.ViewModels
         {
             _SolverVM.CreateNewMap(new MapViewModel(size, robotCount));
         }
+
+        internal void SetBackGroundImage(string photoPath)
+        {
+            _SolverVM.SetBackgroundImage(photoPath);
+        }
     }
 }
