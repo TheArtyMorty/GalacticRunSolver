@@ -5,21 +5,30 @@
              xmlns:controls="clr-namespace:SolverApp.Views.Controls"
              xmlns:local="clr-namespace:SolverApp"
              BackgroundImageSource="Background.png"
+             x:Name="TheSolverPage"
              NavigationPage.HasNavigationBar="False">
     
     <Grid Margin="{Binding Source={x:Static local:App.Margin}}">
         <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="12*"/>
             <RowDefinition Height="6*"/>
-            <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
 
-        <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}" Grid.Row="0"/>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="7*"/>
+            </Grid.ColumnDefinitions>
+            <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
+            <Slider WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
+        </Grid>
         
-        <!--<ScrollView Orientation="Both" Grid.Row="0">
+        <ScrollView x:Name="TheMapView" Orientation="Both" Grid.Row="1">
             <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
-        </ScrollView>-->
+        </ScrollView>
 
-        <StackLayout x:Name="SolverArea" Grid.Row="1" Orientation="Vertical">
+        <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical">
             <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}"/>
 
             <ScrollView Orientation="Vertical">

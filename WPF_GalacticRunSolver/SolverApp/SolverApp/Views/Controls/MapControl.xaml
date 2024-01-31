@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:local="clr-namespace:SolverApp"
-             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
-             xmlns:localConverters="clr-namespace:SolverApp.Converters"
+             xmlns:vm="clr-namespace:SolverApp.ViewModels"
              x:Class="SolverApp.Views.Controls.MapControl">
 
     <ContentView.Content>
-        <Grid x:Name="MapGrid" ColumnSpacing="2" RowSpacing="2"/>
+        <Grid x:Name="MapGrid" ColumnSpacing="2" RowSpacing="2" 
+               WidthRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}"
+               HeightRequest="{Binding Source={RelativeSource AncestorType={x:Type vm:SolverViewModel}}, Path=_ZoomSize}"/>
     </ContentView.Content>
 </ContentView>

@@ -41,7 +41,7 @@ namespace SolverApp.ViewModels
         {
             _solverPage = solverPage;
             logger = new AppLogger(BackwardLogValue, () => _Log = "");
-            CreateNewMap(new MapViewModel(8));
+            CreateNewMap(new MapViewModel(16,4));
             _SolveMap = new Command(SolveMap);
 
             //background Worker
@@ -179,6 +179,15 @@ namespace SolverApp.ViewModels
             _Solutions = result;
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
+        }
+
+
+        private static int defaultSize = 400;
+        public int _ZoomSize { get; set; } = defaultSize;
+        internal void ZoomInOrOut(double v, double mapControlWidth)
+        {
+            _ZoomSize = (int)(mapControlWidth + v * mapControlWidth);
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
         }
     }
 }

@@ -7,10 +7,12 @@
              x:Class="SolverApp.Views.Controls.TargetControl">
 
     <ContentView.Content>
-        <Image 
-        Source="{Binding Path=_Color, 
-        Mode=OneWay, 
-        Converter={x:Static localConverters:TargetColorToImageConverter.Instance}}">
+        <Image Aspect="AspectFill"
+               MinimumHeightRequest="10"
+               MinimumWidthRequest="10"
+               Source="{Binding Path=_Color, 
+                Mode=OneWay, 
+                Converter={x:Static localConverters:TargetColorToImageConverter.Instance}}">
         </Image>
     </ContentView.Content>
     <ContentView.GestureRecognizers>

@@ -1,15 +1,14 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:vm="clr-namespace:SolverApp.ViewModels"
-             xmlns:local="clr-namespace:SolverApp"
              xmlns:localConverters="clr-namespace:SolverApp.Converters"
              x:Class="SolverApp.Views.Controls.CaseControl">
     
     <ContentView.Content>
         <Image x:Name="Case" 
-               WidthRequest="50"
-               HeightRequest="50"
+               Aspect="AspectFill"
+               MinimumHeightRequest="10"
+               MinimumWidthRequest="10"
                Source="{Binding Path=_WallType, Mode=OneWay, Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}"/>
     </ContentView.Content>
     <ContentView.GestureRecognizers>

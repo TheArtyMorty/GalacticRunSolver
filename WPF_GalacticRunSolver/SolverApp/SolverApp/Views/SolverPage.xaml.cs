@@ -19,5 +19,13 @@ namespace SolverApp.Views
             TheMapControl.GenerateMap(map);
         }
 
+        public void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var SolverPageVM = BindingContext as SolverViewModel;
+            if (SolverPageVM != null)
+            {
+                SolverPageVM.ZoomInOrOut(e.NewValue/1000, Math.Max(TheMapView.Width, TheMapView.Height));
+            }
+        }
     }
 }
