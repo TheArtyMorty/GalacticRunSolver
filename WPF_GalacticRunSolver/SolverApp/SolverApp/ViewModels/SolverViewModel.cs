@@ -182,11 +182,11 @@ namespace SolverApp.ViewModels
         }
 
 
-        private static int defaultSize = 400;
+        private static int defaultSize = 325;
         public int _ZoomSize { get; set; } = defaultSize;
         internal void ZoomInOrOut(double v, double mapControlWidth)
         {
-            _ZoomSize = (int)(mapControlWidth + v * mapControlWidth);
+            _ZoomSize = (int)(-50 + mapControlWidth + v * mapControlWidth);
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
         }
         

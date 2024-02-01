@@ -8,36 +8,23 @@
         <Grid Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="5*"/>
-                <RowDefinition Height="4*"/>
+                <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
 
-            <Frame Grid.Row="0" BackgroundColor="#15FFFFFF" CornerRadius="25">
-                <Grid x:Name="Helper">
+            <Frame Grid.Row="0" BackgroundColor="#15FFFFFF" CornerRadius="25" VerticalOptions="Center" HeightRequest="200">
+                <Grid x:Name="ExportImportSection">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="2*"/>
-                        <RowDefinition Height="4*"/>
-                        <RowDefinition Height="10*"/>
                         <RowDefinition Height="1*"/>
+                        <RowDefinition Height="2*"/>
+                        <RowDefinition Height="2*"/>
                     </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Text="Creation Helper" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
-                    <StackLayout Grid.Row="1" Margin="5" Orientation="Horizontal" HorizontalOptions="Center">
-                        <Button Text="Take" Grid.Column="1" Clicked="TakePicture" Margin="5"/>
-                        <Button Text="Choose" Grid.Column="3" Clicked="ChoosePicture" Margin="5"/>
-                        <Button Text="Reset" Grid.Column="5" Clicked="Reset" Margin="5"/>
-                    </StackLayout>
-                    <Grid Grid.Row="2" Margin="5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="3*"/>
-                            <ColumnDefinition Width="1*"/>
-                        </Grid.ColumnDefinitions>
-                        <Image  Grid.Column="1" x:Name="TheBoardPreview" Aspect="AspectFit" BackgroundColor="#20FFFFFF"/>
-                    </Grid>
-                    <Label Grid.Row="3" Text="Preview" TextColor="White" HorizontalOptions="Center" VerticalOptions="Start"/>
+                    <Label Grid.Row="0" Text="Map Export/Import" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
+                    <Button Text="Save Map" Clicked="SaveMap" Margin="5" CornerRadius="5" Grid.Row="1" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="150"/>
+                    <Button Text="Load Map" Clicked="LoadMap" Margin="5" CornerRadius="5" Grid.Row="2" VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="150"/>
                 </Grid>
             </Frame>
 
-            <Frame Grid.Row="1" BackgroundColor="#15FFFFFF" CornerRadius="25">
+            <Frame Grid.Row="1" BackgroundColor="#15FFFFFF" CornerRadius="25" VerticalOptions="Center" HeightRequest="200">
                 <Grid x:Name="NewMapSection">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*"/>
@@ -79,11 +66,9 @@
                             </Picker.Items>
                         </Picker>
                     </Grid>
-                    <Button Text="Create Map" Clicked="CreateMap" Margin="5" CornerRadius="5" Grid.Row="3"/>
+                    <Button Text="Create Map" Clicked="CreateMap" Margin="5" CornerRadius="5" Grid.Row="3"  VerticalOptions="Center" HorizontalOptions="Center" WidthRequest="150"/>
                 </Grid>
             </Frame>
-
-
         </Grid>
     </ContentPage.Content>
 </ContentPage>

@@ -21,18 +21,19 @@
                 <ColumnDefinition Width="7*"/>
             </Grid.ColumnDefinitions>
             <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
-            <Slider WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
+            <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
         </Grid>
-        
-        <ScrollView x:Name="TheMapView" Orientation="Both" Grid.Row="1">
-            <Grid Margin="5">
-                <Image Source="{Binding _backgroundPhoto}" BackgroundColor="#20FFFFFF" Opacity="0.4"/>
+
+        <Grid Grid.Row="1" BackgroundColor="#10FFFFFF"/>
+        <ScrollView x:Name="TheMapView" Orientation="Both" Grid.Row="1" >
+            <Grid VerticalOptions="Start" HorizontalOptions="Start">
+                <Image Source="{Binding _backgroundPhoto}" Opacity="0.4"/>
                 <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
             </Grid>
         </ScrollView>
 
         <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical">
-            <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}"/>
+            <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}" HorizontalOptions="Center" WidthRequest="150"/>
 
             <ScrollView Orientation="Vertical">
                 <StackLayout Orientation="Vertical">

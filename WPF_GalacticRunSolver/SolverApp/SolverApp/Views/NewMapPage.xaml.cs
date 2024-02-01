@@ -1,11 +1,7 @@
 ﻿using SolverApp.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -63,49 +59,28 @@ namespace SolverApp.Views
                 await Shell.Current.GoToAsync("//SolverPage");
             }
         }
-
-        async void TakePicture(object sender, EventArgs args)
+        async void SaveMap(object sender, EventArgs args)
         {
-            var photo = await MediaPicker.CapturePhotoAsync();
-            await LoadPhotoAsync(photo);
-        }
-
-        async void ChoosePicture(object sender, EventArgs args)
-        {
-            var photo = await MediaPicker.PickPhotoAsync();
-            await LoadPhotoAsync(photo);
-        }
-
-        public string PhotoPath { get; set; }
-        async Task LoadPhotoAsync(FileResult photo)
-        {
-            // canceled
-            if (photo == null)
+            string result = await DisplayPromptAsync("Save file as...", "fileName");
+            if (result != null && result.Length > 0)
             {
-                PhotoPath = null;
-                return;
+                var dataContext = this.BindingContext as NewMapViewModel;
+                string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".map");
+                dataContext.SaveMap(_fileName);
             }
-            // save the file into local storage
-            var newFile = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
-            using (var stream = await photo.OpenReadAsync())
-            using (var newStream = File.OpenWrite(newFile))
-                await stream.CopyToAsync(newStream);
-
-            SetPhoto(newFile);
         }
-
-        private void SetPhoto(string photoPath)
+        async void LoadMap(object sender, EventArgs args)
         {
-            PhotoPath = photoPath;
-            TheBoardPreview.Source = PhotoPath;
-
-            var dataContext = this.BindingContext as NewMapViewModel;
-            dataContext.SetBackGroundImage(PhotoPath);
-        }
-
-        async void Reset(object sender, EventArgs args)
-        {
-            SetPhoto("");
+            var files = System.IO.Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "*.map");
+            var fileNames = files.Select(path => System.IO.Path.GetFileName(path)).ToArray();
+            string result = await DisplayActionSheet("Open file...", "cancel", "exit", fileNames);
+            string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result);
+            if (File.Exists(_fileName))
+            {
+                var dataContext = this.BindingContext as NewMapViewModel;
+                dataContext.LoadMap(_fileName);
+                await Shell.Current.GoToAsync("//SolverPage");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SolverApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,9 +19,14 @@ namespace SolverApp.ViewModels
             _SolverVM.CreateNewMap(new MapViewModel(size, robotCount));
         }
 
-        internal void SetBackGroundImage(string photoPath)
+        internal void SaveMap(string fileName)
         {
-            _SolverVM.SetBackgroundImage(photoPath);
+            _SolverVM.theMap.SaveMap(fileName);
+        }
+
+        internal void LoadMap(string fileName)
+        {
+            _SolverVM.CreateNewMap(new MapViewModel(fileName));
         }
     }
 }

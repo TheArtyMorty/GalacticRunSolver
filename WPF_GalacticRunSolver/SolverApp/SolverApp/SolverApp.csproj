@@ -11,6 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\PhotoHelperPage.xaml.cs">
+      <DependentUpon>PhotoHelperPage.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\SolverPage.xaml.cs">
       <DependentUpon>SolverPage.xaml</DependentUpon>
     </Compile>
@@ -36,6 +39,9 @@
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Views\NewMapPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\PhotoHelperPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

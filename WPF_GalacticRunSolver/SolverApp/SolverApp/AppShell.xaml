@@ -11,6 +11,10 @@
         <Tab Title="New Map"
             Icon="IconPlus.png">
             <ShellContent x:Name="ShellNewMapPage" Route="NewMapPage"/>
+        </Tab> 
+        <Tab Title="Photo"
+            Icon="IconPhoto.png">
+            <ShellContent x:Name="ShellPhotoHelperPage" Route="PhotoHelperPage"/>
         </Tab>
     </TabBar>
 </Shell>

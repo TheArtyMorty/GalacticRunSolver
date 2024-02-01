@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SolverApp.Views.PhotoHelperPage"           
+             BackgroundImageSource="Background.png"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid Margin="20">
+        <Frame BackgroundColor="#15FFFFFF" CornerRadius="25">
+            <Grid x:Name="Helper">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Text="Creation Helper" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
+                <StackLayout Grid.Row="1" Margin="5" Orientation="Horizontal" HorizontalOptions="Center">
+                    <ImageButton Source="IconPhoto.png" Clicked="TakePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconClear.png" Clicked="Reset" Margin="5" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                </StackLayout>
+                <Image  Grid.Row="2" x:Name="TheBoardPreview" Aspect="AspectFit" BackgroundColor="#20FFFFFF"/>
+                <Label Grid.Row="3" Text="Preview" TextColor="White" HorizontalOptions="Center" VerticalOptions="Start"/>
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>
