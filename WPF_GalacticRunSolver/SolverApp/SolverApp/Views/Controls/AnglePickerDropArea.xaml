@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:tt="clr-namespace:SolverApp"
+             x:Class="SolverApp.Views.Controls.AnglePickerDropArea">
+    <ContentView.Content>
+        <AbsoluteLayout x:Name="AnglePickerArea" 
+                        BackgroundColor="#33F752E3" 
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2" />
+    </ContentView.Content>
+</ContentView>

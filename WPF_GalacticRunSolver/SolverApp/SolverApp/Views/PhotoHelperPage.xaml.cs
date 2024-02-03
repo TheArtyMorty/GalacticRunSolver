@@ -1,10 +1,13 @@
-﻿using SolverApp.ViewModels;
+﻿using SkiaSharp;
+using SolverApp.ViewModels;
 using System;
 using System.IO;
 using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using SkiaSharp.Views.Forms;
+using TouchTracking;
 
 namespace SolverApp.Views
 {
@@ -18,14 +21,30 @@ namespace SolverApp.Views
 
         async void TakePicture(object sender, EventArgs args)
         {
-            var photo = await MediaPicker.CapturePhotoAsync();
-            await LoadPhotoAsync(photo);
+            try
+            {
+                var photo = await MediaPicker.CapturePhotoAsync();
+                await LoadPhotoAsync(photo);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         async void ChoosePicture(object sender, EventArgs args)
         {
-            var photo = await MediaPicker.PickPhotoAsync();
-            await LoadPhotoAsync(photo);
+            try
+            {
+                var photo = await MediaPicker.PickPhotoAsync();
+                await LoadPhotoAsync(photo);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
         }
 
         public string PhotoPath { get; set; }
@@ -37,27 +56,23 @@ namespace SolverApp.Views
                 PhotoPath = null;
                 return;
             }
-            // save the file into local storage
             var newFile = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
             using (var stream = await photo.OpenReadAsync())
             using (var newStream = File.OpenWrite(newFile))
                 await stream.CopyToAsync(newStream);
 
-            SetPhoto(newFile);
+            LoadPhoto(newFile);
         }
 
-        private void SetPhoto(string photoPath)
+        private void LoadPhoto(string path)
         {
-            PhotoPath = photoPath;
-            TheBoardPreview.Source = PhotoPath;
-
-            var dataContext = this.BindingContext as PhotoHelperViewModel;
-            dataContext.SetBackGroundImage(PhotoPath);
+            var dataContext = BindingContext as PhotoHelperViewModel;
+            dataContext.SetBackGroundImage(path);
         }
 
-        async void Reset(object sender, EventArgs args)
+        void Reset(object sender, EventArgs args)
         {
-            SetPhoto("");
+            LoadPhoto("");
         }
     }
 }

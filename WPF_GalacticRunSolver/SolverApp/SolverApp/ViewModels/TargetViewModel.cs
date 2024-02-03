@@ -14,7 +14,6 @@ namespace SolverApp.ViewModels
         {
             _Target = target;
             _IncrementColor = new Command(IncrementColor);
-            _DecrementColor = new Command(DecrementColor);
         }
 
         public Target _Target { get; }
@@ -37,26 +36,14 @@ namespace SolverApp.ViewModels
         }
 
         public ICommand _IncrementColor { get; }
-        public ICommand _DecrementColor { get; }
 
         public void IncrementColor()
         {
             int type = (int)_Color;
             type++;
-            if (type >= Enum.GetNames(typeof(EColor)).Length)
+            if (type > 3)
             {
                 type = 0;
-            }
-            _Color = (EColor)type;
-        }
-
-        public void DecrementColor()
-        {
-            int type = (int)_Color;
-            type--;
-            if (type < 0)
-            {
-                type = Enum.GetNames(typeof(EColor)).Length - 1;
             }
             _Color = (EColor)type;
         }

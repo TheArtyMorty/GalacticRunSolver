@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SolverApp.Views.PhotoHelperPage"           
+             x:Class="SolverApp.Views.PhotoHelperPage"  
+             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
              BackgroundImageSource="Background.png"
              NavigationPage.HasNavigationBar="False">
 
@@ -20,7 +21,11 @@
                     <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
                     <ImageButton Source="IconClear.png" Clicked="Reset" Margin="5" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
                 </StackLayout>
-                <Image  Grid.Row="2" x:Name="TheBoardPreview" Aspect="AspectFit" BackgroundColor="#20FFFFFF"/>
+                <Grid Grid.Row="2">
+                    <Image x:Name="TheBoardPreview" Aspect="AspectFit" Source="{Binding PhotoPath}"/>
+                    <controls:AnglePickerDropArea x:Name="DropArea"/>
+                </Grid>
+                
                 <Label Grid.Row="3" Text="Preview" TextColor="White" HorizontalOptions="Center" VerticalOptions="Start"/>
             </Grid>
         </Frame>
