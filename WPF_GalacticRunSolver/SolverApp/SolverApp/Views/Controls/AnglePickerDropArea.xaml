@@ -17,7 +17,7 @@
                         <ColumnDefinition Width="7*"/>
                     </Grid.ColumnDefinitions>
                     <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
-                    <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
+                    <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000" Value="500"/>
                 </Grid>
                 <ScrollView x:Name="TheScrollView" Orientation="Both" Grid.Row="1" >
                     <Grid x:Name="ZoomableArea">

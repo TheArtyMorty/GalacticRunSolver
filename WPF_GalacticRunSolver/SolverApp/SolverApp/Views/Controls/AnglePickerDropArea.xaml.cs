@@ -6,9 +6,6 @@ using TouchTracking;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System;
-using Xamarin.Forms.Internals;
-using SolverApp.ViewModels;
-using System.ComponentModel;
 
 namespace SolverApp.Views.Controls
 {
@@ -18,20 +15,11 @@ namespace SolverApp.Views.Controls
         public AnglePickerDropArea()
         {
             InitializeComponent();
-            ZoomInOrOut(3, defaultSize);
-        }
+            ZoomInOrOut(2, defaultSize);
 
-        class DragInfo
-        {
-            public DragInfo(long id, Point pressPoint)
-            {
-                Id = id;
-                PressPoint = pressPoint;
-            }
-
-            public long Id { private set; get; }
-
-            public Point PressPoint { private set; get; }
+            TouchEffect touchEffect = new TouchEffect();
+            touchEffect.TouchAction += OnPictureTouched;
+            AnglePickerArea.Effects.Add(touchEffect);
         }
 
         static int AnglePickerSize = 25;
@@ -39,10 +27,10 @@ namespace SolverApp.Views.Controls
         {
             var width = ZoomableArea.Width;
             var height = ZoomableArea.Height;
-            if (width == 0  || height == 0)
+            if (width <= 0 || height <= 0)
             {
-                width = defaultSize * 3 - 50;
-                height = defaultSize * 3 - 50;
+                width = defaultSize * 2 - 50;
+                height = defaultSize * 2 - 50;
             }
             AnglePickerArea.Children.Clear();
             Angles.Clear();
@@ -64,53 +52,53 @@ namespace SolverApp.Views.Controls
             };
 
             TouchEffect touchEffect = new TouchEffect();
-            touchEffect.TouchAction += OnTouchEffectAction;
+            touchEffect.TouchAction += OnAngleTouched;
             boxView.Effects.Add(touchEffect);
             AnglePickerArea.Children.Add(boxView, position);
 
             Angles.Add(boxView);
         }
 
-        Dictionary<BoxView, DragInfo> dragDictionary = new Dictionary<BoxView, DragInfo>();
+        BoxView selected = null;
 
-        void OnTouchEffectAction(object sender, TouchActionEventArgs args)
+        void OnAngleTouched(object sender, TouchActionEventArgs args)
         {
             BoxView boxView = sender as BoxView;
 
             switch (args.Type)
             {
                 case TouchActionType.Pressed:
-                    // Don't allow a second touch on an already touched BoxView
-                    if (!dragDictionary.ContainsKey(boxView))
+                    if (selected == null)
                     {
-                        dragDictionary.Add(boxView, new DragInfo(args.Id, new Point(args.Location.X, args.Location.Y)));
-
+                        selected = boxView;
+                        boxView.Color = Color.Orange;
                         // Set Capture property to true
                         TouchEffect touchEffect = (TouchEffect)boxView.Effects.FirstOrDefault(e => e is TouchEffect);
                         touchEffect.Capture = true;
                     }
                     break;
+            }
+        }
 
-                case TouchActionType.Moved:
-                    if (dragDictionary.ContainsKey(boxView) && dragDictionary[boxView].Id == args.Id)
+        void OnPictureTouched(object sender, TouchActionEventArgs args)
+        {
+            switch (args.Type)
+            {
+                case TouchActionType.Pressed:
+                    if (selected != null)
                     {
+                        var boxView = selected;
+                        boxView.Color = Color.Red;
+                        // Move to position
                         Rectangle rect = AbsoluteLayout.GetLayoutBounds(boxView);
-                        Point initialLocation = dragDictionary[boxView].PressPoint;
-                        rect.X += args.Location.X - initialLocation.X;
-                        rect.Y += args.Location.Y - initialLocation.Y;
-                        rect.X = Math.Max(rect.X, -AnglePickerSize/2);
-                        rect.Y = Math.Max(rect.Y, -AnglePickerSize / 2);
-                        rect.X = Math.Min(rect.X, AnglePickerArea.Width - AnglePickerSize / 2);
-                        rect.Y = Math.Min(rect.Y, AnglePickerArea.Height - AnglePickerSize / 2);
+                        rect.X = args.Location.X - AnglePickerSize / 2;
+                        rect.Y = args.Location.Y - AnglePickerSize / 2;
                         AbsoluteLayout.SetLayoutBounds(boxView, rect);
                         canvasView.InvalidateSurface();
-                    }
-                    break;
-
-                case TouchActionType.Released:
-                    if (dragDictionary.ContainsKey(boxView) && dragDictionary[boxView].Id == args.Id)
-                    {
-                        dragDictionary.Remove(boxView);
+                        // Set Capture property to true
+                        TouchEffect touchEffect = (TouchEffect)boxView.Effects.FirstOrDefault(e => e is TouchEffect);
+                        touchEffect.Capture = true;
+                        selected = null;
                     }
                     break;
             }
@@ -156,15 +144,30 @@ namespace SolverApp.Views.Controls
 
         public void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
         {
-            ZoomInOrOut(e.NewValue / 1000, Math.Max(TheScrollView.Width, TheScrollView.Height));
+            ZoomInOrOut(1 + e.NewValue / 500, Math.Max(TheScrollView.Width, TheScrollView.Height));
         }
         private static int defaultSize = 400;
         public int _ZoomSize { get; set; } = defaultSize;
-        internal void ZoomInOrOut(double v, double scrollViewWidth)
+        internal void ZoomInOrOut(double zoom, double scrollViewWidth)
         {
-            _ZoomSize = (int)(-50 + scrollViewWidth + v * scrollViewWidth);
+            _ZoomSize = (int)(zoom * scrollViewWidth - 50);
+            var previousWidth = ZoomableArea.Width;
+            var previousHeight = ZoomableArea.Height;
             ZoomableArea.WidthRequest = _ZoomSize;
             ZoomableArea.HeightRequest = _ZoomSize;
+            foreach (var boxView in Angles)
+            {
+                // getPreviousPosition
+                var previousX = boxView.X;
+                var previousY = boxView.Y;
+
+                // Move to position
+                Rectangle rect = AbsoluteLayout.GetLayoutBounds(boxView);
+                rect.X = previousX * _ZoomSize / previousWidth;
+                rect.Y = previousY * _ZoomSize / previousWidth;
+                AbsoluteLayout.SetLayoutBounds(boxView, rect);
+            }
+            canvasView.InvalidateSurface();
         }
     }
 }

@@ -20,7 +20,7 @@
                     <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
                     <ImageButton Source="IconClear.png" Clicked="Reset" Margin="5" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
                 </StackLayout>
-                <Grid Grid.Row="2" IsVisible="{Binding PhotoLoaded}" BackgroundColor ="Pink">
+                <Grid Grid.Row="2" IsVisible="{Binding PhotoLoaded}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="15*"/>
