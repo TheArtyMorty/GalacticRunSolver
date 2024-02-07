@@ -16,12 +16,20 @@ namespace SolverApp.ViewModels
 
         private SolverViewModel _SolverVM;
 
-        public string PhotoPath {  get; set; }
         internal void SetBackGroundImage(string photoPath)
         {
-            PhotoPath = photoPath;
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(PhotoPath)));
             _SolverVM.SetBackgroundImage(photoPath);
+            Refresh(photoPath.Length > 0);
+        }
+
+        public bool PhotoLoaded { get; set; } = false;
+        public bool NoPhotoLoaded => !PhotoLoaded;
+
+        public void Refresh(bool photoLoaded)
+        {
+            PhotoLoaded = photoLoaded;
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(PhotoLoaded)));
+            PropertyChanged(this, new PropertyChangedEventArgs(nameof(NoPhotoLoaded)));
         }
     }
 }

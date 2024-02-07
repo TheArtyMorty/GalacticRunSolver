@@ -1,13 +1,32 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:tt="clr-namespace:SolverApp"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             xmlns:views="clr-namespace:SolverApp.Views"
              x:Class="SolverApp.Views.Controls.AnglePickerDropArea">
     <ContentView.Content>
-        <AbsoluteLayout x:Name="AnglePickerArea" 
-                        BackgroundColor="#33F752E3" 
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2" />
+        <Grid BackgroundColor="#20ffffff">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="9*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="7*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
+                    <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
+                </Grid>
+                <ScrollView x:Name="TheScrollView" Orientation="Both" Grid.Row="1" >
+                    <Grid x:Name="ZoomableArea">
+                        <Image x:Name="PhotoViewer" Aspect="AspectFit"/>
+                        <AbsoluteLayout x:Name="AnglePickerArea"/>
+                        <skia:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
+                    </Grid>
+                </ScrollView>
+            </Grid>
+        </Grid>
     </ContentView.Content>
 </ContentView>

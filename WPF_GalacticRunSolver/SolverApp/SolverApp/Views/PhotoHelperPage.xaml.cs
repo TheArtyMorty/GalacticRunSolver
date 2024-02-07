@@ -47,13 +47,11 @@ namespace SolverApp.Views
             }
         }
 
-        public string PhotoPath { get; set; }
         async Task LoadPhotoAsync(FileResult photo)
         {
             // canceled
             if (photo == null)
             {
-                PhotoPath = null;
                 return;
             }
             var newFile = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
@@ -68,6 +66,8 @@ namespace SolverApp.Views
         {
             var dataContext = BindingContext as PhotoHelperViewModel;
             dataContext.SetBackGroundImage(path);
+            DropArea.SetPhoto(path);
+            DropArea.ResetAngles();
         }
 
         void Reset(object sender, EventArgs args)
