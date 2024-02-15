@@ -6,167 +6,272 @@ using TouchTracking;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System;
+using System.IO;
+using Xamarin.Forms.Shapes;
 
 namespace SolverApp.Views.Controls
 {
+    class BoardSelectionZone
+    {
+        const float MINIMUM = 10;   // pixels width or height
+
+        SKRect maxRect;             // generally the size of the bitmap
+
+        public BoardSelectionZone(SKRect maxRect)
+        {
+            this.maxRect = maxRect;
+
+            var Left = maxRect.Left;
+            var Top = maxRect.Top;
+            var Right = maxRect.Right;
+            var Bottom = maxRect.Bottom;
+
+            Corners = new SKPoint[] { 
+                    new SKPoint(Left, Top),
+                    new SKPoint(Right, Top),
+                    new SKPoint(Right, Bottom),
+                    new SKPoint(Left, Bottom) };
+        }
+
+        public SKPoint[] Corners { get; set; }
+
+        public int HitTest(SKPoint point, float radius)
+        {
+            SKPoint[] corners = Corners;
+
+            for (int index = 0; index < corners.Length; index++)
+            {
+                SKPoint diff = point - corners[index];
+
+                if ((float)Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y) < radius)
+                {
+                    return index;
+                }
+            }
+
+            return -1;
+        }
+
+        public void MoveCorner(int index, SKPoint point)
+        {
+            Corners[index].X = Math.Min(Math.Max(point.X, maxRect.Left), maxRect.Right - MINIMUM);
+            Corners[index].Y = Math.Min(Math.Max(point.Y, maxRect.Top), maxRect.Bottom - MINIMUM);
+        }
+    }
+
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class AnglePickerDropArea : ContentView
     {
+        BoardSelectionZone cornerSelection;
+        SKMatrix inverseBitmapMatrix;
+        const int CORNER = 30;
+        const int RADIUS = 200;     // pixel radius of touch hit-test
+
         public AnglePickerDropArea()
         {
             InitializeComponent();
-            ZoomInOrOut(2, defaultSize);
 
-            TouchEffect touchEffect = new TouchEffect();
-            touchEffect.TouchAction += OnPictureTouched;
-            AnglePickerArea.Effects.Add(touchEffect);
+            touchEffect.TouchAction += OnTouchEffectTouchAction;
+            canvasView.Effects.Add(touchEffect);
         }
 
-        static int AnglePickerSize = 25;
-        public void ResetAngles()
+        // Touch tracking
+        TouchEffect touchEffect = new TouchEffect();
+        struct TouchPoint
         {
-            var width = ZoomableArea.Width;
-            var height = ZoomableArea.Height;
-            if (width <= 0 || height <= 0)
-            {
-                width = defaultSize * 2 - 50;
-                height = defaultSize * 2 - 50;
-            }
-            AnglePickerArea.Children.Clear();
-            Angles.Clear();
-            AddBoxViewToLayout(new Point(0, 0));
-            AddBoxViewToLayout(new Point(width - AnglePickerSize, 0));
-            AddBoxViewToLayout(new Point(width - AnglePickerSize, height - AnglePickerSize));
-            AddBoxViewToLayout(new Point(0, height - AnglePickerSize));
-            canvasView.InvalidateSurface();
+            public int CornerIndex { set; get; }
+            public SKPoint Offset { set; get; }
         }
 
-        private List<BoxView> Angles = new List<BoxView>();
-        void AddBoxViewToLayout(Point position)
+        Dictionary<long, TouchPoint> touchPoints = new Dictionary<long, TouchPoint>();
+        private long panningTouchPoint = -1;
+        private SKPoint panningOffset;
+
+        void OnTouchEffectTouchAction(object sender, TouchActionEventArgs args)
         {
-            BoxView boxView = new BoxView
-            {
-                WidthRequest = AnglePickerSize,
-                HeightRequest = AnglePickerSize,
-                Color = Color.Red
-            };
-
-            TouchEffect touchEffect = new TouchEffect();
-            touchEffect.TouchAction += OnAngleTouched;
-            boxView.Effects.Add(touchEffect);
-            AnglePickerArea.Children.Add(boxView, position);
-
-            Angles.Add(boxView);
-        }
-
-        BoxView selected = null;
-
-        void OnAngleTouched(object sender, TouchActionEventArgs args)
-        {
-            BoxView boxView = sender as BoxView;
+            SKPoint pixelLocation = ConvertToPixel(args.Location);
+            SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
 
             switch (args.Type)
             {
                 case TouchActionType.Pressed:
-                    if (selected == null)
+                    // Convert radius to bitmap/cropping scale
+                    float radius = inverseBitmapMatrix.ScaleX * RADIUS;
+
+                    // Find corner that the finger is touching
+                    int cornerIndex = cornerSelection.HitTest(bitmapLocation, radius);
+
+                    if (cornerIndex != -1 && !touchPoints.ContainsKey(args.Id))
                     {
-                        selected = boxView;
-                        boxView.Color = Color.Orange;
-                        // Set Capture property to true
-                        TouchEffect touchEffect = (TouchEffect)boxView.Effects.FirstOrDefault(e => e is TouchEffect);
-                        touchEffect.Capture = true;
+                        TouchPoint touchPoint = new TouchPoint
+                        {
+                            CornerIndex = cornerIndex,
+                            Offset = bitmapLocation - cornerSelection.Corners[cornerIndex]
+                        };
+
+                        touchPoints.Add(args.Id, touchPoint);
+                    }
+                    else if (panningTouchPoint == -1)
+                    {
+                        panningTouchPoint = args.Id;
+                        panningOffset = bitmapLocation;
                     }
                     break;
-            }
-        }
 
-        void OnPictureTouched(object sender, TouchActionEventArgs args)
-        {
-            switch (args.Type)
-            {
-                case TouchActionType.Pressed:
-                    if (selected != null)
+                case TouchActionType.Moved:
+                    if (touchPoints.ContainsKey(args.Id))
                     {
-                        var boxView = selected;
-                        boxView.Color = Color.Red;
-                        // Move to position
-                        Rectangle rect = AbsoluteLayout.GetLayoutBounds(boxView);
-                        rect.X = args.Location.X - AnglePickerSize / 2;
-                        rect.Y = args.Location.Y - AnglePickerSize / 2;
-                        AbsoluteLayout.SetLayoutBounds(boxView, rect);
+                        TouchPoint touchPoint = touchPoints[args.Id];
+                        cornerSelection.MoveCorner(touchPoint.CornerIndex,
+                                                bitmapLocation - touchPoint.Offset);
                         canvasView.InvalidateSurface();
-                        // Set Capture property to true
-                        TouchEffect touchEffect = (TouchEffect)boxView.Effects.FirstOrDefault(e => e is TouchEffect);
-                        touchEffect.Capture = true;
-                        selected = null;
+                    }
+                    else if (panningTouchPoint == args.Id)
+                    {
+                        PanPoint += (bitmapLocation - panningOffset);
+                        canvasView.InvalidateSurface();
+                    }
+                    break;
+
+                case TouchActionType.Released:
+                case TouchActionType.Cancelled:
+                    if (touchPoints.ContainsKey(args.Id))
+                    {
+                        touchPoints.Remove(args.Id);
+                    }
+                    else
+                    {
+                        panningTouchPoint = -1;
                     }
                     break;
             }
         }
 
-        SKPaint paintRed = new SKPaint
+        SKPoint ConvertToPixel(TouchTrackingPoint pt)
+        {
+            return new SKPoint((float)(canvasView.CanvasSize.Width * pt.X / Width),
+                               (float)(canvasView.CanvasSize.Height * pt.Y / Height));
+        }
+
+        // Drawing objects
+        SKPaint cornerStroke = new SKPaint
         {
             Style = SKPaintStyle.Stroke,
             Color = SKColors.Red,
-            StrokeWidth = 10,
-            StrokeCap = SKStrokeCap.Round,
-            StrokeJoin = SKStrokeJoin.Round
+            StrokeWidth = 15
         };
 
+        SKPaint edgeStroke = new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            Color = SKColors.Red,
+            StrokeWidth = 5
+        };
+
+        private SKPoint PanPoint;
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
-            SKCanvas canvas = args.Surface.Canvas;
-            canvas.Clear();
+            SKImageInfo info = args.Info;
+            SKSurface surface = args.Surface;
+            SKCanvas canvas = surface.Canvas;
 
-            if (Angles.Count > 0)
+            canvas.Clear(SKColors.White);
+
+            if (bitmap != null)
             {
-                SKPath path = new SKPath();
-                path.MoveTo(ConvertToPixel(AbsoluteLayout.GetLayoutBounds(Angles[0]).Location));
-                path.LineTo(ConvertToPixel(AbsoluteLayout.GetLayoutBounds(Angles[1]).Location));
-                path.LineTo(ConvertToPixel(AbsoluteLayout.GetLayoutBounds(Angles[2]).Location));
-                path.LineTo(ConvertToPixel(AbsoluteLayout.GetLayoutBounds(Angles[3]).Location));
-                path.LineTo(ConvertToPixel(AbsoluteLayout.GetLayoutBounds(Angles[0]).Location));
-                canvas.DrawPath(path, paintRed);
+                // Calculate rectangle for displaying bitmap
+                //float scale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height);
+                SetDefaultScaleIfNeeded(info);
+                float scale = (float)_scale;
+                ClampPanPointIfNeeded(info, scale);
+                float xOffset = (float)PanPoint.X; 
+                float yOffset = (float)PanPoint.Y;
+                SKRect bitmapRect = new SKRect(xOffset, yOffset, xOffset + scale * bitmap.Width, yOffset + scale * bitmap.Height);
+                canvas.DrawBitmap(bitmap, bitmapRect);
+
+                // Calculate a matrix transform for displaying the cropping rectangle
+                SKMatrix bitmapScaleMatrix = SKMatrix.CreateScaleTranslation(scale, scale, xOffset, yOffset);
+
+                // Display corners and edges
+                SKPath edgePath = new SKPath();
+                edgePath.MoveTo(xOffset + scale * cornerSelection.Corners[3].X,
+                    yOffset + scale * cornerSelection.Corners[3].Y);
+
+                var cornerPath = new SKPath();
+
+                foreach (var corner in cornerSelection.Corners)
+                {
+                    var X = xOffset + scale * corner.X;
+                    var Y = yOffset + scale * corner.Y;
+                    cornerPath.MoveTo(X, Y + CORNER);
+                    cornerPath.LineTo(X, Y - CORNER);
+                    cornerPath.MoveTo(X - CORNER, Y);
+                    cornerPath.LineTo(X + CORNER, Y);
+                    edgePath.LineTo(X, Y);
+                }
+
+                canvas.DrawPath(edgePath, edgeStroke);
+                canvas.DrawPath(cornerPath, cornerStroke);
+
+                // Invert the transform for touch tracking
+                bitmapScaleMatrix.TryInvert(out inverseBitmapMatrix);
             }
         }
 
-        SKPoint ConvertToPixel(Point pt)
+        private void ClampPanPointIfNeeded(SKImageInfo info, float scale)
         {
-            var center = new Point(pt.X + AnglePickerSize/2, pt.Y + AnglePickerSize/2);
-            return new SKPoint((float)(canvasView.CanvasSize.Width * center.X / canvasView.Width),
-                               (float)(canvasView.CanvasSize.Height * center.Y / canvasView.Height));
+            var borderOffset = 0;
+            var minX = Math.Min(0, info.Width - scale * bitmap.Width)- borderOffset;
+            var minY = Math.Min(0, info.Height - scale * bitmap.Height)- borderOffset;
+            var maxX = Math.Max(0, info.Width - scale * bitmap.Width) + borderOffset;
+            var maxY = Math.Max(0, info.Height - scale * bitmap.Height) + borderOffset;
+            PanPoint.X = Math.Max(PanPoint.X, minX);
+            PanPoint.Y = Math.Max(PanPoint.Y, minY);
+            PanPoint.X = Math.Min(PanPoint.X, maxX);
+            PanPoint.Y = Math.Min(PanPoint.Y, maxY);
         }
 
+        private void SetDefaultScaleIfNeeded(SKImageInfo info)
+        {
+            if (_defaultScale <= 0)
+            {
+                _defaultScale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height); ;
+                _scale = _defaultScale <= 0 ? 1 : _defaultScale;
+            }
+        }
+
+        private SKBitmap bitmap;
         public void SetPhoto(string path)
         {
-            PhotoViewer.Source = path;
+            if (path.Length > 0)
+            {
+                var fileStream = File.OpenRead(path);
+                bitmap = SKBitmap.Decode(fileStream);
+
+                SKRect bitmapRect = new SKRect(0, 0, bitmap.Width, bitmap.Height);
+                cornerSelection = new BoardSelectionZone(bitmapRect);
+            }
+            else
+            {
+                bitmap = null;
+            }
+            _defaultScale = -1;
+            ZoomSlider.Value = 0;
+            canvasView.InvalidateSurface();
         }
+
 
         public void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
         {
-            ZoomInOrOut(1 + e.NewValue / 500, Math.Max(TheScrollView.Width, TheScrollView.Height));
+            ZoomInOrOut(e.NewValue, Math.Max(canvasView.Width, canvasView.Height));
         }
-        private static int defaultSize = 400;
-        public int _ZoomSize { get; set; } = defaultSize;
+
+        private double _defaultScale;
+        private double _scale;
+ 
         internal void ZoomInOrOut(double zoom, double scrollViewWidth)
         {
-            _ZoomSize = (int)(zoom * scrollViewWidth - 50);
-            var previousWidth = ZoomableArea.Width;
-            var previousHeight = ZoomableArea.Height;
-            ZoomableArea.WidthRequest = _ZoomSize;
-            ZoomableArea.HeightRequest = _ZoomSize;
-            foreach (var boxView in Angles)
-            {
-                // getPreviousPosition
-                var previousX = boxView.X;
-                var previousY = boxView.Y;
-
-                // Move to position
-                Rectangle rect = AbsoluteLayout.GetLayoutBounds(boxView);
-                rect.X = previousX * _ZoomSize / previousWidth;
-                rect.Y = previousY * _ZoomSize / previousWidth;
-                AbsoluteLayout.SetLayoutBounds(boxView, rect);
-            }
+            _scale = _defaultScale + zoom;
             canvasView.InvalidateSurface();
         }
     }

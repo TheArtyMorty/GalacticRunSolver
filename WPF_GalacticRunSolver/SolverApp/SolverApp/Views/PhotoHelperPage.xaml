@@ -3,31 +3,32 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SolverApp.Views.PhotoHelperPage"  
              xmlns:controls="clr-namespace:SolverApp.Views.Controls"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
              BackgroundImageSource="Background.png"
              NavigationPage.HasNavigationBar="False">
 
-    <Grid Margin="20">
-        <Frame BackgroundColor="#15FFFFFF" CornerRadius="25">
+    <Grid Margin="5">
+        <Frame BackgroundColor="#15FFFFFF" CornerRadius="25" Margin="0">
             <Grid x:Name="Helper">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="1*"/>
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition Height="10*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="15*"/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Text="Creation Helper" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
-                <StackLayout Grid.Row="1" Margin="5" Orientation="Horizontal" HorizontalOptions="Center">
-                    <ImageButton Source="IconPhoto.png" Clicked="TakePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
-                    <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" Margin="5" VerticalOptions="Center" CornerRadius="5"/>
-                    <ImageButton Source="IconClear.png" Clicked="Reset" Margin="5" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
+                    <ImageButton Source="IconPhoto.png" Clicked="TakePicture" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconClear.png" Clicked="Reset" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
                 </StackLayout>
                 <Grid Grid.Row="2" IsVisible="{Binding PhotoLoaded}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="15*"/>
+                            <RowDefinition Height="9*"/>
                             <RowDefinition Height="1*"/>
                         </Grid.RowDefinitions>
                         <controls:AnglePickerDropArea x:Name="DropArea" Grid.Row="0"/>
-                        <Label Grid.Row="1" Text="Preview" TextColor="White" HorizontalOptions="Center" VerticalOptions="Start"/>
+                        <Button Grid.Row="1" Text="Recognize" Clicked="RecognizeMap" WidthRequest="200" HorizontalOptions="Center" VerticalOptions="Start"/>
                     </Grid>
                 </Grid>
                 <Grid Grid.Row="2" IsVisible="{Binding NoPhotoLoaded}">

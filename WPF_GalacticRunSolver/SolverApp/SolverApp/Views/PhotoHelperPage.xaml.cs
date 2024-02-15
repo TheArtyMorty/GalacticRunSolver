@@ -8,6 +8,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using SkiaSharp.Views.Forms;
 using TouchTracking;
+using static SkiaSharp.SKImageFilter;
 
 namespace SolverApp.Views
 {
@@ -62,17 +63,22 @@ namespace SolverApp.Views
             LoadPhoto(newFile);
         }
 
+
         private void LoadPhoto(string path)
         {
             var dataContext = BindingContext as PhotoHelperViewModel;
             dataContext.SetBackGroundImage(path);
             DropArea.SetPhoto(path);
-            DropArea.ResetAngles();
         }
 
         void Reset(object sender, EventArgs args)
         {
-            LoadPhoto("");
+            LoadPhoto(string.Empty);
+        }
+
+        void RecognizeMap(object sender, EventArgs args)
+        {
+            //TO DO
         }
     }
 }
