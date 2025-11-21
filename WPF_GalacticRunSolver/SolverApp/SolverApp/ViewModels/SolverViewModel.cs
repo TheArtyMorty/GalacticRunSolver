@@ -41,7 +41,7 @@ namespace SolverApp.ViewModels
         {
             _solverPage = solverPage;
             logger = new AppLogger(BackwardLogValue, () => _Log = "");
-            CreateNewMap(new MapViewModel(16,4));
+            LoadMapFromAutosave();
             _SolveMap = new Command(SolveMap);
 
             //background Worker
@@ -123,11 +123,24 @@ namespace SolverApp.ViewModels
             }
             else
             {
+                SaveMapToAutosave();
                 Clear();
                 _worker.RunWorkerAsync();
                 theMap._InitialMap = new Map(theMap._Map);
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
             }
+        }
+
+        private void SaveMapToAutosave()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoSave.map");
+            theMap.SaveMap(fileName);
+        }
+
+        private void LoadMapFromAutosave()
+        {
+            string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoSave.map");
+            CreateNewMap(new MapViewModel(fileName));
         }
 
         public string _SolveButtonText { get { return _worker.IsBusy ? "Stop" : "Solve"; } }

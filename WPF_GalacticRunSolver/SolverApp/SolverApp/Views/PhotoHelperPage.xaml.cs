@@ -78,7 +78,7 @@ namespace SolverApp.Views
 
         void RecognizeMap(object sender, EventArgs args)
         {
-            //TO DO
+            DropArea.StartRecognition();
         }
     }
 }
