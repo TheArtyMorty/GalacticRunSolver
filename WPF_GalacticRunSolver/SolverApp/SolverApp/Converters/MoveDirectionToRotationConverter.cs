@@ -1,7 +1,9 @@
 ﻿using SolverApp.Models;
 using System;
 using System.Globalization;
-using Xamarin.Forms;
+using Microsoft.Maui.Controls.Compatibility;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui;
 
 namespace SolverApp.Converters
 {

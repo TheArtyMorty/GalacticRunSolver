@@ -3,7 +3,7 @@ using SolverApp.Views;
 
 namespace SolverApp
 {
-    public partial class AppShell : Xamarin.Forms.Shell
+    public partial class AppShell : Microsoft.Maui.Controls.Shell
     {
         public AppShell()
         {

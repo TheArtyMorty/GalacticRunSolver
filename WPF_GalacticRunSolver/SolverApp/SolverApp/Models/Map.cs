@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.ObjectModel;
+using Microsoft.Maui.ApplicationModel;
 
 
 namespace SolverApp.Models

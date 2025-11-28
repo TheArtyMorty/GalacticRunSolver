@@ -1,14 +1,6 @@
-﻿using SkiaSharp.Views.Forms;
-using SkiaSharp;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SkiaSharp;
 using TouchTracking;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using System;
-using System.IO;
-using Xamarin.Forms.Shapes;
-using static SolverApp.Views.Controls.BoardSelectionZone;
+using SkiaSharp.Views.Maui;
 
 namespace SolverApp.Views.Controls
 {
@@ -418,11 +410,29 @@ namespace SolverApp.Views.Controls
                 Persp2 = 1
             };
 
-            SKMatrix result = SKMatrix.MakeIdentity();
+            SKMatrix result = SKMatrix.CreateIdentity();
             SKMatrix.Concat(ref result, A, S);
             return result;
         }
+
         public void StartRecognition()
+        {
+            // My 4 corners of output
+            var outputCorners = new SKPoint[]
+            {
+                new SKPoint(0, 0),
+                new SKPoint(1000, 0),
+                new SKPoint(1000, 1000),
+                new SKPoint(0, 1000),
+            };
+
+            // Get the 4 corners selected
+            var inputCorners = cornerSelection.Corners;
+
+            //Compute H
+            // Start by computing A
+        }
+        public void StartRecognition_Old()
         {
             // Crop and reset to center
             bitmap = GetCroppedBitmap();

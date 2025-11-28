@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SolverApp.Views.PhotoHelperPage"  
+             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
+             BackgroundImageSource="background.png"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid Margin="5">
+        <Frame BackgroundColor="#15FFFFFF" CornerRadius="25" Margin="0">
+            <Grid x:Name="Helper">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="15*"/>
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Text="Creation Helper" VerticalOptions="Center" HorizontalOptions="Center" FontSize="Large" FontAttributes="Bold" TextColor="White"/>
+                <StackLayout Grid.Row="1" Orientation="Horizontal" HorizontalOptions="Center">
+                    <ImageButton Source="IconPhoto.png" Clicked="TakePicture" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconImage.png" Clicked="ChoosePicture" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                    <ImageButton Source="IconClear.png" Clicked="Reset" WidthRequest="75" HeightRequest="75" VerticalOptions="Center" CornerRadius="5"/>
+                </StackLayout>
+                <Grid Grid.Row="2" IsVisible="{Binding PhotoLoaded}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="9*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <controls:AnglePickerDropArea x:Name="DropArea" Grid.Row="0"/>
+                        <Button Grid.Row="1" Text="Recognize" Clicked="RecognizeMap" WidthRequest="200" HorizontalOptions="Center" VerticalOptions="Start"/>
+                    </Grid>
+                </Grid>
+                <Grid Grid.Row="2" IsVisible="{Binding NoPhotoLoaded}">
+                    <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                        <Label Text="How to recognize a map?" FontSize="Large" TextColor="White"/>
+                        <Label Text="Step 1 : Take/Load a photo using the buttons above." FontSize="Default"  TextColor="White"/>
+                        <Label Text="Step 2 : Position the angles precisely to delimitate the map borders." FontSize="Default"  TextColor="White"/>
+                        <Label Text="Step 3 : Click the Recognize button." FontSize="Default"  TextColor="White"/>
+                    </StackLayout>
+                </Grid>
+            </Grid>
+        </Frame>
+    </Grid>
+</ContentPage>

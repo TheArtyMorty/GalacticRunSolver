@@ -1,5 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SolverApp.Views.NewMapPage"
              BackgroundImageSource="Background.png"
@@ -40,7 +40,7 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Text="Map size : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Left"/>
+                        <Label Text="Map size : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Start"/>
                         <Picker x:Name="SizePicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="0" SelectedIndexChanged="OnMapSizeChanged">
                             <Picker.Items>
                                 <x:String>Small</x:String>
@@ -56,7 +56,7 @@
                             <ColumnDefinition Width="1*"/>
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
-                        <Label Text="Robot Number : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Left"/>
+                        <Label Text="Robot Number : " TextColor="White" Grid.Column="0" VerticalTextAlignment="Center" FontSize="Large" HorizontalTextAlignment="Start"/>
                         <Picker x:Name="RobotCountPicker" Grid.Column="1" BackgroundColor="White" Margin="5" SelectedIndex="2">
                             <Picker.Items>
                                 <x:String>2</x:String>

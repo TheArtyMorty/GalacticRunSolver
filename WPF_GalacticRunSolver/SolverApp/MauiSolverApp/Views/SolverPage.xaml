@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SolverApp.Views.SolverPage"
+             xmlns:controls="clr-namespace:SolverApp.Views.Controls"
+             xmlns:local="clr-namespace:MauiSolverApp"
+             BackgroundImageSource="background.png"
+             x:Name="TheSolverPage"
+             NavigationPage.HasNavigationBar="False">
+    
+    <Grid Margin="{Binding Source={x:Static local:App.Margin}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="12*"/>
+            <RowDefinition Height="6*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="7*"/>
+            </Grid.ColumnDefinitions>
+            <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
+            <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="1000"/>
+        </Grid>
+
+        <Grid Grid.Row="1" BackgroundColor="#10FFFFFF"/>
+        <ScrollView x:Name="TheMapView" Orientation="Both" Grid.Row="1" >
+            <Grid VerticalOptions="Start" HorizontalOptions="Start">
+                <Image Source="{Binding _backgroundPhoto}" Opacity="0.4"/>
+                <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
+            </Grid>
+        </ScrollView>
+
+        <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical">
+            <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}" HorizontalOptions="Center" WidthRequest="150"/>
+
+            <ScrollView Orientation="Vertical">
+                <StackLayout Orientation="Vertical">
+                <StackLayout x:Name="SolutionsArea"
+                            Orientation="Vertical"
+                            BindableLayout.ItemsSource="{Binding _Solutions}">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate>
+                            <controls:SolutionControl/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </StackLayout>
+
+                <Label Text="{Binding _Log}" TextColor="White" Margin="10"/>
+                </StackLayout>
+            </ScrollView>
+        </StackLayout>
+    </Grid>
+
+</ContentPage>

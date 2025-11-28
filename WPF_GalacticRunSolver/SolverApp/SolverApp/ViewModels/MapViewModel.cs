@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
 
 namespace SolverApp.ViewModels
 {
@@ -18,30 +19,30 @@ namespace SolverApp.ViewModels
         {
             if (System.IO.File.Exists(path))
             {
-                _Map = new Map(path);
-                _InitialMap = new Map(_Map);
+                _Map = new Models.Map(path);
+                _InitialMap = new Models.Map(_Map);
             }
             else
             {
-                _Map = new Map(8);
-                _InitialMap = new Map(_Map);
+                _Map = new Models.Map(8);
+                _InitialMap = new Models.Map(_Map);
             }
             ID = previousID++;
             InitObjects();
         }
 
-        public MapViewModel(Map map)
+        public MapViewModel(Models.Map map)
         {
             _Map = map;
-            _InitialMap = new Map(_Map);
+            _InitialMap = new Models.Map(_Map);
             ID = previousID++;
             InitObjects();
         }
 
         public MapViewModel(int mapSize, int robotsCount = 4)
         {
-            _Map = new Map(mapSize, robotsCount);
-            _InitialMap = new Map(_Map);
+            _Map = new Models.Map(mapSize, robotsCount);
+            _InitialMap = new Models.Map(_Map);
             ID = previousID++;
             InitObjects();
         }
@@ -144,8 +145,8 @@ namespace SolverApp.ViewModels
 
         public ObservableCollection<ObservableCollection<CaseViewModel>> _Cases { get; set; }
 
-        public Map _Map {get; set;}
-        public Map _InitialMap {get; set;}
+        public Models.Map _Map {get; set;}
+        public Models.Map _InitialMap {get; set;}
 
     }
 }
