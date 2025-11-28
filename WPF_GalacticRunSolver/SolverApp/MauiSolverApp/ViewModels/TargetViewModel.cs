@@ -10,7 +10,7 @@ namespace SolverApp.ViewModels
 {
     public class TargetViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
         public TargetViewModel(Target target)
         {
@@ -32,7 +32,8 @@ namespace SolverApp.ViewModels
                 else
                 {
                     _Target._Color = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Color)));
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Color)));
                 }
             }
         }
@@ -62,9 +63,12 @@ namespace SolverApp.ViewModels
                 else
                 {
                     _Target._Position = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
+                    }
                 }
             }
         }

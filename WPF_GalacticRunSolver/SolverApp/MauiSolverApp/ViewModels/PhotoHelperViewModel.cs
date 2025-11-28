@@ -7,7 +7,7 @@ namespace SolverApp.ViewModels
 {
     class PhotoHelperViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
         public PhotoHelperViewModel(SolverViewModel solvervm)
         {
@@ -28,6 +28,7 @@ namespace SolverApp.ViewModels
         public void Refresh(bool photoLoaded)
         {
             PhotoLoaded = photoLoaded;
+            if (PropertyChanged == null) return;
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(PhotoLoaded)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(NoPhotoLoaded)));
         }

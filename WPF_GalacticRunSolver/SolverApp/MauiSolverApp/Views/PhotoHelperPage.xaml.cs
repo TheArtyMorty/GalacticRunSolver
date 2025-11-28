@@ -15,7 +15,8 @@ namespace SolverApp.Views
             try
             {
                 var photo = await MediaPicker.CapturePhotoAsync();
-                await LoadPhotoAsync(photo);
+                if (photo != null)
+                    await LoadPhotoAsync(photo);
 
             }
             catch (Exception e)
@@ -29,7 +30,8 @@ namespace SolverApp.Views
             try
             {
                 var photo = await MediaPicker.PickPhotoAsync();
-                await LoadPhotoAsync(photo);
+                if (photo != null)
+                    await LoadPhotoAsync(photo);
 
             }
             catch (Exception e)
@@ -57,7 +59,8 @@ namespace SolverApp.Views
         private void LoadPhoto(string path)
         {
             var dataContext = BindingContext as PhotoHelperViewModel;
-            dataContext.SetBackGroundImage(path);
+            if (dataContext != null)
+                dataContext.SetBackGroundImage(path);
             DropArea.SetPhoto(path);
         }
 

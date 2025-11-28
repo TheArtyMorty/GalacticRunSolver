@@ -27,11 +27,15 @@ namespace SolverApp.Views.Controls
             {
                 if (e.Data.Properties.ContainsKey("Target"))
                 {
-                    ((CaseViewModel)this.BindingContext).Drop(e.Data.Properties["Target"] as TargetViewModel);
+                    var target = e.Data.Properties["Target"] as TargetViewModel;
+                    if (target != null)
+                        ((CaseViewModel)this.BindingContext).Drop(target);
                 }
                 if (e.Data.Properties.ContainsKey("Robot"))
                 {
-                    ((CaseViewModel)this.BindingContext).Drop(e.Data.Properties["Robot"] as RobotViewModel);
+                    var robot = e.Data.Properties["Robot"] as RobotViewModel;
+                    if (robot != null)
+                        ((CaseViewModel)this.BindingContext).Drop(robot);
                 }
             }
         }

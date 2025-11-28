@@ -13,7 +13,7 @@ namespace SolverApp.ViewModels
 {
     public class MoveViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
         public MoveViewModel(EColor c, EMoveDirection m)
         {
@@ -37,7 +37,8 @@ namespace SolverApp.ViewModels
             set
             {
                 color = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Color)));
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Color)));
             }
         }
 
@@ -51,14 +52,15 @@ namespace SolverApp.ViewModels
             set
             {
                 direction = value;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Direction)));
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Direction)));
             }
         }
     }
 
     public class SolutionViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
         public ICommand _PlaySolution { get; }
         public void PlaySolution()
@@ -82,9 +84,12 @@ namespace SolverApp.ViewModels
 
         public void Refresh()
         {
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsPlaying)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsNotPlaying)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Enabled)));
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsPlaying)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_IsNotPlaying)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Enabled)));
+            }
         }
 
         SolverViewModel _solverVM;
@@ -118,7 +123,8 @@ namespace SolverApp.ViewModels
                 if (value != moves)
                 {
                     moves = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Moves)));
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Moves)));
                 }
             }
         }

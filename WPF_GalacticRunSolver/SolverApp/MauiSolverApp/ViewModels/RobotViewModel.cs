@@ -10,7 +10,7 @@ namespace SolverApp.ViewModels
 {
     public class RobotViewModel : INotifyPropertyChanged, IComparable
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
         static int idIncrement = 0;
 
@@ -21,10 +21,10 @@ namespace SolverApp.ViewModels
             ID = idIncrement++;
         }
 
-        public int CompareTo(object obj)
+        public int CompareTo(object? obj)
         {
             if (obj == null) return 1;
-            RobotViewModel other = obj as RobotViewModel;
+            RobotViewModel other = (RobotViewModel)obj;
             if (other._Robot._Position.X > _Robot._Position.X)
             {
                 return -1;
@@ -61,9 +61,12 @@ namespace SolverApp.ViewModels
                 else
                 {
                     _Robot._Position = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Position)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_X)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Y)));
+                    }
                 }
             }
         }

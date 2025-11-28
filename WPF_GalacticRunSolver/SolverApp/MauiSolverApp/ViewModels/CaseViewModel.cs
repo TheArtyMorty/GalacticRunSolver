@@ -33,7 +33,8 @@ namespace SolverApp.ViewModels
                 else
                 {
                     _Case._WallType = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_WallType)));
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_WallType)));
                 }
             }
         }

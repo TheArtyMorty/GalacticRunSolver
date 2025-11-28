@@ -10,6 +10,7 @@ using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;
 using Microsoft.Maui.ApplicationModel;
+using Android.Test.Suitebuilder.Annotation;
 
 namespace SolverApp.ViewModels
 {
@@ -38,8 +39,9 @@ namespace SolverApp.ViewModels
 
     public class SolverViewModel : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };
+        public event PropertyChangedEventHandler? PropertyChanged = (sender, e) => { };
 
+#pragma warning disable CS8618
         public SolverViewModel(SolverPage solverPage)
         {
             _solverPage = solverPage;
@@ -54,6 +56,7 @@ namespace SolverApp.ViewModels
             _worker.DoWork += worker_DoWork;
             _worker.RunWorkerCompleted += worker_RunWorkerCompleted;
         }
+#pragma warning restore CS8618
 
         public MapViewModel _map;
         public MapViewModel theMap { 
@@ -67,7 +70,8 @@ namespace SolverApp.ViewModels
                 else
                 {
                     _map = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(theMap)));
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(theMap)));
                     Clear();
                 }
             }
@@ -103,7 +107,8 @@ namespace SolverApp.ViewModels
                 else
                 {
                     log = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Log)));
+                    if (PropertyChanged != null)
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Log)));
                 }
             }
         }
@@ -112,7 +117,8 @@ namespace SolverApp.ViewModels
         {
             logger.Clear();
             _Solutions = new ObservableCollection<SolutionViewModel>();
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
         }
 
         public Command _SolveMap { get; }
@@ -130,7 +136,8 @@ namespace SolverApp.ViewModels
                 Clear();
                 _worker.RunWorkerAsync();
                 theMap._InitialMap = new Models.Map(theMap._Map);
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
             }
         }
 
@@ -154,7 +161,8 @@ namespace SolverApp.ViewModels
             if (!simulationRunning)
             {
                 simulationRunning = true;
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
                 foreach (var svm in _Solutions)
                 {
                     svm.Refresh();
@@ -172,7 +180,8 @@ namespace SolverApp.ViewModels
         private void OnFinished()
         {
             simulationRunning = false;
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonEnabled)));
             foreach (var svm in _Solutions)
             {
                 svm.Refresh();
@@ -180,21 +189,26 @@ namespace SolverApp.ViewModels
             _toDo();
         }
 
-        void worker_DoWork(object sender, DoWorkEventArgs e)
+        void worker_DoWork(object? sender, DoWorkEventArgs e)
         {
             var solutions = Solver.Solve(theMap._Map, logger, ref _worker);
             e.Result = solutions;
         }
 
-        void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        void worker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e)
         {
+            if (e.Result == null)
+                return;
             var workerResult = (List<Solution>)e.Result;
             ObservableCollection<SolutionViewModel> result = new ObservableCollection<SolutionViewModel>
                 (workerResult.Select(solution => new SolutionViewModel(solution, this)));
 
             _Solutions = result;
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolveButtonText)));
+            }
         }
 
 
@@ -203,14 +217,16 @@ namespace SolverApp.ViewModels
         internal void ZoomInOrOut(double v, double mapControlWidth)
         {
             _ZoomSize = (int)(-50 + mapControlWidth + v * mapControlWidth);
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
         }
         
         public string _backgroundPhoto {  get; set; }
         internal void SetBackgroundImage(string photoPath)
         {
             _backgroundPhoto = photoPath;
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
         }
     }
 }

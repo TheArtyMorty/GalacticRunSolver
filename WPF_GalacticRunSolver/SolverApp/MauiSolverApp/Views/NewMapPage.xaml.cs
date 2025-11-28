@@ -68,7 +68,8 @@ namespace SolverApp.Views
             {
                 var dataContext = this.BindingContext as NewMapViewModel;
                 string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".map");
-                dataContext.SaveMap(_fileName);
+                if (dataContext != null)
+                    dataContext.SaveMap(_fileName);
             }
         }
         async void LoadMap(object sender, EventArgs args)
@@ -80,7 +81,8 @@ namespace SolverApp.Views
             if (File.Exists(_fileName))
             {
                 var dataContext = this.BindingContext as NewMapViewModel;
-                dataContext.LoadMap(_fileName);
+                if (dataContext != null)
+                    dataContext.LoadMap(_fileName);
                 await Shell.Current.GoToAsync("//SolverPage");
             }
         }

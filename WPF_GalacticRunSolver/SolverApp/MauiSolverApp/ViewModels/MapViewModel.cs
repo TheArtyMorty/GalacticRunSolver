@@ -15,6 +15,7 @@ namespace SolverApp.ViewModels
         static int previousID = 0;
         private int ID = 0;
 
+#pragma warning disable CS8618
         public MapViewModel(String path)
         {
             if (System.IO.File.Exists(path))
@@ -46,6 +47,7 @@ namespace SolverApp.ViewModels
             ID = previousID++;
             InitObjects();
         }
+#pragma warning restore CS8618
 
         private void InitObjects()
         {
@@ -55,9 +57,12 @@ namespace SolverApp.ViewModels
             _Robots = new ObservableCollection<RobotViewModel>
                     (_Map._Robots.Select(robot => new RobotViewModel(robot)));
             _Target = new TargetViewModel(_Map._Target);
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+            }
         }
 
         public void SaveMap(string path)
@@ -80,10 +85,13 @@ namespace SolverApp.ViewModels
             }
             _Target._Position = _InitialMap._Target._Position;
             _Target._Color = _InitialMap._Target._Color;
-            
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
-            PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Target)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Cases)));
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+            }
         }
 
         public async void PlaySolution(Solution solution, Action onFinished)
@@ -135,7 +143,10 @@ namespace SolverApp.ViewModels
             {
                 await Task.Delay(delay);
                 robot.IncrementMove(increment);
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+                }
             }
         }
 
