@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiSolverApp.Views.TestPage"
+             xmlns:ctrls="clr-namespace:SolverApp.Views.Controls"
+             Title="TestPage">
+    <Grid x:Name="Helper" Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="15*"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Text="TEXT ON TOP ROW" FontAttributes="Bold"/>
+
+        <Frame Grid.Row="1" Margin="0" CornerRadius="0" Padding="0">
+            <ctrls:PanPinchContainer>
+                <Image Source="dotnet_bot.png" HeightRequest="185" Aspect="AspectFit"/>
+            </ctrls:PanPinchContainer>
+        </Frame>
+
+        <Button Text="BUTOON ON BOTTOM ROW" Grid.Row="2" WidthRequest="200"/>
+    </Grid>
+</ContentPage>

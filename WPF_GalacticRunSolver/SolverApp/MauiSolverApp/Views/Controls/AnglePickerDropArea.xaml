@@ -4,24 +4,13 @@
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui;assembly=SkiaSharp.Views.Maui.Core"
              xmlns:skia_controls="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:views="clr-namespace:SolverApp.Views"
+             xmlns:ctrls="clr-namespace:SolverApp.Views.Controls"
              x:Class="SolverApp.Views.Controls.AnglePickerDropArea">
-    <ContentView.Content>
-        <Grid BackgroundColor="#20ffffff">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="9*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="7*"/>
-                    </Grid.ColumnDefinitions>
-                    <Label TextColor="White" Text="Zoom : " FontSize="Large" VerticalTextAlignment="Center" Grid.Column="0"/>
-                    <Slider x:Name="ZoomSlider" WidthRequest="150" Grid.Column="1" ValueChanged="OnSliderValueChanged" Minimum="0" Maximum="3" Value="0"/>
-                </Grid>
-                <skia_controls:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface"  Grid.Row="1" />
-            </Grid>
-        </Grid>
+    <ContentView.Content BackgroundColor="#20ffffff">
+        <Frame Grid.Row="1" Margin="0" CornerRadius="0" Padding="0">
+            <ctrls:PanPinchContainer>
+                <skia_controls:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
+            </ctrls:PanPinchContainer>
+        </Frame>
     </ContentView.Content>
 </ContentView>

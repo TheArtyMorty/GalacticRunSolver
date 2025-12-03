@@ -1,4 +1,5 @@
-﻿using SolverApp.ViewModels;
+﻿using MauiSolverApp.Views;
+using SolverApp.ViewModels;
 using SolverApp.Views;
 
 namespace MauiSolverApp
@@ -20,6 +21,8 @@ namespace MauiSolverApp
             PhotoHelperPage photoHelperPage = new PhotoHelperPage();
             photoHelperPage.BindingContext = new PhotoHelperViewModel(solverVM);
             ShellPhotoHelperPage.Content = photoHelperPage;
+            //TestPage test = new TestPage();
+            //ShellPhotoHelperPage.Content = test;
         }
     }
 }

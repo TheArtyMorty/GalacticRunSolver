@@ -1,5 +1,7 @@
-﻿using SkiaSharp;
+﻿using Android.Icu.Number;
+using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using System.Diagnostics;
 
 namespace SolverApp.Views.Controls
 {
@@ -161,19 +163,31 @@ namespace SolverApp.Views.Controls
         const int CORNER = 30;
         const int RADIUS = 200;     // pixel radius of touch hit-test
 
+#pragma warning disable CS8618
         public AnglePickerDropArea()
         {
             InitializeComponent();
 
-            var tapGestureRecognizer = new TapGestureRecognizer();
-            tapGestureRecognizer.Tapped += OnTapGestureRecognizerTapped;
-            canvasView.GestureRecognizers.Add(tapGestureRecognizer);
+            //var tapGestureRecognizer = new TapGestureRecognizer();
+            //tapGestureRecognizer.Tapped += OnTapGestureRecognizerTapped;
+            //canvasView.GestureRecognizers.Add(tapGestureRecognizer);
 
-            var dragGestureRecognizer = new DragGestureRecognizer();
-            dragGestureRecognizer.DragStarting += OnDragGestureRecognizerDragStarting;
-            dragGestureRecognizer.DropCompleted += OnDragGestureRecognizerDropCompleted;
-            canvasView.GestureRecognizers.Add(dragGestureRecognizer);
+            //var dropGestureRecognizer = new DropGestureRecognizer();
+            //dropGestureRecognizer.DragOver += OnDragGestureRecognizerDragOver;
+            //dropGestureRecognizer.Drop += OnDragGestureRecognizerDrop;
+
+            //var dragGestureRecognizer = new DragGestureRecognizer();
+            //dragGestureRecognizer.CanDrag = true;
+            //dragGestureRecognizer.DragStarting += OnDragGestureRecognizerDragStarting;
+            //dragGestureRecognizer.DropCompleted += OnDragGestureRecognizerDropCompleted;
+            //canvasView.GestureRecognizers.Add(dragGestureRecognizer);
+
+            //var panGestureRecognizer = new PanGestureRecognizer();
+            //panGestureRecognizer.PanUpdated += OnPanGestureRecognizerPanUpdated;
+            //panGestureRecognizer.TouchPoints = 1;
+            //canvasView.GestureRecognizers.Add(panGestureRecognizer);
         }
+#pragma warning restore CS8618
 
         // Touch tracking
         struct TouchPoint
@@ -183,89 +197,110 @@ namespace SolverApp.Views.Controls
         }
 
         Dictionary<long, TouchPoint> touchPoints = new Dictionary<long, TouchPoint>();
-        private long panningTouchPoint = -1;
-        private SKPoint panningOffset;
 
-        async void OnTapGestureRecognizerTapped(object? sender, TappedEventArgs e)
-        {
-            // TODO
-        }
-
-        async void OnDragGestureRecognizerDragStarting(object? sender, DragStartingEventArgs e)
-        {
-            // TODO
-        }
-        
-        async void OnDragGestureRecognizerDropCompleted(object? sender, DropCompletedEventArgs e)
-        {
-            // TODO
-        }
-
-        //void OnTouchEffectTouchAction(object sender, TouchActionEventArgs args)
-        //{
-        //    SKPoint pixelLocation = ConvertToPixel(args.Location);
-        //    SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
-
-        //    switch (args.Type)
-        //    {
-        //        case TouchActionType.Pressed:
-        //            // Convert radius to bitmap/cropping scale
-        //            float radius = inverseBitmapMatrix.ScaleX * RADIUS;
-
-        //            // Find corner that the finger is touching
-        //            int cornerIndex = cornerSelection.HitTest(bitmapLocation, radius);
-
-        //            if (cornerIndex != -1 && !touchPoints.ContainsKey(args.Id))
-        //            {
-        //                TouchPoint touchPoint = new TouchPoint
-        //                {
-        //                    CornerIndex = cornerIndex,
-        //                    Offset = bitmapLocation - cornerSelection.Corners[cornerIndex]
-        //                };
-
-        //                touchPoints.Add(args.Id, touchPoint);
-        //            }
-        //            else if (panningTouchPoint == -1)
-        //            {
-        //                panningTouchPoint = args.Id;
-        //                panningOffset = bitmapLocation;
-        //            }
-        //            break;
-
-        //        case TouchActionType.Moved:
-        //            if (touchPoints.ContainsKey(args.Id))
-        //            {
-        //                TouchPoint touchPoint = touchPoints[args.Id];
-        //                cornerSelection.MoveCorner(touchPoint.CornerIndex,
-        //                                        bitmapLocation - touchPoint.Offset);
-        //                canvasView.InvalidateSurface();
-        //            }
-        //            else if (panningTouchPoint == args.Id)
-        //            {
-        //                PanPoint += (bitmapLocation - panningOffset);
-        //                canvasView.InvalidateSurface();
-        //            }
-        //            break;
-
-        //        case TouchActionType.Released:
-        //        case TouchActionType.Cancelled:
-        //            if (touchPoints.ContainsKey(args.Id))
-        //            {
-        //                touchPoints.Remove(args.Id);
-        //            }
-        //            else
-        //            {
-        //                panningTouchPoint = -1;
-        //            }
-        //            break;
-        //    }
-        //}
-
-        //SKPoint ConvertToPixel(TouchTrackingPoint pt)
+        //SKPoint ConvertToPixel(Point pt)
         //{
         //    return new SKPoint((float)(canvasView.CanvasSize.Width * pt.X / Width),
         //                       (float)(canvasView.CanvasSize.Height * pt.Y / Height));
         //}
+
+        //void OnTapGestureRecognizerTapped(object? sender, TappedEventArgs e)
+        //{
+        //    // Do I really have to handle tap ? 
+        //}
+
+        //SKPoint pan_start;
+        //void OnPanGestureRecognizerPanUpdated(object? sender, PanUpdatedEventArgs e)
+        //{
+        //    switch (e.StatusType)
+        //    {
+        //        case GestureStatus.Started:
+        //            Debug.WriteLine("Pan Started");
+        //            pan_start = PanPoint;
+        //            break;
+        //        case GestureStatus.Running:
+        //            var point = new SKPoint((float)(e.TotalX), (float)(e.TotalY));
+        //            Debug.WriteLine(string.Format("total {0}x {0}y", point.X, point.Y));
+
+        //            SKPoint pixelLocation = ConvertToPixel(new Point(point.X, point.Y));
+        //            //SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
+
+        //            PanPoint += pixelLocation;
+        //            Debug.WriteLine(string.Format("Pan point {0}x {0}y", PanPoint.X, PanPoint.Y));
+        //            canvasView.InvalidateSurface();
+        //            break;
+        //        case GestureStatus.Completed:
+        //            canvasView.InvalidateSurface();
+        //            break;
+        //        case GestureStatus.Canceled:
+        //            PanPoint = pan_start;
+        //            canvasView.InvalidateSurface();
+        //            break;
+        //    }
+        //}
+
+        //void OnDragGestureRecognizerDragOver(object? sender, DragEventArgs e)
+        //{
+        //    var point = e.GetPosition(canvasView);
+        //    if (point == null || !point.HasValue)
+        //        return;
+
+        //    SKPoint pixelLocation = ConvertToPixel(point.Value);
+        //    SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
+
+        //    if (touchPoints.ContainsKey(0))
+        //    {
+        //        TouchPoint touchPoint = touchPoints[0];
+        //        cornerSelection.MoveCorner(touchPoint.CornerIndex,
+        //                                bitmapLocation - touchPoint.Offset);
+        //        canvasView.InvalidateSurface();
+        //    }
+        //}
+
+        //void OnDragGestureRecognizerDragStarting(object? sender, DragStartingEventArgs e)
+        //{
+        //    var point = e.GetPosition(canvasView);
+        //    if (point == null || !point.HasValue)
+        //        return;
+
+        //    SKPoint pixelLocation = ConvertToPixel(point.Value);
+        //    SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
+
+        //    //Convert radius to bitmap/ cropping scale
+        //    float radius = inverseBitmapMatrix.ScaleX * RADIUS;
+
+        //    // Find corner that the finger is touching
+        //    int cornerIndex = cornerSelection.HitTest(bitmapLocation, radius);
+
+        //    if (cornerIndex != -1)
+        //    {
+        //        TouchPoint touchPoint = new TouchPoint
+        //        {
+        //            CornerIndex = cornerIndex,
+        //            Offset = bitmapLocation - cornerSelection.Corners[cornerIndex]
+        //        };
+
+        //        touchPoints.Add(0, touchPoint);
+        //    }
+        //}
+
+        //void OnDragGestureRecognizerDrop(object? sender, DropEventArgs e)
+        //{
+        //    if (touchPoints.ContainsKey(0))
+        //    {
+        //        touchPoints.Remove(0);
+        //    }
+        //}
+
+
+        //void OnDragGestureRecognizerDropCompleted(object? sender, DropCompletedEventArgs e)
+        //{
+        //    if (touchPoints.ContainsKey(0))
+        //    {
+        //        touchPoints.Remove(0);
+        //    }
+        //}
+
 
         // Drawing objects
         SKPaint cornerStroke = new SKPaint
@@ -343,6 +378,7 @@ namespace SolverApp.Views.Controls
             PanPoint.Y = Math.Max(PanPoint.Y, minY);
             PanPoint.X = Math.Min(PanPoint.X, maxX);
             PanPoint.Y = Math.Min(PanPoint.Y, maxY);
+            Debug.WriteLine(string.Format("Clamped : {0}x {0}y", PanPoint.X, PanPoint.Y));
         }
 
         private void SetDefaultScaleIfNeeded(SKImageInfo info)
@@ -374,15 +410,10 @@ namespace SolverApp.Views.Controls
 
         private void ResetPanAndZoom()
         {
+            Debug.WriteLine("Pan resetted  !!!!!!!!!!!!!!!!!!!!!!!!!!!");
             PanPoint = new SKPoint(0, 0);
             _defaultScale = -1;
-            ZoomSlider.Value = 0;
             canvasView.InvalidateSurface();
-        }
-
-        public void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
-        {
-            ZoomInOrOut(e.NewValue, Math.Max(canvasView.Width, canvasView.Height));
         }
 
         private double _defaultScale;
