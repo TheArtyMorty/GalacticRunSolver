@@ -126,7 +126,7 @@ namespace SolverApp.Views.Controls
             await ClampTranslationAsync(targetX, targetY, animate);
         }
 
-        private async void DoubleTappedAsync(object? sender, TappedEventArgs e)
+        public async void DoubleTappedAsync(object? sender, TappedEventArgs e)
         {
             _startScale = Content.Scale;
             _currentScale = _startScale;
@@ -159,7 +159,7 @@ namespace SolverApp.Views.Controls
             _panY = Content.TranslationY;
         }
 
-        private async void OnPanUpdatedAsync(object? sender, PanUpdatedEventArgs e)
+        public async void OnPanUpdatedAsync(object? sender, PanUpdatedEventArgs e)
         {
             if (!_isPanEnabled)
             {
@@ -197,7 +197,7 @@ namespace SolverApp.Views.Controls
             }
         }
 
-        private async void OnPinchUpdatedAsync(object? sender, PinchGestureUpdatedEventArgs e)
+        public async void OnPinchUpdatedAsync(object? sender, PinchGestureUpdatedEventArgs e)
         {
             if (e.Status == GestureStatus.Started)
             {

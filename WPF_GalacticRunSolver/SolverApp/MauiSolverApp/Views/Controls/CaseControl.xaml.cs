@@ -1,15 +1,4 @@
-﻿using SolverApp.Models;
-using SolverApp.ViewModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Microsoft.Maui.Controls.Xaml;
-using Microsoft.Maui.Controls.Compatibility;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui;
+﻿using SolverApp.ViewModels;
 
 namespace SolverApp.Views.Controls
 {
