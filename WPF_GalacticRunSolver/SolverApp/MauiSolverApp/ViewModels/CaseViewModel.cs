@@ -5,6 +5,7 @@ using System.Windows.Input;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;
+using SolverApp.Views;
 
 namespace SolverApp.ViewModels
 {
@@ -45,6 +46,8 @@ namespace SolverApp.ViewModels
 
         public void IncrementWallType()
         {
+            if (!SolverPage.AllowCustomWalls)
+                return;
             int type = (int)_WallType;
             type++;
             if (type >= Enum.GetNames(typeof(EWallType)).Length)
@@ -56,6 +59,8 @@ namespace SolverApp.ViewModels
 
         public void DecrementWallType()
         {
+            if (!SolverPage.AllowCustomWalls)
+                return;
             int type = (int)_WallType;
             type--;
             if (type < 0)

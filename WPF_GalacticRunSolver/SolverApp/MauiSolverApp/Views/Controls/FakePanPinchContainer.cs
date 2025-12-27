@@ -9,9 +9,6 @@ namespace SolverApp.Views.Controls
         private readonly TapGestureRecognizer _doubleTapGestureRecognizer;
         private readonly PanGestureRecognizer _panGestureRecognizer;
         private readonly PinchGestureRecognizer _pinchGestureRecognizer;
-        private readonly SwipeGestureRecognizer _swipeGestureRecognizer;
-
-        private bool isSwipeEnabled = true;
 
         public FakePanPinchContainer() : base()
         {
@@ -34,11 +31,6 @@ namespace SolverApp.Views.Controls
 
             _doubleTapGestureRecognizer.Tapped += DoubleTappedAsyncForwarded;
             GestureRecognizers.Add(_doubleTapGestureRecognizer);
-
-            _swipeGestureRecognizer = new SwipeGestureRecognizer { Threshold = 100,  Direction = SwipeDirection.Left | SwipeDirection.Right };
-            _swipeGestureRecognizer.Swiped += OnSwiped;
-
-            GestureRecognizers.Add(_swipeGestureRecognizer);
         }
 
         PanPinchContainer? realContainer = null;
@@ -47,50 +39,11 @@ namespace SolverApp.Views.Controls
             realContainer = real;
         }
 
-        void OnTimerEnd()
-        {
-            IsVisible = true;
-        }
-
-        void OnSwiped(object? sender, SwipedEventArgs e)
-        {
-            if (!isSwipeEnabled)
-            {
-                return;
-            }
-
-            int disableTime = e.Direction == SwipeDirection.Right ? 10 : 2;
-            var timer = Application.Current.Dispatcher.CreateTimer();
-            timer.IsRepeating = false;
-            timer.Interval = TimeSpan.FromSeconds(disableTime);
-            timer.Tick += (s, e) => OnTimerEnd();
-            timer.Start();
-            // Disable the fake ui to allow for other interactions
-            IsVisible = false;
-        }
-
         public void OnPanUpdatedAsyncForwarded(object? sender, PanUpdatedEventArgs e)
         {
             if (realContainer == null)
             {
                 return;
-            }
-
-            switch (e.StatusType)
-            {
-                case GestureStatus.Started:
-                case GestureStatus.Running:
-                    isSwipeEnabled = false;
-                    break;
-                case GestureStatus.Completed:
-                case GestureStatus.Canceled:
-                default:
-                    var timer = Application.Current.Dispatcher.CreateTimer();
-                    timer.IsRepeating = false;
-                    timer.Interval = TimeSpan.FromSeconds(0.5);
-                    timer.Tick += (s, e) => { isSwipeEnabled = true; };
-                    timer.Start();
-                    break;
             }
 
             realContainer.OnPanUpdatedAsync(sender, e);

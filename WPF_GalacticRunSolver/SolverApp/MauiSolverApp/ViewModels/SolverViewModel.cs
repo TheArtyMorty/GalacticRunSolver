@@ -49,6 +49,8 @@ namespace SolverApp.ViewModels
             LoadMapFromAutosave();
             _SolveMap = new Command(SolveMap);
 
+            _ResetWalls = new Command(ResetWalls);
+
             //background Worker
             _worker = new BackgroundWorker();
             _worker.WorkerSupportsCancellation = true;
@@ -121,7 +123,15 @@ namespace SolverApp.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Solutions)));
         }
 
+
+        private void ResetWalls()
+        {
+            theMap.ResetWalls();
+            Clear();
+        }
+
         public Command _SolveMap { get; }
+        public Command _ResetWalls { get; }
 
         BackgroundWorker _worker;
         public void SolveMap()
@@ -152,6 +162,55 @@ namespace SolverApp.ViewModels
             string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AutoSave.map");
             CreateNewMap(new MapViewModel(fileName));
         }
+
+        public bool solverModeOn = false;
+        public bool _SolverModeOn
+        {
+            get
+            {
+                return solverModeOn;
+            }
+            set
+            {
+                if (solverModeOn == value) return;
+                else
+                {
+                    solverModeOn = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolverModeOn)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_SolverModeOff)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_PanEnabled)));
+                    }
+                }
+            }
+        }
+
+        public bool _SolverModeOff { get { return !solverModeOn; } }
+
+        public bool panModeOn = false;
+        public bool _PanModeOn
+        {
+            get
+            {
+                return panModeOn;
+            }
+            set
+            {
+                if (panModeOn == value) return;
+                else
+                {
+                    panModeOn = value;
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_PanModeOn)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_PanEnabled)));
+                    }
+                }
+            }
+        }
+
+        public bool _PanEnabled { get { return solverModeOn || _PanModeOn; } }
 
         public string _SolveButtonText { get { return _worker.IsBusy ? "Stop" : "Solve"; } }
         public bool _SolveButtonEnabled { get { return !simulationRunning; } }
@@ -227,6 +286,11 @@ namespace SolverApp.ViewModels
             _backgroundPhoto = photoPath;
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
+        }
+
+        internal void SetQuadrant(string quadrant, string board)
+        {
+            theMap.SetQuadrant(quadrant, board);
         }
     }
 }

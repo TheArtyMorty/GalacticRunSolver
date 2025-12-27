@@ -25,7 +25,7 @@ namespace SolverApp.ViewModels
             }
             else
             {
-                _Map = new Models.Map(8);
+                _Map = new Models.Map(16);
                 _InitialMap = new Models.Map(_Map);
             }
             ID = previousID++;
@@ -148,6 +148,202 @@ namespace SolverApp.ViewModels
                     PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
                 }
             }
+        }
+
+        internal void ResetWalls()
+        {
+            foreach (var row in _Cases)
+            {
+                foreach (CaseViewModel caseVM in row)
+                {
+                    caseVM._WallType = EWallType.None;
+                }
+            }
+        }
+
+        internal void ResetQuadrant(string quadrant)
+        {
+            int minX = 0;
+            int maxX = 16;
+            int minY = 0;
+            int maxY = 16;
+            switch (quadrant)
+            {
+                case "TopLeft":
+                    minX = 0;
+                    minY = 0;
+                    maxY = 8;
+                    maxX = 8;
+                    break;
+                case "TopRight":
+                    minX = 8;
+                    minY = 0;
+                    maxY = 8;
+                    maxX = 16;
+                    break;
+                case "BottomLeft":
+                    minX = 0;
+                    minY = 8;
+                    maxY = 16;
+                    maxX = 8;
+                    break;
+                case "BottomRight":
+                    minX = 8;
+                    minY = 8;
+                    maxY = 16;
+                    maxX = 16;
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (var row in _Cases)
+            {
+                foreach (CaseViewModel caseVM in row)
+                {
+                    if (caseVM._Case._Position.X >= minX && caseVM._Case._Position.X < maxX &&
+                        caseVM._Case._Position.Y >= minY && caseVM._Case._Position.Y < maxY)
+                        caseVM._WallType = EWallType.None;
+                }
+            }
+        }
+
+        internal void SetQuadrant(string quadrant, string board)
+        {
+            ResetQuadrant(quadrant);
+
+            List<Tuple<int,int, EWallType>> wallsToSet = new List<Tuple<int, int, EWallType>>();
+            switch (board)
+            {
+                case "A":
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 0, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 4, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 2, EWallType.TopRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 5, EWallType.BottomRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 1, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 7, EWallType.BottomLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
+                    break;
+                case "B":
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 0, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 5, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 2, EWallType.BottomRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(3, 1, EWallType.BottomLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 3, EWallType.BottomRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 5, EWallType.TopRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 6, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
+                    break;
+                case "C":
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 0, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 4, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 1, EWallType.BottomLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 2, EWallType.TopRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 5, EWallType.BottomRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 6, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
+                    break;
+                case "D":
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 0, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 2, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 1, EWallType.TopRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 3, EWallType.BottomLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 4, EWallType.TopLeft));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(3, 6, EWallType.BottomRight));
+                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
+                    break;
+                default:
+                    break;
+            }
+
+            for (int i = 0; i < wallsToSet.Count; i++)
+            {
+                switch (quadrant)
+                {
+                    case "TopRight":
+                        RotateRight(ref wallsToSet, i);
+                        break;
+                    case "BottomLeft":
+                        RotateLeft(ref wallsToSet, i);
+                        break;
+                    case "BottomRight":
+                        RotateTwice(ref wallsToSet, i);
+                        break;
+                    case "TopLeft":
+                    default:
+                        break;
+                }
+            }
+
+            foreach (var wall in wallsToSet)
+            {
+                SetCase(wall.Item1, wall.Item2, wall.Item3);
+            }
+        }
+
+        internal void RotateRight(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        {
+            var toRotate = wallsToSet[i];
+            EWallType wallType = toRotate.Item3;
+            int newX = 15 - toRotate.Item1;
+            int newY = toRotate.Item2;
+            EWallType newWallType;
+            if (wallType == EWallType.BottomLeft)
+            {
+                newWallType = EWallType.TopLeft;
+            }
+            else
+            {
+                newWallType = wallType + 1;
+            }
+            wallsToSet[i] = new Tuple<int, int, EWallType>(newY, newX, newWallType);
+        }
+
+        internal void RotateLeft(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        {
+            var toRotate = wallsToSet[i];
+            EWallType wallType = toRotate.Item3;
+            int newX = toRotate.Item1;
+            int newY = 15 - toRotate.Item2;
+            EWallType newWallType;
+            if (wallType == EWallType.TopLeft)
+            {
+                newWallType = EWallType.BottomLeft;
+            }
+            else
+            {
+                newWallType = wallType - 1;
+            }
+            wallsToSet[i] = new Tuple<int, int, EWallType>(newY, newX, newWallType);
+        }
+
+        internal void RotateTwice(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        {
+            var toRotate = wallsToSet[i];
+            int newX = 15 - toRotate.Item2;
+            int newY = 15 - toRotate.Item1;
+            EWallType newWallType = EWallType.None;
+            switch (toRotate.Item3)
+            {
+                case EWallType.TopLeft:
+                    newWallType = EWallType.BottomRight;
+                    break;
+                case EWallType.TopRight:
+                    newWallType = EWallType.BottomLeft;
+                    break;
+                case EWallType.BottomLeft:
+                    newWallType = EWallType.TopRight;
+                    break;
+                case EWallType.BottomRight:
+                    newWallType = EWallType.TopLeft;
+                    break;
+            }
+            wallsToSet[i] = new Tuple<int, int, EWallType>(newY, newX, newWallType);
+        }
+
+        internal void SetCase(int x, int y, EWallType wallType)
+        {
+            _Cases[x][y]._WallType = wallType;
         }
 
         public TargetViewModel _Target {  get; set; }

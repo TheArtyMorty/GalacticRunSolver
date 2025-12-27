@@ -11,11 +11,26 @@
     
     <Grid Margin="{Binding Source={x:Static local:App.Margin}}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="12*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="10*"/>
             <RowDefinition Height="6*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" BackgroundColor="#10FFFFFF">
+        <Grid Grid.Row="0" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="15"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Text="Edit Mode " TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" Grid.Column="1"/>
+            <Switch x:Name="SwitchMode" Toggled="Switch_Toggled" HorizontalOptions="Center" VerticalOptions="Center" Grid.Column="2" />
+            <Label Text="Solver" TextColor="White" HorizontalOptions="Start" VerticalOptions="Center" Margin="10" Grid.Column="3"/>
+        </Grid>
+
+        <Grid Grid.Row="1" BackgroundColor="#10FFFFFF">
             <Frame Margin="0" CornerRadius="0" Padding="0" BackgroundColor="Transparent">
                 <ctrls:PanPinchContainer x:Name="MainPanPinch">
                     <Grid>
@@ -26,15 +41,66 @@
             </Frame>
         </Grid>
 
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="1" IsVisible="{Binding _PanEnabled}">
             <Frame Margin="0" CornerRadius="0" Padding="0" BackgroundColor="Transparent">
                 <ctrls:FakePanPinchContainer x:Name="FakePanPinch">
-                    <Rectangle Fill="#44444444"/>
+                    <Rectangle Fill="#11111111"/>
                 </ctrls:FakePanPinchContainer>
             </Frame>
         </Grid>
 
-        <StackLayout x:Name="SolverArea" Grid.Row="1" Orientation="Vertical">
+        <ScrollView Orientation="Vertical" Grid.Row="2" Margin="5">
+            <StackLayout x:Name="EditModeArea" Padding="5"  Orientation="Vertical" IsVisible="{Binding _SolverModeOff}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Label Text="Pan Mode :    On " TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" Grid.Column="1"/>
+                    <Switch x:Name="PanMode" Toggled="PanMode_Toggled" HorizontalOptions="Center" VerticalOptions="Center" Grid.Column="2" />
+                    <Label Text=" Off" TextColor="White" HorizontalOptions="Start" VerticalOptions="Center" Margin="10" Grid.Column="3"/>
+                </Grid>
+                <HorizontalStackLayout Margin="5">
+                    <CheckBox CheckedChanged="CheckBox_CheckedChanged" />
+                    <Label Text=" Allow placing custom walls."/>
+                </HorizontalStackLayout>
+                <Button Text="Reset walls" Command="{Binding _ResetWalls}" Margin="5"/>
+                <HorizontalStackLayout>
+                    <Label Text="Top Left Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopLeft"  Margin="5"/>
+                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopLeft"  Margin="5"/>
+                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopLeft"  Margin="5"/>
+                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopLeft"  Margin="5"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label Text="Top Right Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopRight" Margin="5"/>
+                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopRight" Margin="5"/>
+                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopRight" Margin="5"/>
+                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopRight" Margin="5"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label Text="Bottom Left Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomLeft" Margin="5"/>
+                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomLeft" Margin="5"/>
+                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomLeft" Margin="5"/>
+                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomLeft" Margin="5"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout>
+                    <Label Text="Bottom Right Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomRight" Margin="5"/>
+                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomRight" Margin="5"/>
+                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomRight" Margin="5"/>
+                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomRight" Margin="5"/>
+                </HorizontalStackLayout>
+            </StackLayout>
+        </ScrollView>
+
+        <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical" IsVisible="{Binding _SolverModeOn}" Margin="5">
             <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}" HorizontalOptions="Center" WidthRequest="150"/>
 
             <ScrollView Orientation="Vertical">
