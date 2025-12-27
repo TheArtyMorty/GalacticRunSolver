@@ -16,7 +16,7 @@ namespace SolverApp.Views.Controls
             IsClippedToBounds = true;
 
             _panGestureRecognizer = new PanGestureRecognizer();
-            _panGestureRecognizer.TouchPoints = 2;
+            _panGestureRecognizer.TouchPoints = 1;
             _panGestureRecognizer.PanUpdated += OnPanUpdatedAsyncForwarded;
             GestureRecognizers.Add(_panGestureRecognizer);
 

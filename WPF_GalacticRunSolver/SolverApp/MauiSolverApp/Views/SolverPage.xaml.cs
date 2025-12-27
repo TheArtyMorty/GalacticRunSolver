@@ -10,6 +10,13 @@ namespace SolverApp.Views
             InitializeComponent();
 
             FakePanPinch.ConnectToRealContainer(MainPanPinch);
+
+            List<string> allEditions = new List<string> {
+                "1st/3rd Edition (Red Box)",
+                "2nd Edition (Blue Box)" };
+
+            BoardEdition.ItemsSource = allEditions;
+            BoardEdition.SelectedItem = allEditions[0];
         }
 
         public void GenerateMap(MapViewModel map)
@@ -43,7 +50,8 @@ namespace SolverApp.Views
                 var splitted = parameters.Split(';');
                 var quadrant = splitted[1];
                 var board = splitted[0];
-                bindingContext.SetQuadrant(quadrant, board);
+                var editionIndex = BoardEdition.ItemsSource.Cast<string>().ToList().IndexOf((string)BoardEdition.SelectedItem);
+                bindingContext.SetQuadrant(quadrant, board, editionIndex);
             }
         }
 

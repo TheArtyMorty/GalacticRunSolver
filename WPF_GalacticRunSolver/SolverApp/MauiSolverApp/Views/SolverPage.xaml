@@ -66,37 +66,80 @@
                 </Grid>
                 <HorizontalStackLayout Margin="5">
                     <CheckBox CheckedChanged="CheckBox_CheckedChanged" />
-                    <Label Text=" Allow placing custom walls."/>
+                    <Label Text=" Allow placing custom walls." TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" />
                 </HorizontalStackLayout>
-                <Button Text="Reset walls" Command="{Binding _ResetWalls}" Margin="5"/>
-                <HorizontalStackLayout>
-                    <Label Text="Top Left Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopLeft"  Margin="5"/>
-                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopLeft"  Margin="5"/>
-                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopLeft"  Margin="5"/>
-                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopLeft"  Margin="5"/>
+                <ListView x:Name="BoardEdition">
+                    
+                </ListView>
+                <HorizontalStackLayout BackgroundColor="#11ffffff">
+                    <Label Text="Top Left :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout>
+                            <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopLeft" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Margin="0,3,0,0">
+                            <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;TopLeft" Margin="5,0,0,0"/>
+                            <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;TopLeft" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
-                <HorizontalStackLayout>
-                    <Label Text="Top Right Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopRight" Margin="5"/>
-                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopRight" Margin="5"/>
-                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopRight" Margin="5"/>
-                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopRight" Margin="5"/>
+                <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <Label Text="Top Right :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout>
+                            <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopRight" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Margin="0,3,0,0">
+                            <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;TopRight" Margin="5,0,0,0"/>
+                            <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;TopRight" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
-                <HorizontalStackLayout>
-                    <Label Text="Bottom Left Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomLeft" Margin="5"/>
-                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomLeft" Margin="5"/>
-                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomLeft" Margin="5"/>
-                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomLeft" Margin="5"/>
+                <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <Label Text="Bottom Left :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout>
+                            <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomLeft" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Margin="0,3,0,0">
+                            <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;BottomLeft" Margin="5,0,0,0"/>
+                            <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;BottomLeft" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
-                <HorizontalStackLayout>
-                    <Label Text="Bottom Right Quadrant : " WidthRequest="150" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                    <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomRight" Margin="5"/>
-                    <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomRight" Margin="5"/>
-                    <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomRight" Margin="5"/>
-                    <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomRight" Margin="5"/>
+                <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <Label Text="Bottom Right :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                    <VerticalStackLayout>
+                        <HorizontalStackLayout>
+                            <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomRight" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Margin="0,3,0,0">
+                            <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;BottomRight" Margin="5,0,0,0"/>
+                            <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;BottomRight" Margin="5,0,0,0"/>
+                        </HorizontalStackLayout>
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
+                <Button Text="Reset ALL walls" Command="{Binding _ResetWalls}" Margin="5" WidthRequest="150" HorizontalOptions="Start"/>
             </StackLayout>
         </ScrollView>
 

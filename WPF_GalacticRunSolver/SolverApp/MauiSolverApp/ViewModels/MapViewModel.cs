@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Maui.ApplicationModel;
+using MauiSolverApp.Utilities;
 
 namespace SolverApp.ViewModels
 {
@@ -208,53 +209,11 @@ namespace SolverApp.ViewModels
             }
         }
 
-        internal void SetQuadrant(string quadrant, string board)
+        internal void SetQuadrant(string quadrant, string board, int editionIndex)
         {
             ResetQuadrant(quadrant);
 
-            List<Tuple<int,int, EWallType>> wallsToSet = new List<Tuple<int, int, EWallType>>();
-            switch (board)
-            {
-                case "A":
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 0, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 4, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 2, EWallType.TopRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 5, EWallType.BottomRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 1, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 7, EWallType.BottomLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
-                    break;
-                case "B":
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(5, 0, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 5, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 2, EWallType.BottomRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(3, 1, EWallType.BottomLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 3, EWallType.BottomRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 5, EWallType.TopRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 6, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
-                    break;
-                case "C":
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 0, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 4, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 1, EWallType.BottomLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 2, EWallType.TopRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 5, EWallType.BottomRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(4, 6, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
-                    break;
-                case "D":
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 0, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(0, 2, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(2, 1, EWallType.TopRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(6, 3, EWallType.BottomLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(1, 4, EWallType.TopLeft));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(3, 6, EWallType.BottomRight));
-                    wallsToSet.Add(new Tuple<int, int, EWallType>(7, 7, EWallType.TopLeft));
-                    break;
-                default:
-                    break;
-            }
+            var wallsToSet = BoardUtilities.GetWallsForQuadrant(board, editionIndex);
 
             for (int i = 0; i < wallsToSet.Count; i++)
             {

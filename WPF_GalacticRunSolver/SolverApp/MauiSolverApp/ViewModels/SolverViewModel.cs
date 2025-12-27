@@ -188,7 +188,7 @@ namespace SolverApp.ViewModels
 
         public bool _SolverModeOff { get { return !solverModeOn; } }
 
-        public bool panModeOn = false;
+        public bool panModeOn = true;
         public bool _PanModeOn
         {
             get
@@ -288,9 +288,9 @@ namespace SolverApp.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
         }
 
-        internal void SetQuadrant(string quadrant, string board)
+        internal void SetQuadrant(string quadrant, string board, int editionIndex)
         {
-            theMap.SetQuadrant(quadrant, board);
+            theMap.SetQuadrant(quadrant, board, editionIndex);
         }
     }
 }
