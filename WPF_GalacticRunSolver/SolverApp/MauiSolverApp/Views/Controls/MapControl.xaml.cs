@@ -16,7 +16,13 @@ namespace SolverApp.Views.Controls
         public MapControl()
         {
             InitializeComponent();
+
+            sizeToCaseControl = new Dictionary<int, List<CaseControl>>();
+            for (int i = 8; i <= 20; i++)
+                sizeToCaseControl.Add(i, new List<CaseControl>());
         }
+
+        Dictionary<int, List<CaseControl>> sizeToCaseControl;
 
         public void GenerateMap(MapViewModel theMap)
         {
@@ -42,6 +48,9 @@ namespace SolverApp.Views.Controls
                         var theCase = theMap._Cases[j][i];
                         caseControl.BindingContext = theCase;
                         MapGrid.Add(caseControl, i, j);
+                        // store for reuse
+                        var sizeToAdd = Math.Max(8, Math.Max(i+1, j+1));
+                        sizeToCaseControl[sizeToAdd].Add(caseControl);
                     }
                 }
                 // set target
@@ -78,23 +87,29 @@ namespace SolverApp.Views.Controls
             }
         }
 
-        internal void UpdateSize(int sliderCorrectValue)
+        internal void UpdateSize(int newSize)
         {
             int currentSize = MapGrid.RowDefinitions.Count;
-            if (sliderCorrectValue > currentSize)
+            if (newSize > currentSize)
             {
-                for (int i = currentSize; i < sliderCorrectValue; i++)
+                for (int i = currentSize; i < newSize; i++)
                 {
                     MapGrid.RowDefinitions.Add(new RowDefinition());
                     MapGrid.ColumnDefinitions.Add(new ColumnDefinition());
                 }
             }
-            else if (sliderCorrectValue < currentSize)
+            else if (newSize < currentSize)
             {
-                for (int i = currentSize - 1; i >= sliderCorrectValue; i--)
+                for (int i = currentSize - 1; i >= newSize; i--)
                 {
                     MapGrid.RowDefinitions.RemoveAt(i);
                     MapGrid.ColumnDefinitions.RemoveAt(i);
+                    // Remove case controls
+                    foreach (var caseControl in sizeToCaseControl[i+1])
+                    {
+                        MapGrid.Children.Remove(caseControl);
+                    }
+                    sizeToCaseControl[i+1].Clear();
                 }
             }
         }

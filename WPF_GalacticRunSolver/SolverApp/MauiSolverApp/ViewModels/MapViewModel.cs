@@ -355,6 +355,18 @@ namespace SolverApp.ViewModels
             }
         }
 
-
+        internal void ChangeSize(int newSize)
+        {
+            if (newSize > _Map._Size)
+            {
+                //Handle adding cases
+            }
+            else
+            {
+                //Handle removing cases
+                //Handle clamping robots and target
+            }
+            _Map._Size = newSize;
+        }
     }
 }

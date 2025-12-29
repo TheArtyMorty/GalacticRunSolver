@@ -300,7 +300,7 @@ namespace SolverApp.ViewModels
 
         internal void ChangeSize(int newSize)
         {
-            //theMap.ChangeSize(newSize);
+            theMap.ChangeSize(newSize);
             if (PropertyChanged != null)
             {
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_QuadrantModeVisible)));

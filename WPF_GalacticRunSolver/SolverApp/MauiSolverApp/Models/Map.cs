@@ -356,7 +356,7 @@ namespace SolverApp.Models
         #endregion
 
         #region Properties
-        public int _Size { get; }
+        public int _Size { get; set; }
         public ObservableCollection<Robot> _Robots { get; } = new ObservableCollection<Robot> { };
         public Target _Target { get; set; }
         public ObservableCollection<ObservableCollection<Case>> _Cases { get; } = new ObservableCollection<ObservableCollection<Case>> { };
