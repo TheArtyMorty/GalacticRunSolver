@@ -53,11 +53,48 @@ namespace SolverApp.Views.Controls
                 // set robots
                 foreach (var robotVM in theMap._Robots)
                 {
-                    RobotControl robot = new RobotControl();
-                    robot.BindingContext = robotVM;
-                    robot.SetBinding(Grid.RowProperty, "_Y");
-                    robot.SetBinding(Grid.ColumnProperty, "_X");
-                    MapGrid.Children.Add(robot);
+                    AddRobot(robotVM);
+                }
+            }
+        }
+
+        public void AddRobot(RobotViewModel robotVM)
+        {
+            RobotControl robot = new RobotControl();
+            robot.BindingContext = robotVM;
+            robot.SetBinding(Grid.RowProperty, "_Y");
+            robot.SetBinding(Grid.ColumnProperty, "_X");
+            MapGrid.Children.Add(robot);
+        }
+
+        public void RemoveAdditionalRobot()
+        {
+            var childToRemove = MapGrid.Children.OfType<RobotControl>().Where(r => ((RobotViewModel)r.BindingContext)._Color == Models.EColor.Gray);
+            if (childToRemove.Count() > 0)
+            {
+                var robotToRemove = childToRemove.Last();
+                int indexToRemove = MapGrid.Children.IndexOf(robotToRemove);
+                MapGrid.Children.RemoveAt(indexToRemove);
+            }
+        }
+
+        internal void UpdateSize(int sliderCorrectValue)
+        {
+            int currentSize = MapGrid.RowDefinitions.Count;
+            if (sliderCorrectValue > currentSize)
+            {
+                for (int i = currentSize; i < sliderCorrectValue; i++)
+                {
+                    MapGrid.RowDefinitions.Add(new RowDefinition());
+                    MapGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                }
+            }
+            else if (sliderCorrectValue < currentSize)
+            {
+                for (int i = currentSize - 1; i >= sliderCorrectValue; i--)
+                {
+                    MapGrid.RowDefinitions.RemoveAt(i);
+                    MapGrid.ColumnDefinitions.RemoveAt(i);
                 }
             }
         }

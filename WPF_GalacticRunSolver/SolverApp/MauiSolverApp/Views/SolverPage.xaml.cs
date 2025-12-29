@@ -11,12 +11,7 @@ namespace SolverApp.Views
 
             FakePanPinch.ConnectToRealContainer(MainPanPinch);
 
-            List<string> allEditions = new List<string> {
-                "1st/3rd Edition (Red Box)",
-                "2nd Edition (Blue Box)" };
-
-            BoardEdition.ItemsSource = allEditions;
-            BoardEdition.SelectedItem = allEditions[0];
+            BoardEdition.SelectedIndex = 0;
         }
 
         public void GenerateMap(MapViewModel map)
@@ -50,8 +45,7 @@ namespace SolverApp.Views
                 var splitted = parameters.Split(';');
                 var quadrant = splitted[1];
                 var board = splitted[0];
-                var editionIndex = BoardEdition.ItemsSource.Cast<string>().ToList().IndexOf((string)BoardEdition.SelectedItem);
-                bindingContext.SetQuadrant(quadrant, board, editionIndex);
+                bindingContext.SetQuadrant(quadrant, board, BoardEdition.SelectedIndex);
             }
         }
 
@@ -60,6 +54,70 @@ namespace SolverApp.Views
         private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
         {
             AllowCustomWalls = e.Value;
+        } 
+        
+        private void AdditionalRobot_checkedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (e.Value)
+            {
+                var bindingContext = this.BindingContext as SolverViewModel;
+                if (bindingContext != null && bindingContext.theMap._Robots.Count == 4)
+                {
+                    bindingContext.theMap.CreateAdditionalRobot();
+                    TheMapControl.AddRobot(bindingContext.theMap._Robots.Last());
+                }
+            }
+            else
+            {
+                var bindingContext = this.BindingContext as SolverViewModel;
+                if (bindingContext != null && bindingContext.theMap._Robots.Count == 5)
+                {
+                    bindingContext.theMap.RemoveAdditionalRobot();
+                    TheMapControl.RemoveAdditionalRobot();
+                }
+            }
         }
+
+        private void CustomMapSize_checkedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            CustomMapSize.IsVisible = e.Value;
+        }
+
+        private void Stepper_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var dataContext = this.BindingContext as SolverViewModel;
+            var newSize = (int)e.NewValue;
+            if (dataContext != null)
+                dataContext.ChangeSize(newSize);
+            TheMapControl.UpdateSize(newSize);
+            MapSize.Text = newSize.ToString();
+        }
+
+        async void SaveMap(object sender, EventArgs args)
+        {
+            string result = await DisplayPromptAsync("Save file as...", "fileName");
+            if (result != null && result.Length > 0)
+            {
+                var dataContext = this.BindingContext as SolverViewModel;
+                string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result + ".map");
+                if (dataContext != null)
+                    dataContext.theMap.SaveMap(_fileName);
+            }
+        }
+        async void LoadMap(object sender, EventArgs args)
+        {
+            var files = System.IO.Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "*.map");
+            var fileNames = files.Select(path => System.IO.Path.GetFileName(path)).ToArray();
+            string result = await DisplayActionSheet("Open file...", "cancel", "exit", fileNames);
+            string _fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), result);
+            if (File.Exists(_fileName))
+            {
+                var dataContext = this.BindingContext as SolverViewModel;
+                if (dataContext != null)
+                    dataContext.CreateNewMap(new MapViewModel(_fileName));
+            }
+        }
+
+
     }
 }

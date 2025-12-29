@@ -13,10 +13,6 @@
         Icon="IconOptions.png">
             <ShellContent x:Name="ShellSolverPage" Route="SolverPage"/>
         </Tab>
-        <Tab Title="New Map"
-        Icon="IconPlus.png">
-            <ShellContent x:Name="ShellNewMapPage" Route="NewMapPage"/>
-        </Tab>
         <Tab Title="Photo"
         Icon="IconPhoto.png">
             <ShellContent x:Name="ShellPhotoHelperPage" Route="PhotoHelperPage"/>

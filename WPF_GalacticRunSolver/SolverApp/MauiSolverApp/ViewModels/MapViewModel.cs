@@ -121,7 +121,7 @@ namespace SolverApp.ViewModels
 
         private Position GetMoveIncrement(Move move)
         {
-            switch(move.direction)
+            switch (move.direction)
             {
                 case EMoveDirection.Up:
                     return new Position(0, -1);
@@ -305,14 +305,56 @@ namespace SolverApp.ViewModels
             _Cases[x][y]._WallType = wallType;
         }
 
-        public TargetViewModel _Target {  get; set; }
+        public TargetViewModel _Target { get; set; }
 
         public ObservableCollection<RobotViewModel> _Robots { get; set; }
 
         public ObservableCollection<ObservableCollection<CaseViewModel>> _Cases { get; set; }
 
-        public Models.Map _Map {get; set;}
-        public Models.Map _InitialMap {get; set;}
+        public Models.Map _Map { get; set; }
+        public Models.Map _InitialMap { get; set; }
+
+
+        private Position GetFirstAvailablePosition()
+        {
+            for (int y = 0; y < 5; y++)
+            {
+                if (_Map._Robots.All(r => r._Position != new Position(0, y)))
+                {
+                    return new Position(0, y);
+                }
+            }
+            return new Position(0, 0);
+        }
+
+        public void CreateAdditionalRobot()
+        {
+            if (_Map._Robots.Count < 5)
+            {
+                _Map._Robots.Add(new Robot(EColor.Gray, GetFirstAvailablePosition()));
+                var newRobot = _Map._Robots.Last();
+                var newRobotVM = new RobotViewModel(newRobot);
+                _Robots.Add(newRobotVM);
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+                }
+            }
+        }
+        
+        public void RemoveAdditionalRobot()
+        {
+            if (_Map._Robots.Count == 5)
+            {
+                _Robots.Remove(_Robots.Where(r => r._Color == EColor.Gray).First());
+                _Map._Robots.Remove(_Map._Robots.Where(r => r._Color == EColor.Gray).First());
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs(nameof(_Robots)));
+                }
+            }
+        }
+
 
     }
 }

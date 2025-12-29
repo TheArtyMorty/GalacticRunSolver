@@ -14,9 +14,9 @@ namespace MauiSolverApp
             solverPage.BindingContext = solverVM;
             ShellSolverPage.Content = solverPage;
 
-            NewMapPage newMapPage = new NewMapPage();
-            newMapPage.BindingContext = new NewMapViewModel(solverVM);
-            ShellNewMapPage.Content = newMapPage;
+            //NewMapPage newMapPage = new NewMapPage();
+            //newMapPage.BindingContext = new NewMapViewModel(solverVM);
+            //ShellNewMapPage.Content = newMapPage;
 
             PhotoHelperPage photoHelperPage = new PhotoHelperPage();
             photoHelperPage.BindingContext = new PhotoHelperViewModel(solverVM);

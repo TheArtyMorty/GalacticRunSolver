@@ -73,7 +73,10 @@ namespace SolverApp.ViewModels
                 {
                     _map = value;
                     if (PropertyChanged != null)
+                    {
                         PropertyChanged(this, new PropertyChangedEventArgs(nameof(theMap)));
+                        PropertyChanged(this, new PropertyChangedEventArgs(nameof(_QuadrantModeVisible)));
+                    }
                     Clear();
                 }
             }
@@ -210,6 +213,8 @@ namespace SolverApp.ViewModels
             }
         }
 
+        public bool _QuadrantModeVisible { get { return theMap._Map._Size == 16; } }
+
         public bool _PanEnabled { get { return solverModeOn || _PanModeOn; } }
 
         public string _SolveButtonText { get { return _worker.IsBusy ? "Stop" : "Solve"; } }
@@ -291,6 +296,15 @@ namespace SolverApp.ViewModels
         internal void SetQuadrant(string quadrant, string board, int editionIndex)
         {
             theMap.SetQuadrant(quadrant, board, editionIndex);
+        }
+
+        internal void ChangeSize(int newSize)
+        {
+            //theMap.ChangeSize(newSize);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_QuadrantModeVisible)));
+            }
         }
     }
 }
