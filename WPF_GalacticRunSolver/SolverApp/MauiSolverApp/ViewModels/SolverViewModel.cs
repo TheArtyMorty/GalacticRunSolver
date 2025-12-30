@@ -87,6 +87,7 @@ namespace SolverApp.ViewModels
         {
             theMap = map;
             _solverPage.GenerateMap(theMap);
+            _solverPage.SetMaxSizeCheckbox(theMap._Map._Size);
         }
 
         void BackwardLogValue(string value)

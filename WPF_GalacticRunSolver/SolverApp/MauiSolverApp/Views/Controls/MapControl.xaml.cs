@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Microsoft.Maui.Controls.Xaml;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui;
+using SolverApp.Models;
+using System.Collections.ObjectModel;
 
 namespace SolverApp.Views.Controls
 {
@@ -44,13 +46,8 @@ namespace SolverApp.Views.Controls
                 {
                     for (int j = 0; j < theMap._Map._Size; j++)
                     {
-                        var caseControl = new CaseControl();
-                        var theCase = theMap._Cases[j][i];
-                        caseControl.BindingContext = theCase;
-                        MapGrid.Add(caseControl, i, j);
-                        // store for reuse
-                        var sizeToAdd = Math.Max(8, Math.Max(i+1, j+1));
-                        sizeToCaseControl[sizeToAdd].Add(caseControl);
+                        CaseViewModel theCase = theMap._Cases[j][i];
+                        AddCase(theCase);
                     }
                 }
                 // set target
@@ -65,6 +62,18 @@ namespace SolverApp.Views.Controls
                     AddRobot(robotVM);
                 }
             }
+        }
+
+        public void AddCase(CaseViewModel theCase)
+        {
+            var caseControl = new CaseControl();
+            caseControl.BindingContext = theCase;
+            var i = theCase._Case._Position.X;
+            var j = theCase._Case._Position.Y;
+            MapGrid.Add(caseControl, i, j);
+            // store for reuse
+            var sizeToAdd = Math.Max(8, Math.Max(i + 1, j + 1));
+            sizeToCaseControl[sizeToAdd].Add(caseControl);
         }
 
         public void AddRobot(RobotViewModel robotVM)
@@ -87,8 +96,9 @@ namespace SolverApp.Views.Controls
             }
         }
 
-        internal void UpdateSize(int newSize)
+        internal void UpdateSize(MapViewModel theMap)
         {
+            var newSize = theMap._Map._Size;
             int currentSize = MapGrid.RowDefinitions.Count;
             if (newSize > currentSize)
             {
@@ -96,6 +106,23 @@ namespace SolverApp.Views.Controls
                 {
                     MapGrid.RowDefinitions.Add(new RowDefinition());
                     MapGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                }
+                //Handle adding cases
+                for (int i = 0; i < currentSize; i++)
+                {
+                    for (int j = currentSize; j < newSize; j++)
+                    {
+                        CaseViewModel theCase = theMap._Cases[j][i];
+                        AddCase(theCase);
+                    }
+                }
+                for (int i = currentSize; i < newSize; i++)
+                {
+                    for (int j = 0; j < newSize; j++)
+                    {
+                        CaseViewModel theCase = theMap._Cases[j][i];
+                        AddCase(theCase);
+                    }
                 }
             }
             else if (newSize < currentSize)

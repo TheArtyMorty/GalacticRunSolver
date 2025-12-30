@@ -360,12 +360,66 @@ namespace SolverApp.ViewModels
             if (newSize > _Map._Size)
             {
                 //Handle adding cases
+                for (int i = 0; i < _Map._Size; i++)
+                {
+                    for (int j = _Map._Size; j < newSize; j++)
+                    {
+                        _Map._Cases[i].Add(new Case(new Position(j, i)));
+                    }
+                }
+                for (int i = _Map._Size; i < newSize; i++)
+                {
+                    ObservableCollection<Case> newColumn = new ObservableCollection<Case>();
+                    for (int j = 0; j < newSize; j++)
+                    {
+                        newColumn.Add(new Case(new Position(j, i)));
+                    }
+                    _Map._Cases.Add(newColumn);
+                }
+                _Cases = new ObservableCollection<ObservableCollection<CaseViewModel>>
+                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
+                        row.Select(lacase => new CaseViewModel(lacase)))));
             }
             else
             {
                 //Handle removing cases
-                //Handle clamping robots and target
+                for (int i = newSize; i < _Map._Size; i++)
+                {
+                    _Map._Cases.RemoveAt(i);
+                }
+                for (int i = 0; i < newSize; i++)
+                {
+                    for (int j = newSize; j < _Map._Size; j++)
+                    {
+                        _Map._Cases[i].RemoveAt(j);
+                    }
+                }
+                _Cases = new ObservableCollection<ObservableCollection<CaseViewModel>>
+                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
+                        row.Select(lacase => new CaseViewModel(lacase)))));
+                //Handle clamping robots
+                foreach (var robot in _Robots)
+                {
+                    if (robot._Position.X >= newSize)
+                    {
+                        robot._Position = new Position(newSize - 1, robot._Position.Y);
+                    }
+                    if (robot._Position.Y >= newSize)
+                    {
+                        robot._Position = new Position(robot._Position.X, newSize - 1);
+                    }
+                }
+                // clamping target
+                if (_Target._Position.X >= newSize)
+                {
+                    _Target._Position = new Position(newSize - 1, _Target._Position.Y);
+                }
+                if (_Target._Position.Y >= newSize)
+                {
+                    _Target._Position = new Position(_Target._Position.X, newSize - 1);
+                }
             }
+            //Finally we set the new size
             _Map._Size = newSize;
         }
     }

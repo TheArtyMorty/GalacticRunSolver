@@ -73,13 +73,13 @@
                     <Label Text=" Use 5th robot." TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" />
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Margin="5">
-                    <CheckBox CheckedChanged="CustomMapSize_checkedChanged" />
+                    <CheckBox x:Name="CheckCustomMapSize" CheckedChanged="CustomMapSize_checkedChanged" />
                     <Label Text=" Custom map size." TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" />
                 </HorizontalStackLayout>
                 <HorizontalStackLayout Margin="5" x:Name="CustomMapSize" IsVisible="False">
                     <Label Text="Custom size : " TextColor="White" HorizontalOptions="End" VerticalOptions="Center" Margin="10" />
                     <Label x:Name="MapSize" Text="16" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="10" WidthRequest="35"/>
-                    <Stepper VerticalOptions="Center" Minimum="8" Maximum="20" Value="16" ValueChanged="Stepper_ValueChanged" Increment="1" Margin="10" WidthRequest="150" />
+                    <Stepper x:Name="MapSizeStepper" VerticalOptions="Center" Minimum="8" Maximum="20" Value="16" ValueChanged="Stepper_ValueChanged" Increment="1" Margin="10" WidthRequest="150" />
                 </HorizontalStackLayout>
                 <Picker x:Name="BoardEdition" BackgroundColor="White" Margin="5" SelectedIndex="0">
                     <Picker.Items>
@@ -87,7 +87,7 @@
                         <x:String>2nd Edition (Blue Box)</x:String>
                     </Picker.Items>
                 </Picker>
-                <VerticalStackLayout>
+                <VerticalStackLayout IsVisible="{Binding _QuadrantModeVisible}">
                     <HorizontalStackLayout BackgroundColor="#11ffffff">
                     <Label Text="Top Left :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
                     <VerticalStackLayout>

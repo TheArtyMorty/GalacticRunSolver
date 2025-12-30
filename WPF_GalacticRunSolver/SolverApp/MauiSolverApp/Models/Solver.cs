@@ -141,7 +141,7 @@ public abstract class ILogger
 		public long ToKey(int mapSize)
 		{
 			long result = 0;
-			int offset = (int)Math.Log(mapSize,2);
+			int offset = (int)Math.Log(mapSize,2)+1;
 			foreach (var robot in Robots)
 			{
 				result = result << (2 * offset);
@@ -181,10 +181,11 @@ public static class Solver
 					var move = new Move(robot._Color, direction);
 					newState.Moves.Add(move);
 					newState.SimulateState(move, map);
+					var key = newState.ToKey(map._Size);
 
-					if (!statesAlreadyDone.Contains(newState.ToKey(map._Size)))
+                    if (!statesAlreadyDone.Contains(key))
 					{
-						statesAlreadyDone.Add(newState.ToKey(map._Size));
+						statesAlreadyDone.Add(key);
 						states.Add(newState);
 					}
 				}

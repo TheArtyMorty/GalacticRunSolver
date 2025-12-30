@@ -78,9 +78,29 @@ namespace SolverApp.Views
             }
         }
 
+        internal void SetMaxSizeCheckbox(int size)
+        {
+            CheckCustomMapSize.IsChecked = (size != 16);
+            MapSizeStepper.Value = size;
+            MapSize.Text = size.ToString();
+        }
+
         private void CustomMapSize_checkedChanged(object sender, CheckedChangedEventArgs e)
         {
             CustomMapSize.IsVisible = e.Value;
+            var dataContext = this.BindingContext as SolverViewModel;
+            if (dataContext != null)
+            {
+                if (e.Value)
+                {
+                    MapSizeStepper.Value = dataContext.theMap._Map._Size;
+                }
+                else
+                {
+                    ValueChangedEventArgs args = new ValueChangedEventArgs(MapSizeStepper.Value, 16);
+                    Stepper_ValueChanged(MapSizeStepper, args);
+                }
+            }
         }
 
         private void Stepper_ValueChanged(object sender, ValueChangedEventArgs e)
@@ -88,9 +108,11 @@ namespace SolverApp.Views
             var dataContext = this.BindingContext as SolverViewModel;
             var newSize = (int)e.NewValue;
             if (dataContext != null)
+            {
                 dataContext.ChangeSize(newSize);
-            TheMapControl.UpdateSize(newSize);
-            MapSize.Text = newSize.ToString();
+                TheMapControl.UpdateSize(dataContext.theMap);
+                MapSize.Text = newSize.ToString();
+            }
         }
 
         async void SaveMap(object sender, EventArgs args)
@@ -118,6 +140,6 @@ namespace SolverApp.Views
             }
         }
 
-
+        
     }
 }
