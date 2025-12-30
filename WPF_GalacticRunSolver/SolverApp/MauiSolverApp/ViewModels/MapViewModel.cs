@@ -365,20 +365,21 @@ namespace SolverApp.ViewModels
                     for (int j = _Map._Size; j < newSize; j++)
                     {
                         _Map._Cases[i].Add(new Case(new Position(j, i)));
+                        _Cases[i].Add(new CaseViewModel(_Map._Cases[i][j]));
                     }
                 }
                 for (int i = _Map._Size; i < newSize; i++)
                 {
-                    ObservableCollection<Case> newColumn = new ObservableCollection<Case>();
+                    var newColumn = new ObservableCollection<Case>();
+                    var newColumnVM = new ObservableCollection<CaseViewModel>();
                     for (int j = 0; j < newSize; j++)
                     {
                         newColumn.Add(new Case(new Position(j, i)));
+                        newColumnVM.Add(new CaseViewModel(newColumn[j]));
                     }
                     _Map._Cases.Add(newColumn);
+                    _Cases.Add(newColumnVM);
                 }
-                _Cases = new ObservableCollection<ObservableCollection<CaseViewModel>>
-                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
-                        row.Select(lacase => new CaseViewModel(lacase)))));
             }
             else
             {
@@ -386,17 +387,16 @@ namespace SolverApp.ViewModels
                 for (int i = newSize; i < _Map._Size; i++)
                 {
                     _Map._Cases.RemoveAt(i);
+                    _Cases.RemoveAt(i);
                 }
                 for (int i = 0; i < newSize; i++)
                 {
                     for (int j = newSize; j < _Map._Size; j++)
                     {
                         _Map._Cases[i].RemoveAt(j);
+                        _Cases[i].RemoveAt(j);
                     }
                 }
-                _Cases = new ObservableCollection<ObservableCollection<CaseViewModel>>
-                    (_Map._Cases.Select(row => new ObservableCollection<CaseViewModel>(
-                        row.Select(lacase => new CaseViewModel(lacase)))));
                 //Handle clamping robots
                 foreach (var robot in _Robots)
                 {
