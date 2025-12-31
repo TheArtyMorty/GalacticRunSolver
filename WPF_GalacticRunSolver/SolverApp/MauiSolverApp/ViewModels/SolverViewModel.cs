@@ -294,7 +294,7 @@ namespace SolverApp.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
         }
 
-        internal void SetQuadrant(string quadrant, string board, int editionIndex)
+        internal void SetQuadrant(string quadrant, int board, int editionIndex)
         {
             theMap.SetQuadrant(quadrant, board, editionIndex);
         }

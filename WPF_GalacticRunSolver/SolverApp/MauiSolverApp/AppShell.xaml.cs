@@ -21,8 +21,9 @@ namespace MauiSolverApp
             PhotoHelperPage photoHelperPage = new PhotoHelperPage();
             photoHelperPage.BindingContext = new PhotoHelperViewModel(solverVM);
             ShellPhotoHelperPage.Content = photoHelperPage;
+
             //TestPage test = new TestPage();
-            //ShellPhotoHelperPage.Content = test;
+            //ShellTestPage.Content = test;
         }
     }
 }

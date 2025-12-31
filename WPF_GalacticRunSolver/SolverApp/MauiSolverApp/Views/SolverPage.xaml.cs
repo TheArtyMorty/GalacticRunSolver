@@ -33,22 +33,6 @@ namespace SolverApp.Views
                 bindingContext._PanModeOn = !PanMode.IsToggled;
         }
 
-        private void Quadrant_Clicked(object sender, EventArgs e)
-        {
-            var bindingContext = this.BindingContext as SolverViewModel;
-            if (bindingContext == null)
-                return;
-
-            var parameters = ((Button)sender).CommandParameter as string;
-            if (parameters != null)
-            {
-                var splitted = parameters.Split(';');
-                var quadrant = splitted[1];
-                var board = splitted[0];
-                bindingContext.SetQuadrant(quadrant, board, BoardEdition.SelectedIndex);
-            }
-        }
-
         public static bool AllowCustomWalls = false;
 
         private void CheckBox_CheckedChanged(object sender, CheckedChangedEventArgs e)
@@ -140,6 +124,56 @@ namespace SolverApp.Views
             }
         }
 
-        
+        private void BoardEdition_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var numberOfBoardsInEdition = 8;
+            if (BoardEdition.SelectedIndex == 0)
+                numberOfBoardsInEdition = 16;
+
+            TopLeftStepper.Maximum = numberOfBoardsInEdition;
+            TopRightStepper.Maximum = numberOfBoardsInEdition;
+            BottomLeftStepper.Maximum = numberOfBoardsInEdition;
+            BottomRightStepper.Maximum = numberOfBoardsInEdition;
+        }
+
+        private void TopLeftStepper_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var bindingContext = this.BindingContext as SolverViewModel;
+            if (bindingContext == null)
+                return;
+
+            TopLeftBoard.Text = "Board " + e.NewValue.ToString();
+            bindingContext.SetQuadrant("TopLeft", (int)e.NewValue, BoardEdition.SelectedIndex);
+        }
+
+        private void TopRightStepper_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var bindingContext = this.BindingContext as SolverViewModel;
+            if (bindingContext == null)
+                return;
+
+            TopRightBoard.Text = "Board " + e.NewValue.ToString();
+            bindingContext.SetQuadrant("TopRight", (int)e.NewValue, BoardEdition.SelectedIndex);
+        }
+
+        private void BottomLeftStepper_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var bindingContext = this.BindingContext as SolverViewModel;
+            if (bindingContext == null)
+                return;
+
+            BottomLeftBoard.Text = "Board " + e.NewValue.ToString();
+            bindingContext.SetQuadrant("BottomLeft", (int)e.NewValue, BoardEdition.SelectedIndex);
+        }
+
+        private void BottomRightStepper_ValueChanged(object sender, ValueChangedEventArgs e)
+        {
+            var bindingContext = this.BindingContext as SolverViewModel;
+            if (bindingContext == null)
+                return;
+
+            BottomRightBoard.Text = "Board " + e.NewValue.ToString();
+            bindingContext.SetQuadrant("BottomRight", (int)e.NewValue, BoardEdition.SelectedIndex);
+        }
     }
 }

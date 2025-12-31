@@ -98,13 +98,13 @@ namespace SolverApp.ViewModels
         public async void PlaySolution(Solution solution, Action onFinished)
         {
             Reset();
-            await Task.Delay(300);
+            await Task.Delay(150);
             foreach (Move move in solution.moves)
             {
                 if (!Cancel)
                 {
                     await PlayMove(move);
-                    await Task.Delay(200);
+                    await Task.Delay(100);
                 }
             }
             Reset();
@@ -209,7 +209,7 @@ namespace SolverApp.ViewModels
             }
         }
 
-        internal void SetQuadrant(string quadrant, string board, int editionIndex)
+        internal void SetQuadrant(string quadrant, int board, int editionIndex)
         {
             ResetQuadrant(quadrant);
 
@@ -384,14 +384,14 @@ namespace SolverApp.ViewModels
             else
             {
                 //Handle removing cases
-                for (int i = newSize; i < _Map._Size; i++)
+                for (int i = _Map._Size -1; i >= newSize; i--)
                 {
                     _Map._Cases.RemoveAt(i);
                     _Cases.RemoveAt(i);
                 }
                 for (int i = 0; i < newSize; i++)
                 {
-                    for (int j = newSize; j < _Map._Size; j++)
+                    for (int j = _Map._Size - 1; j >= newSize; j--)
                     {
                         _Map._Cases[i].RemoveAt(j);
                         _Cases[i].RemoveAt(j);
@@ -400,13 +400,9 @@ namespace SolverApp.ViewModels
                 //Handle clamping robots
                 foreach (var robot in _Robots)
                 {
-                    if (robot._Position.X >= newSize)
+                    if (robot._Position.X >= newSize || robot._Position.Y >= newSize)
                     {
-                        robot._Position = new Position(newSize - 1, robot._Position.Y);
-                    }
-                    if (robot._Position.Y >= newSize)
-                    {
-                        robot._Position = new Position(robot._Position.X, newSize - 1);
+                        robot._Position = GetFirstAvailablePosition();
                     }
                 }
                 // clamping target

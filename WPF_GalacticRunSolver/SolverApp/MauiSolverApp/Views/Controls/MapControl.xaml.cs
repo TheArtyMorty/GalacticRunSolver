@@ -55,6 +55,7 @@ namespace SolverApp.Views.Controls
                 }
                 // set target
                 TargetControl target = new TargetControl();
+                target.ZIndex = 10;
                 target.BindingContext = theMap._Target;
                 target.SetBinding(Grid.RowProperty, "_Y");
                 target.SetBinding(Grid.ColumnProperty, "_X");
@@ -70,6 +71,7 @@ namespace SolverApp.Views.Controls
         public void AddCase(CaseViewModel theCase)
         {
             var caseControl = new CaseControl();
+            caseControl.ZIndex = 1;
             caseControl.BindingContext = theCase;
             var i = theCase._Case._Position.X;
             var j = theCase._Case._Position.Y;
@@ -82,6 +84,7 @@ namespace SolverApp.Views.Controls
         public void AddRobot(RobotViewModel robotVM)
         {
             RobotControl robot = new RobotControl();
+            robot.ZIndex = 5;
             robot.BindingContext = robotVM;
             robot.SetBinding(Grid.RowProperty, "_Y");
             robot.SetBinding(Grid.ColumnProperty, "_X");

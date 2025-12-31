@@ -4,21 +4,17 @@
              x:Class="MauiSolverApp.Views.TestPage"
              xmlns:ctrls="clr-namespace:SolverApp.Views.Controls"
              Title="TestPage">
-    <Grid x:Name="Helper" Margin="5">
+    <Grid x:Name="Helper" Margin="5" BackgroundColor="Green">
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="15*"/>
-            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Text="TEXT ON TOP ROW" FontAttributes="Bold"/>
+        <HorizontalStackLayout Grid.Row="0">
+            <Button Text="Increase Size" Clicked="Button_Clicked"/>
+        </HorizontalStackLayout>
 
-        <Frame Grid.Row="1" Margin="0" CornerRadius="0" Padding="0">
-            <ctrls:PanPinchContainer>
-                <Image Source="dotnet_bot.png" HeightRequest="185" Aspect="AspectFit"/>
-            </ctrls:PanPinchContainer>
-        </Frame>
+        <ctrls:MapControl x:Name="TheMapControl" Grid.Row="1"/>
 
-        <Button Text="BUTOON ON BOTTOM ROW" Grid.Row="2" WidthRequest="200"/>
     </Grid>
 </ContentPage>

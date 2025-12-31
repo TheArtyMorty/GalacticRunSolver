@@ -17,6 +17,9 @@
         Icon="IconPhoto.png">
             <ShellContent x:Name="ShellPhotoHelperPage" Route="PhotoHelperPage"/>
         </Tab>
+        <!--<Tab Title="Test" Icon="IconOptions.png">
+            <ShellContent x:Name="ShellTestPage" Route="TestPage"/>
+        </Tab>-->
     </TabBar>
 
 </Shell>

@@ -49,8 +49,8 @@
             </Frame>
         </Grid>
 
-        <ScrollView Orientation="Vertical" Grid.Row="2" Margin="5">
-            <StackLayout x:Name="EditModeArea" Padding="5"  Orientation="Vertical" IsVisible="{Binding _SolverModeOff}">
+        <ScrollView Orientation="Vertical" Grid.Row="2" Margin="5" IsVisible="{Binding _SolverModeOff}">
+            <StackLayout x:Name="EditModeArea" Padding="5"  Orientation="Vertical">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="15"/>
@@ -82,7 +82,7 @@
                     <Stepper x:Name="MapSizeStepper" VerticalOptions="Center" Minimum="8" Maximum="20" Value="16" ValueChanged="Stepper_ValueChanged" Increment="1" Margin="10" WidthRequest="150" />
                 </HorizontalStackLayout>
                 <VerticalStackLayout IsVisible="{Binding _QuadrantModeVisible}">
-                    <Picker x:Name="BoardEdition" BackgroundColor="White" Margin="5" SelectedIndex="0">
+                    <Picker x:Name="BoardEdition" BackgroundColor="White" Margin="5" SelectedIndex="0" SelectedIndexChanged="BoardEdition_SelectedIndexChanged">
                         <Picker.Items>
                             <x:String>1st/3rd Edition (Red Box)</x:String>
                             <x:String>2nd Edition (Blue Box)</x:String>
@@ -90,71 +90,23 @@
                     </Picker>
                     <HorizontalStackLayout BackgroundColor="#11ffffff">
                         <Label Text="Top Left :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <VerticalStackLayout>
-                            <HorizontalStackLayout>
-                                <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopLeft" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                            <HorizontalStackLayout Margin="0,3,0,0">
-                                <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;TopLeft" Margin="5,0,0,0"/>
-                                <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;TopLeft" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
+                        <Label x:Name="TopLeftBoard" Text="Board 1" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="10" WidthRequest="75"/>
+                        <Stepper x:Name="TopLeftStepper" VerticalOptions="Center" Minimum="1" Maximum="8" Value="1" ValueChanged="TopLeftStepper_ValueChanged" Increment="1" Margin="10" WidthRequest="100" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <HorizontalStackLayout BackgroundColor="#11ffffff">
                         <Label Text="Top Right :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <VerticalStackLayout>
-                            <HorizontalStackLayout>
-                                <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;TopRight" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                            <HorizontalStackLayout Margin="0,3,0,0">
-                                <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;TopRight" Margin="5,0,0,0"/>
-                                <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;TopRight" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
+                        <Label x:Name="TopRightBoard" Text="Board 1" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="10" WidthRequest="75"/>
+                        <Stepper x:Name="TopRightStepper" VerticalOptions="Center" Minimum="1" Maximum="8" Value="1" ValueChanged="TopRightStepper_ValueChanged" Increment="1" Margin="10" WidthRequest="100" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <HorizontalStackLayout BackgroundColor="#11ffffff">
                         <Label Text="Bottom Left :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <VerticalStackLayout>
-                            <HorizontalStackLayout>
-                                <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomLeft" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                            <HorizontalStackLayout Margin="0,3,0,0">
-                                <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;BottomLeft" Margin="5,0,0,0"/>
-                                <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;BottomLeft" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
+                        <Label x:Name="BottomLeftBoard" Text="Board 1" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="10" WidthRequest="75"/>
+                        <Stepper x:Name="BottomLeftStepper" VerticalOptions="Center" Minimum="1" Maximum="8" Value="1" ValueChanged="BottomLeftStepper_ValueChanged" Increment="1" Margin="10" WidthRequest="100" />
                     </HorizontalStackLayout>
-                    <HorizontalStackLayout BackgroundColor="#11ffffff" Margin="0,5,0,0">
+                    <HorizontalStackLayout BackgroundColor="#11ffffff">
                         <Label Text="Bottom Right :" WidthRequest="100" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
-                        <VerticalStackLayout>
-                            <HorizontalStackLayout>
-                                <Button Text="A" Clicked="Quadrant_Clicked" CommandParameter="A;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="B" Clicked="Quadrant_Clicked" CommandParameter="B;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="C" Clicked="Quadrant_Clicked" CommandParameter="C;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="D" Clicked="Quadrant_Clicked" CommandParameter="D;BottomRight" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                            <HorizontalStackLayout Margin="0,3,0,0">
-                                <Button Text="E" Clicked="Quadrant_Clicked" CommandParameter="E;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="F" Clicked="Quadrant_Clicked" CommandParameter="F;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="G" Clicked="Quadrant_Clicked" CommandParameter="G;BottomRight" Margin="5,0,0,0"/>
-                                <Button Text="H" Clicked="Quadrant_Clicked" CommandParameter="H;BottomRight" Margin="5,0,0,0"/>
-                            </HorizontalStackLayout>
-                        </VerticalStackLayout>
+                        <Label x:Name="BottomRightBoard" Text="Board 1" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" Margin="10" WidthRequest="75"/>
+                        <Stepper x:Name="BottomRightStepper" VerticalOptions="Center" Minimum="1" Maximum="8" Value="1" ValueChanged="BottomRightStepper_ValueChanged" Increment="1" Margin="10" WidthRequest="100" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
                 <Button Text="Reset ALL walls" Command="{Binding _ResetWalls}" Margin="5" WidthRequest="150" HorizontalOptions="Start"/>
@@ -163,25 +115,23 @@
             </StackLayout>
         </ScrollView>
 
-        <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical" IsVisible="{Binding _SolverModeOn}" Margin="5">
-            <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}" HorizontalOptions="Center" WidthRequest="150"/>
-
-            <ScrollView Orientation="Vertical">
+        <ScrollView Orientation="Vertical" Grid.Row="2" Margin="5" IsVisible="{Binding _SolverModeOn}">
+            <StackLayout x:Name="SolverArea" Grid.Row="2" Orientation="Vertical" Margin="5">
+                <Button Text="{Binding _SolveButtonText}" Command="{Binding _SolveMap}" IsEnabled="{Binding _SolveButtonEnabled}" HorizontalOptions="Center" WidthRequest="150"/>
                 <StackLayout Orientation="Vertical">
-                <StackLayout x:Name="SolutionsArea"
-                            Orientation="Vertical"
-                            BindableLayout.ItemsSource="{Binding _Solutions}">
-                    <BindableLayout.ItemTemplate>
-                        <DataTemplate>
-                            <controls:SolutionControl/>
-                        </DataTemplate>
-                    </BindableLayout.ItemTemplate>
+                    <StackLayout x:Name="SolutionsArea"
+                                Orientation="Vertical"
+                                BindableLayout.ItemsSource="{Binding _Solutions}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <controls:SolutionControl Margin="2"/>
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </StackLayout>
+                    <Label Text="{Binding _Log}" TextColor="White" Margin="10"/>
                 </StackLayout>
-
-                <Label Text="{Binding _Log}" TextColor="White" Margin="10"/>
-                </StackLayout>
-            </ScrollView>
-        </StackLayout>
+            </StackLayout>
+        </ScrollView>
     </Grid>
 
 </ContentPage>
