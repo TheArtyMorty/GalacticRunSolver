@@ -138,10 +138,9 @@ public abstract class ILogger
 				robot._Position = GetEndPosition(map, robot, move.direction);
 		}
 
-		public long ToKey(int mapSize)
+        public long ToKey(int offset)
 		{
 			long result = 0;
-			int offset = (int)Math.Log(mapSize,2)+1;
 			foreach (var robot in Robots)
 			{
 				result = result << (2 * offset);
@@ -181,7 +180,7 @@ public static class Solver
 					var move = new Move(robot._Color, direction);
 					newState.Moves.Add(move);
 					newState.SimulateState(move, map);
-					var key = newState.ToKey(map._Size);
+					var key = newState.ToKey(_sizeOffset);
 
                     if (!statesAlreadyDone.Contains(key))
 					{
@@ -193,7 +192,22 @@ public static class Solver
 			return states;
 		}
 
-		static public List<Solution> Solve(Map inputMap, ILogger logger, ref BackgroundWorker worker)
+        static private int _sizeOffset = -1;
+        static private void InitSizeOffset(int mapSize)
+        {
+			_sizeOffset = -1;
+            for (int i = 1; i <= 6; i++)
+			{
+				var maxNwithiBits = Math.Pow(2, i);
+				if (mapSize <= maxNwithiBits)
+                {
+                    _sizeOffset = i;
+                    break;
+                }
+            }
+        }
+
+        static public List<Solution> Solve(Map inputMap, ILogger logger, ref BackgroundWorker worker)
         {
 			//init
 			var map = new Map(inputMap);
@@ -203,9 +217,15 @@ public static class Solver
 			Log(logger, stopWatch, "Starting solving");
 			stopWatch.Start();
 			var solutions = new List<Solution>();
+			InitSizeOffset(inputMap._Size);
+            if (_sizeOffset <= 0)
+            {
+                Log(logger, stopWatch, "Error with size offset...");
+                return solutions;
+            }
 
-			//Initial State
-			var initialMoves = new Solution{ };
+            //Initial State
+            var initialMoves = new Solution{ };
 			State initialState = new State(initialMoves, map);
 
 			if (initialState.Heuristic(map) >= 30)
@@ -222,7 +242,7 @@ public static class Solver
 			var CurrentStates = new SolutionsByHeuristic();
 			CurrentStates.Add(initialMoves, initialState.Heuristic(map));
 
-			HashSet<long> statesAlreadyDone = new HashSet<long> { initialState.ToKey(map._Size) };
+			HashSet<long> statesAlreadyDone = new HashSet<long> { initialState.ToKey(_sizeOffset) };
 
 			int bestSolution = -1;
 			int currentH = -1;

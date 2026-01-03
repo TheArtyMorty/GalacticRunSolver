@@ -8,9 +8,13 @@
              x:Class="SolverApp.Views.Controls.AnglePickerDropArea">
     <ContentView.Content BackgroundColor="#20ffffff">
         <Frame Grid.Row="1" Margin="0" CornerRadius="0" Padding="0" BackgroundColor="Transparent">
-            <ctrls:PanPinchContainer>
-                <skia_controls:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
-            </ctrls:PanPinchContainer>
+            <Grid>
+                
+                <ctrls:PanPinchContainer x:Name="PanPinchContainer">
+                    <skia_controls:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
+                </ctrls:PanPinchContainer>
+                <Rectangle x:Name="TapRectangle" BackgroundColor="#30FFFFFF" IsVisible="false" />
+            </Grid>
         </Frame>
     </ContentView.Content>
 </ContentView>

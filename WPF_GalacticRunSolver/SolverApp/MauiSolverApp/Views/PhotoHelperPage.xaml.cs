@@ -73,5 +73,15 @@ namespace SolverApp.Views
         {
             DropArea.StartRecognition();
         }
+
+        private void SelectCorner(object sender, EventArgs e)
+        {
+            var button = (Button)sender;
+            var indexAsString = button.CommandParameter.ToString();
+            if (indexAsString != null)
+            {
+                DropArea.SelectCorner(int.Parse(indexAsString));
+            }
+        }
     }
 }

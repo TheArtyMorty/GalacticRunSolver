@@ -168,24 +168,9 @@ namespace SolverApp.Views.Controls
         {
             InitializeComponent();
 
-            //var tapGestureRecognizer = new TapGestureRecognizer();
-            //tapGestureRecognizer.Tapped += OnTapGestureRecognizerTapped;
-            //canvasView.GestureRecognizers.Add(tapGestureRecognizer);
-
-            //var dropGestureRecognizer = new DropGestureRecognizer();
-            //dropGestureRecognizer.DragOver += OnDragGestureRecognizerDragOver;
-            //dropGestureRecognizer.Drop += OnDragGestureRecognizerDrop;
-
-            //var dragGestureRecognizer = new DragGestureRecognizer();
-            //dragGestureRecognizer.CanDrag = true;
-            //dragGestureRecognizer.DragStarting += OnDragGestureRecognizerDragStarting;
-            //dragGestureRecognizer.DropCompleted += OnDragGestureRecognizerDropCompleted;
-            //canvasView.GestureRecognizers.Add(dragGestureRecognizer);
-
-            //var panGestureRecognizer = new PanGestureRecognizer();
-            //panGestureRecognizer.PanUpdated += OnPanGestureRecognizerPanUpdated;
-            //panGestureRecognizer.TouchPoints = 1;
-            //canvasView.GestureRecognizers.Add(panGestureRecognizer);
+            var tapGestureRecognizer = new TapGestureRecognizer();
+            tapGestureRecognizer.Tapped += OnTapGestureRecognizerTapped;
+            TapRectangle.GestureRecognizers.Add(tapGestureRecognizer);
         }
 #pragma warning restore CS8618
 
@@ -198,108 +183,49 @@ namespace SolverApp.Views.Controls
 
         Dictionary<long, TouchPoint> touchPoints = new Dictionary<long, TouchPoint>();
 
-        //SKPoint ConvertToPixel(Point pt)
-        //{
-        //    return new SKPoint((float)(canvasView.CanvasSize.Width * pt.X / Width),
-        //                       (float)(canvasView.CanvasSize.Height * pt.Y / Height));
-        //}
 
-        //void OnTapGestureRecognizerTapped(object? sender, TappedEventArgs e)
-        //{
-        //    // Do I really have to handle tap ? 
-        //}
+        void OnTapGestureRecognizerTapped(object? sender, TappedEventArgs e)
+        {
+            var position = e.GetPosition(TapRectangle);
+            if (position == null)
+                return;
+            // convert this point in reference of the surface without pan and zoom
+            var refPoint = new SKPoint((float)position.Value.X / (float)TapRectangle.Width, (float)position.Value.Y / (float)TapRectangle.Height);
+            // Calculate X and Y ratio 
+            float xRatio = 1;
+            float yRatio = 1;
+            if (bitmap.Width / TapRectangle.Width > bitmap.Height / TapRectangle.Height)
+            {
+                var actualHeightInRectangle = bitmap.Height /( bitmap.Width / TapRectangle.Width );
+                yRatio = (float)(TapRectangle.Height / actualHeightInRectangle);
+            }
+            else
+            {
+                var actualWidthInRectangle = bitmap.Width / (bitmap.Height / TapRectangle.Height);
+                xRatio = (float)(TapRectangle.Width / actualWidthInRectangle);
+            }
 
-        //SKPoint pan_start;
-        //void OnPanGestureRecognizerPanUpdated(object? sender, PanUpdatedEventArgs e)
-        //{
-        //    switch (e.StatusType)
-        //    {
-        //        case GestureStatus.Started:
-        //            Debug.WriteLine("Pan Started");
-        //            pan_start = PanPoint;
-        //            break;
-        //        case GestureStatus.Running:
-        //            var point = new SKPoint((float)(e.TotalX), (float)(e.TotalY));
-        //            Debug.WriteLine(string.Format("total {0}x {0}y", point.X, point.Y));
-
-        //            SKPoint pixelLocation = ConvertToPixel(new Point(point.X, point.Y));
-        //            //SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
-
-        //            PanPoint += pixelLocation;
-        //            Debug.WriteLine(string.Format("Pan point {0}x {0}y", PanPoint.X, PanPoint.Y));
-        //            canvasView.InvalidateSurface();
-        //            break;
-        //        case GestureStatus.Completed:
-        //            canvasView.InvalidateSurface();
-        //            break;
-        //        case GestureStatus.Canceled:
-        //            PanPoint = pan_start;
-        //            canvasView.InvalidateSurface();
-        //            break;
-        //    }
-        //}
-
-        //void OnDragGestureRecognizerDragOver(object? sender, DragEventArgs e)
-        //{
-        //    var point = e.GetPosition(canvasView);
-        //    if (point == null || !point.HasValue)
-        //        return;
-
-        //    SKPoint pixelLocation = ConvertToPixel(point.Value);
-        //    SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
-
-        //    if (touchPoints.ContainsKey(0))
-        //    {
-        //        TouchPoint touchPoint = touchPoints[0];
-        //        cornerSelection.MoveCorner(touchPoint.CornerIndex,
-        //                                bitmapLocation - touchPoint.Offset);
-        //        canvasView.InvalidateSurface();
-        //    }
-        //}
-
-        //void OnDragGestureRecognizerDragStarting(object? sender, DragStartingEventArgs e)
-        //{
-        //    var point = e.GetPosition(canvasView);
-        //    if (point == null || !point.HasValue)
-        //        return;
-
-        //    SKPoint pixelLocation = ConvertToPixel(point.Value);
-        //    SKPoint bitmapLocation = inverseBitmapMatrix.MapPoint(pixelLocation);
-
-        //    //Convert radius to bitmap/ cropping scale
-        //    float radius = inverseBitmapMatrix.ScaleX * RADIUS;
-
-        //    // Find corner that the finger is touching
-        //    int cornerIndex = cornerSelection.HitTest(bitmapLocation, radius);
-
-        //    if (cornerIndex != -1)
-        //    {
-        //        TouchPoint touchPoint = new TouchPoint
-        //        {
-        //            CornerIndex = cornerIndex,
-        //            Offset = bitmapLocation - cornerSelection.Corners[cornerIndex]
-        //        };
-
-        //        touchPoints.Add(0, touchPoint);
-        //    }
-        //}
-
-        //void OnDragGestureRecognizerDrop(object? sender, DropEventArgs e)
-        //{
-        //    if (touchPoints.ContainsKey(0))
-        //    {
-        //        touchPoints.Remove(0);
-        //    }
-        //}
+            // Now convert to pixel coordinate considering pan and zoom
+            var panPoint = PanPinchContainer.GetPanPoint();
+            var scale = PanPinchContainer.GetScale();
+            Debug.WriteLine(panPoint);
+            var pixelPoint = new SKPoint(
+                xRatio * (refPoint.X * bitmap.Width / (float)scale - (float)panPoint.X * bitmap.Width),
+                yRatio * (refPoint.Y * bitmap.Height / (float)scale - (float)panPoint.Y * bitmap.Height));
+            // Now draw the corner that was chosen
+            cornerSelection.Corners[cornerToBeSelected] = pixelPoint;
+            canvasView.InvalidateSurface();
+            // Point was chosen, hide tap rectangle
+            TapRectangle.IsVisible = false;
+        }
 
 
-        //void OnDragGestureRecognizerDropCompleted(object? sender, DropCompletedEventArgs e)
-        //{
-        //    if (touchPoints.ContainsKey(0))
-        //    {
-        //        touchPoints.Remove(0);
-        //    }
-        //}
+        int cornerToBeSelected = -1;
+        internal void SelectCorner(int v)
+        {
+            TapRectangle.IsVisible = true;
+            cornerToBeSelected = v; 
+        }
 
 
         // Drawing objects
@@ -317,7 +243,6 @@ namespace SolverApp.Views.Controls
             StrokeWidth = 5
         };
 
-        private SKPoint PanPoint;
         void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
         {
             SKImageInfo info = args.Info;
@@ -329,12 +254,10 @@ namespace SolverApp.Views.Controls
             if (bitmap != null)
             {
                 // Calculate rectangle for displaying bitmap
-                //float scale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height);
-                SetDefaultScaleIfNeeded(info);
-                float scale = (float)_scale;
-                ClampPanPointIfNeeded(info, scale);
-                float xOffset = (float)PanPoint.X; 
-                float yOffset = (float)PanPoint.Y;
+                // Scale and offset are handled by PanPinchContainer
+                float scale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height);
+                float xOffset = 0; 
+                float yOffset = 0;
                 SKRect bitmapRect = new SKRect(xOffset, yOffset, xOffset + scale * bitmap.Width, yOffset + scale * bitmap.Height);
                 canvas.DrawBitmap(bitmap, bitmapRect);
 
@@ -367,29 +290,6 @@ namespace SolverApp.Views.Controls
             }
         }
 
-        private void ClampPanPointIfNeeded(SKImageInfo info, float scale)
-        {
-            var borderOffset = 0;
-            var minX = Math.Min(0, info.Width - scale * bitmap.Width)- borderOffset;
-            var minY = Math.Min(0, info.Height - scale * bitmap.Height)- borderOffset;
-            var maxX = Math.Max(0, info.Width - scale * bitmap.Width) + borderOffset;
-            var maxY = Math.Max(0, info.Height - scale * bitmap.Height) + borderOffset;
-            PanPoint.X = Math.Max(PanPoint.X, minX);
-            PanPoint.Y = Math.Max(PanPoint.Y, minY);
-            PanPoint.X = Math.Min(PanPoint.X, maxX);
-            PanPoint.Y = Math.Min(PanPoint.Y, maxY);
-            Debug.WriteLine(string.Format("Clamped : {0}x {0}y", PanPoint.X, PanPoint.Y));
-        }
-
-        private void SetDefaultScaleIfNeeded(SKImageInfo info)
-        {
-            if (_defaultScale <= 0)
-            {
-                _defaultScale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height); ;
-                _scale = _defaultScale <= 0 ? 1 : _defaultScale;
-            }
-        }
-
         private SKBitmap bitmap;
         public void SetPhoto(string path)
         {
@@ -405,26 +305,9 @@ namespace SolverApp.Views.Controls
             {
                 bitmap = null;
             }
-            ResetPanAndZoom();
-        }
-
-        private void ResetPanAndZoom()
-        {
-            Debug.WriteLine("Pan resetted  !!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            PanPoint = new SKPoint(0, 0);
-            _defaultScale = -1;
+            PanPinchContainer.ResetPanAndScale();
             canvasView.InvalidateSurface();
         }
-
-        private double _defaultScale;
-        private double _scale;
- 
-        internal void ZoomInOrOut(double zoom, double scrollViewWidth)
-        {
-            _scale = _defaultScale + zoom;
-            canvasView.InvalidateSurface();
-        }
-
 
         public SKBitmap GetCroppedBitmap()
         {
@@ -482,6 +365,8 @@ namespace SolverApp.Views.Controls
             //Compute H
             // Start by computing A
         }
+
+
         //public void StartRecognition_Old()
         //{
         //    // Crop and reset to center

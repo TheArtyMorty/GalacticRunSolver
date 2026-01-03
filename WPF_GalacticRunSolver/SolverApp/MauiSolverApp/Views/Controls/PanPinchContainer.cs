@@ -39,6 +39,27 @@ namespace SolverApp.Views.Controls
             GestureRecognizers.Add(_doubleTapGestureRecognizer);
         }
 
+        public void ResetPanAndScale()
+        {
+            _currentScale = 1;
+            _panX = 0;
+            _panY = 0; 
+
+            Content.TranslationX = 0;
+            Content.TranslationY = 0;
+            Content.Scale = 1;
+        }
+
+        public Point GetPanPoint()
+        {
+            return new Point( _panX / _currentScale / Content.Width, _panY / _currentScale / Content.Height);
+        }
+
+        public double GetScale()
+        {
+            return _currentScale;
+        }
+
         protected override void OnChildAdded(Element child)
         {
             base.OnChildAdded(child);
