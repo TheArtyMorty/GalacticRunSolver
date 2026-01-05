@@ -26,15 +26,12 @@ namespace SolverApp.Views.Controls
 
         Dictionary<int, List<CaseControl>> sizeToCaseControl;
 
-        MapViewModel currentMap;
-
         public void GenerateMap(MapViewModel theMap)
         {
             // RESET
             MapGrid.Children.Clear();
             MapGrid.RowDefinitions.Clear();
             MapGrid.ColumnDefinitions.Clear();
-            currentMap = theMap;
 
             // Set up
             if (theMap != null)

@@ -3,6 +3,7 @@ using Android.Icu.Number;
 using MauiSolverApp.Utilities;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using SolverApp.ViewModels;
 using System.Diagnostics;
 using static Android.InputMethodServices.Keyboard;
 
@@ -300,13 +301,14 @@ namespace SolverApp.Views.Controls
 
         public void StartRecognition()
         {
+            var outputSize = 500;
             // My 4 corners of output
             var outputCorners = new SKPoint[]
             {
                 new SKPoint(0, 0),
-                new SKPoint(1000, 0),
-                new SKPoint(0, 1000),
-                new SKPoint(1000, 1000),
+                new SKPoint(outputSize, 0),
+                new SKPoint(0, outputSize),
+                new SKPoint(outputSize, outputSize),
             };
 
             // Get the 4 corners selected
@@ -381,20 +383,27 @@ namespace SolverApp.Views.Controls
             alglib.rmatrixinverse(ref H, out info, out rep);
 
             //Now we have H, we can create our new bitmap and populate each pixel with pixels from the original bitmap
-            SKBitmap outputBitmap = new SKBitmap(1000, 1000);
-            for (int i = 0; i < 1000; i++) 
+            SKBitmap outputBitmap = new SKBitmap(outputSize, outputSize);
+
+            IntPtr outputPixelsAddr = outputBitmap.GetPixels();
+            unsafe
             {
-                for (int j = 0; j < 200; j++)
+                byte* ptr = (byte*)outputPixelsAddr.ToPointer();
+                for (int row = 0; row < outputBitmap.Height; row++)
                 {
-                    // Find corresponding pixel in input image
-                    var p = GetInputPoint(i, j, H);
-                    p.X = Math.Max(0, p.X);
-                    p.Y = Math.Max(0, p.Y);
-                    p.X = Math.Min(bitmap.Width - 1, p.X);
-                    p.Y = Math.Min(bitmap.Height - 1, p.Y);
-                    var color = bitmap.GetPixel((int)p.X, (int)p.Y);
-                    //outputBitmap.SetPixel(i, j, color);
-                }
+                    for (int col = 0; col < outputBitmap.Width; col++)
+                    {
+                        var p = GetInputPoint(col, row, H);
+                        var x = (int)p.X;
+                        var y = (int)p.Y;
+                        var color = bitmap.GetPixel(x, y);
+                        //Change output color
+                        *ptr++ = (byte)color.Red;    // red
+                        *ptr++ = (byte)color.Green;  // green
+                        *ptr++ = (byte)color.Blue;   // blue
+                        *ptr++ = (byte)color.Alpha;  // alpha
+                    }
+                }   
             }
 
             // Now we replace the bitmap and draw it on screen
@@ -403,7 +412,26 @@ namespace SolverApp.Views.Controls
             SKRect bitmapRect = new SKRect(0, 0, bitmap.Width, bitmap.Height);
             cornerSelection = new BoardSelectionZone(bitmapRect);
 
+            PanPinchContainer.ResetPanAndScale();
             canvasView.InvalidateSurface();
+
+            //Let's also copy this image to the solver page background
+            var newFile = System.IO.Path.Combine(FileSystem.CacheDirectory, "BackgroundPhotoForSolver");
+            using (var newStream = File.OpenWrite(newFile))
+                bitmap.Encode(newStream, SKEncodedImageFormat.Jpeg, 90);
+
+            var Parent = this.Parent;
+            while (Parent != null && !(Parent is PhotoHelperPage))
+            {
+                Parent = Parent.Parent;
+            }
+
+            if (Parent is PhotoHelperPage photoHelperPage)
+            {
+                var dataContext = photoHelperPage.BindingContext as PhotoHelperViewModel;
+                if (dataContext != null)
+                    dataContext.SetBackGroundImage(newFile);
+            }
         }
 
         static SKPoint GetInputPoint(double x, double y, double[,] H)
@@ -429,85 +457,5 @@ namespace SolverApp.Views.Controls
                 Console.WriteLine();
             }
         }
-
-        //public void StartRecognition_Old()
-        //{
-        //    // Crop and reset to center
-        //    bitmap = GetCroppedBitmap();
-        //    cornerSelection.MoveBackToBounds();
-        //    ResetPanAndZoom();
-
-        //    // Modify colors
-        //    IntPtr pixelsAddr = bitmap.GetPixels();
-        //    const int blackWhiteThreshold = 175;
-        //    unsafe
-        //    {
-        //        byte* ptr = (byte*)pixelsAddr.ToPointer();
-
-        //        for (int row = 0; row < bitmap.Height; row++)
-        //            for (int col = 0; col < bitmap.Width; col++)
-        //            {
-        //                if (cornerSelection.IsPointInside(col, row))
-        //                {
-        //                    if (cornerSelection.IsOnAnyEdge(col, row))
-        //                    {
-        //                        *ptr++ = 255;    // red
-        //                        *ptr++ = 0;    // green
-        //                        *ptr++ = 0;    // blue
-        //                        *ptr++ = 0x00; // alpha
-        //                    }
-        //                    else if (cornerSelection.IsOnLateralLine(col, row))
-        //                    {
-        //                        *ptr++ = 255;    // red
-        //                        *ptr++ = 0;    // green
-        //                        *ptr++ = 125;    // blue
-        //                        *ptr++ = 0x00; // alpha
-        //                    }
-        //                    else if (cornerSelection.IsOnVerticalLine(col, row))
-        //                    {
-        //                        *ptr++ = 255;    // red
-        //                        *ptr++ = 125;    // green
-        //                        *ptr++ = 0;    // blue
-        //                        *ptr++ = 0x00; // alpha
-        //                    }
-        //                    else
-        //                    {
-        //                        //var red = *(ptr);
-        //                        //var green = *(ptr + 1);
-        //                        //var blue = *(ptr + 2);
-        //                        //var grayshade = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-        //                        //byte result = (byte)(grayshade > blackWhiteThreshold ? 255 : 0);
-        //                        //*ptr++ = result;   // red
-        //                        //*ptr++ = result;   // green
-        //                        //*ptr++ = result;   // blue
-        //                        // ptr++;                // alpha
-        //                        ptr++;                
-        //                        ptr++;                
-        //                        ptr++;               
-        //                        ptr++;                // alpha
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    *ptr++ = 0;    // red
-        //                    *ptr++ = 0;    // green
-        //                    *ptr++ = 0;    // blue
-        //                    *ptr++ = 0x00; // alpha
-        //                }
-        //            }
-        //    }
-
-        //    // Redraw
-        //    canvasView.InvalidateSurface();
-
-        //    // recognize walls
-        //    //for (int i  = 0; i < 16-15; i++)
-        //    //{
-        //    //    for (int j = 0; j < 16; j++)
-        //    //    {
-        //    //        var leftPoint = cornerSelection.GetCellPosition(i, j, EPosition.Left);
-        //    //    }
-        //    //}
-        //}
     }
 }
