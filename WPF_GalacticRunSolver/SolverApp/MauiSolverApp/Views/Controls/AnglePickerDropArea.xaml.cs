@@ -1,7 +1,10 @@
-﻿using Android.Icu.Number;
+﻿using Android.Graphics;
+using Android.Icu.Number;
+using MauiSolverApp.Utilities;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using System.Diagnostics;
+using static Android.InputMethodServices.Keyboard;
 
 namespace SolverApp.Views.Controls
 {
@@ -28,7 +31,7 @@ namespace SolverApp.Views.Controls
             var Right = maxRect.Right;
             var Bottom = maxRect.Bottom;
 
-            Corners = new SKPoint[] { 
+            Corners = new SKPoint[] {
                     new SKPoint(Left, Top),
                     new SKPoint(Right, Top),
                     new SKPoint(Right, Bottom),
@@ -101,15 +104,15 @@ namespace SolverApp.Views.Controls
             return IsOnLine(x, y, Corners[0], Corners[1]) ||
                     IsOnLine(x, y, Corners[1], Corners[2]) ||
                     IsOnLine(x, y, Corners[2], Corners[3]) ||
-                    IsOnLine(x, y, Corners[3], Corners[0]) ;
+                    IsOnLine(x, y, Corners[3], Corners[0]);
         }
 
         static bool IsOnLine(int x, int y, SKPoint p1, SKPoint p2)
         {
-            var length = Math.Sqrt((p1.X-p2.X)* (p1.X - p2.X)+ (p1.Y-p2.Y)* (p1.Y - p2.Y));
+            var length = Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y));
             var crossProduct = (y - p1.Y) * (p2.X - p1.X) - (x - p1.X) * (p2.Y - p1.Y);
 
-            if (Math.Abs(crossProduct) > length*3)
+            if (Math.Abs(crossProduct) > length * 3)
             {
                 return false;
             }
@@ -131,7 +134,7 @@ namespace SolverApp.Views.Controls
                     return true;
                 }
             }
-            
+
             return false;
         }
 
@@ -159,9 +162,7 @@ namespace SolverApp.Views.Controls
     public partial class AnglePickerDropArea : ContentView
     {
         BoardSelectionZone cornerSelection;
-        SKMatrix inverseBitmapMatrix;
         const int CORNER = 30;
-        const int RADIUS = 200;     // pixel radius of touch hit-test
 
 #pragma warning disable CS8618
         public AnglePickerDropArea()
@@ -173,15 +174,6 @@ namespace SolverApp.Views.Controls
             TapRectangle.GestureRecognizers.Add(tapGestureRecognizer);
         }
 #pragma warning restore CS8618
-
-        // Touch tracking
-        struct TouchPoint
-        {
-            public int CornerIndex { set; get; }
-            public SKPoint Offset { set; get; }
-        }
-
-        Dictionary<long, TouchPoint> touchPoints = new Dictionary<long, TouchPoint>();
 
 
         void OnTapGestureRecognizerTapped(object? sender, TappedEventArgs e)
@@ -196,7 +188,7 @@ namespace SolverApp.Views.Controls
             float yRatio = 1;
             if (bitmap.Width / TapRectangle.Width > bitmap.Height / TapRectangle.Height)
             {
-                var actualHeightInRectangle = bitmap.Height /( bitmap.Width / TapRectangle.Width );
+                var actualHeightInRectangle = bitmap.Height / (bitmap.Width / TapRectangle.Width);
                 yRatio = (float)(TapRectangle.Height / actualHeightInRectangle);
             }
             else
@@ -224,7 +216,7 @@ namespace SolverApp.Views.Controls
         internal void SelectCorner(int v)
         {
             TapRectangle.IsVisible = true;
-            cornerToBeSelected = v; 
+            cornerToBeSelected = v;
         }
 
 
@@ -256,7 +248,7 @@ namespace SolverApp.Views.Controls
                 // Calculate rectangle for displaying bitmap
                 // Scale and offset are handled by PanPinchContainer
                 float scale = Math.Min((float)info.Width / bitmap.Width, (float)info.Height / bitmap.Height);
-                float xOffset = 0; 
+                float xOffset = 0;
                 float yOffset = 0;
                 SKRect bitmapRect = new SKRect(xOffset, yOffset, xOffset + scale * bitmap.Width, yOffset + scale * bitmap.Height);
                 canvas.DrawBitmap(bitmap, bitmapRect);
@@ -284,9 +276,6 @@ namespace SolverApp.Views.Controls
 
                 canvas.DrawPath(edgePath, edgeStroke);
                 canvas.DrawPath(cornerPath, cornerStroke);
-
-                // Invert the transform for touch tracking
-                bitmapScaleMatrix.TryInvert(out inverseBitmapMatrix);
             }
         }
 
@@ -309,45 +298,6 @@ namespace SolverApp.Views.Controls
             canvasView.InvalidateSurface();
         }
 
-        public SKBitmap GetCroppedBitmap()
-        {
-            SKRect cropRect = cornerSelection.GetBounds() ;
-            SKBitmap croppedBitmap = new SKBitmap((int)cropRect.Width,
-                                                    (int)cropRect.Height);
-            SKRect dest = new SKRect(0, 0, cropRect.Width, cropRect.Height);
-            SKRect source = new SKRect(cropRect.Left, cropRect.Top,
-                                        cropRect.Right, cropRect.Bottom);
-
-            using (SKCanvas canvas = new SKCanvas(croppedBitmap))
-            {
-                canvas.DrawBitmap(bitmap, source, dest);
-            }
-
-            return croppedBitmap;
-        }
-
-        private static SKMatrix ComputeMatrix(SKSize size, SKPoint ptUL, SKPoint ptUR, SKPoint ptLL)
-        {
-            // Scale transform
-            SKMatrix S = SKMatrix.CreateScale(1 / size.Width, 1 / size.Height);
-
-            // Affine transform
-            SKMatrix A = new SKMatrix
-            {
-                ScaleX = ptUR.X - ptUL.X,
-                SkewY = ptUR.Y - ptUL.Y,
-                SkewX = ptLL.X - ptUL.X,
-                ScaleY = ptLL.Y - ptUL.Y,
-                TransX = ptUL.X,
-                TransY = ptUL.Y,
-                Persp2 = 1
-            };
-
-            SKMatrix result = SKMatrix.CreateIdentity();
-            SKMatrix.Concat(ref result, A, S);
-            return result;
-        }
-
         public void StartRecognition()
         {
             // My 4 corners of output
@@ -355,17 +305,130 @@ namespace SolverApp.Views.Controls
             {
                 new SKPoint(0, 0),
                 new SKPoint(1000, 0),
-                new SKPoint(1000, 1000),
                 new SKPoint(0, 1000),
+                new SKPoint(1000, 1000),
             };
 
             // Get the 4 corners selected
             var inputCorners = cornerSelection.Corners;
+            var temp = inputCorners[2];
+            inputCorners[2] = inputCorners[3];
+            inputCorners[3] = temp;
 
             //Compute H
             // Start by computing A
+            double[,] A = new double[8,9];
+
+            for (int i = 0; i < 4; i++)
+            {
+                var X = inputCorners[i];
+                var x = outputCorners[i].X;
+                var y = outputCorners[i].Y;
+                // pair rows
+                A[2 * i,0] = 0;
+                A[2 * i,1] = 0;
+                A[2 * i,2] = 0;
+                A[2 * i,3] = -X.X;
+                A[2 * i,4] = -X.Y;
+                A[2 * i,5] = -1;
+                A[2 * i,6] = y * X.X;
+                A[2 * i,7] = y * X.Y;
+                A[2 * i,8] = y;
+                // odd rows
+                A[2 * i + 1, 0] = X.X;
+                A[2 * i + 1, 1] = X.Y;
+                A[2 * i + 1, 2] = 1;
+                A[2 * i + 1, 3] = 0;
+                A[2 * i + 1, 4] = 0;
+                A[2 * i + 1, 5] = 0;
+                A[2 * i + 1, 6] = -x * X.X;
+                A[2 * i + 1, 7] = -x * X.Y;
+                A[2 * i + 1, 8] = -x;
+            }
+
+            // Output variables for SVD
+            double[] w;       // Singular values
+            double[,] u;      // Left singular vectors
+            double[,] vt;     // Right singular vectors transposed
+
+            // Perform SVD
+            // Flags:
+            //   true  -> compute U
+            //   true  -> compute VT
+            //   2     -> algorithm type (0=default, 1=QR, 2=Divide-and-Conquer)
+            alglib.rmatrixsvd(A, A.GetLength(0), A.GetLength(1),
+                              1, 2, 2, // compute U, VT, algorithm type
+                              out w, out u, out vt);
+
+            // Print VT
+            //Console.WriteLine("\nMatrix VT:");
+            //PrintMatrix(vt);
+
+            // Get H
+            double N = vt[8, 8];
+            double[,] H = new double[3, 3];
+            for (int i = 0; i < 3; i++)
+            {
+                H[i, 0] = vt[8, i * 3] / N;
+                H[i, 1] = vt[8, i * 3 + 1] / N;
+                H[i, 2] = vt[8, i * 3 + 2] / N;
+            }
+            //PrintMatrix(H);
+
+            // Let's inverse H to find proper points
+            int info;
+            alglib.matinvreport rep;
+            alglib.rmatrixinverse(ref H, out info, out rep);
+
+            //Now we have H, we can create our new bitmap and populate each pixel with pixels from the original bitmap
+            SKBitmap outputBitmap = new SKBitmap(1000, 1000);
+            for (int i = 0; i < 1000; i++) 
+            {
+                for (int j = 0; j < 200; j++)
+                {
+                    // Find corresponding pixel in input image
+                    var p = GetInputPoint(i, j, H);
+                    p.X = Math.Max(0, p.X);
+                    p.Y = Math.Max(0, p.Y);
+                    p.X = Math.Min(bitmap.Width - 1, p.X);
+                    p.Y = Math.Min(bitmap.Height - 1, p.Y);
+                    var color = bitmap.GetPixel((int)p.X, (int)p.Y);
+                    //outputBitmap.SetPixel(i, j, color);
+                }
+            }
+
+            // Now we replace the bitmap and draw it on screen
+            bitmap = outputBitmap;
+
+            SKRect bitmapRect = new SKRect(0, 0, bitmap.Width, bitmap.Height);
+            cornerSelection = new BoardSelectionZone(bitmapRect);
+
+            canvasView.InvalidateSurface();
         }
 
+        static SKPoint GetInputPoint(double x, double y, double[,] H)
+        {
+            double[] p = new double[3] { x, y, 1 };
+            double[] p2 = new double[3];
+            for (int i = 0; i < 3; i++)
+            {
+                p2[i] = H[i, 0] * p[0] + H[i, 1] * p[1] + H[i, 2] * p[2];
+            }
+            return new SKPoint((float)(p2[0] / p2[2]), (float)(p2[1] / p2[2]));
+        }
+
+        // Helper method to print a 2D matrix
+        static void PrintMatrix(double[,] mat)
+        {
+            int rows = mat.GetLength(0);
+            int cols = mat.GetLength(1);
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                    Console.Write($"{mat[i, j],10:F6} ");
+                Console.WriteLine();
+            }
+        }
 
         //public void StartRecognition_Old()
         //{
