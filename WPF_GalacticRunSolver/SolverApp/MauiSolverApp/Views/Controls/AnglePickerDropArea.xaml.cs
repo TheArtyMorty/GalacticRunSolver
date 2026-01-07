@@ -1,5 +1,6 @@
 ﻿using Android.Graphics;
 using Android.Icu.Number;
+using Kotlin.Coroutines;
 using MauiSolverApp.Utilities;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
@@ -11,21 +12,11 @@ namespace SolverApp.Views.Controls
 {
     class BoardSelectionZone
     {
-        public enum EPosition
-        {
-            Left,
-            Top,
-            Right,
-            Bottom,
-        }
-
-        const float MINIMUM = 10;   // pixels width or height
-
         SKRect maxRect;             // generally the size of the bitmap
 
-        public BoardSelectionZone(SKRect maxRect)
+        public BoardSelectionZone(SKRect rect)
         {
-            this.maxRect = maxRect;
+            maxRect = rect;
 
             var Left = maxRect.Left;
             var Top = maxRect.Top;
@@ -40,123 +31,6 @@ namespace SolverApp.Views.Controls
         }
 
         public SKPoint[] Corners { get; set; }
-
-        public int HitTest(SKPoint point, float radius)
-        {
-            SKPoint[] corners = Corners;
-
-            for (int index = 0; index < corners.Length; index++)
-            {
-                SKPoint diff = point - corners[index];
-
-                if ((float)Math.Sqrt(diff.X * diff.X + diff.Y * diff.Y) < radius)
-                {
-                    return index;
-                }
-            }
-
-            return -1;
-        }
-
-        public SKRect GetBounds()
-        {
-            return new SKRect(Math.Min(Corners[0].X, Corners[3].X),
-                Math.Min(Corners[0].Y, Corners[1].Y),
-                Math.Max(Corners[1].X, Corners[2].X),
-                Math.Max(Corners[2].Y, Corners[3].Y));
-        }
-
-        public void MoveBackToBounds()
-        {
-            var bounds = GetBounds();
-            for (int i = 0; i < Corners.Length; i++)
-            {
-                Corners[i].X -= bounds.Left;
-                Corners[i].Y -= bounds.Top;
-            }
-        }
-
-        public void MoveCorner(int index, SKPoint point)
-        {
-            Corners[index].X = Math.Min(Math.Max(point.X, maxRect.Left), maxRect.Right - MINIMUM);
-            Corners[index].Y = Math.Min(Math.Max(point.Y, maxRect.Top), maxRect.Bottom - MINIMUM);
-        }
-
-        public bool IsOnLeftSideOf(SKPoint Pt1, SKPoint Pt2, int x, int y)
-        {
-            return (Pt2.X - Pt1.X) * (y - Pt1.Y) - (Pt2.Y - Pt1.Y) * (x - Pt1.X) >= 0;
-        }
-
-        internal bool IsPointInside(int x, int y)
-        {
-            return IsOnLeftSideOf(Corners[0], Corners[1], x, y) &&
-                    IsOnLeftSideOf(Corners[1], Corners[2], x, y) &&
-                    IsOnLeftSideOf(Corners[2], Corners[3], x, y) &&
-                    IsOnLeftSideOf(Corners[3], Corners[0], x, y);
-        }
-
-        internal object GetCellPosition(int i, int j, EPosition pos)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal bool IsOnAnyEdge(int x, int y)
-        {
-            return IsOnLine(x, y, Corners[0], Corners[1]) ||
-                    IsOnLine(x, y, Corners[1], Corners[2]) ||
-                    IsOnLine(x, y, Corners[2], Corners[3]) ||
-                    IsOnLine(x, y, Corners[3], Corners[0]);
-        }
-
-        static bool IsOnLine(int x, int y, SKPoint p1, SKPoint p2)
-        {
-            var length = Math.Sqrt((p1.X - p2.X) * (p1.X - p2.X) + (p1.Y - p2.Y) * (p1.Y - p2.Y));
-            var crossProduct = (y - p1.Y) * (p2.X - p1.X) - (x - p1.X) * (p2.Y - p1.Y);
-
-            if (Math.Abs(crossProduct) > length * 3)
-            {
-                return false;
-            }
-            return true;
-        }
-
-        internal bool IsOnLateralLine(int x, int y)
-        {
-            for (int i = 1; i < 16; i++)
-            {
-                var x1 = Corners[0].X + (Corners[3].X - Corners[0].X) / 16 * i;
-                var y1 = Corners[0].Y + (Corners[3].Y - Corners[0].Y) / 16 * i;
-                var p1 = new SKPoint(x1, y1);
-                var x2 = Corners[1].X + (Corners[2].X - Corners[1].X) / 16 * i;
-                var y2 = Corners[1].Y + (Corners[2].Y - Corners[1].Y) / 16 * i;
-                var p2 = new SKPoint(x2, y2);
-                if (IsOnLine(x, y, p1, p2))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        internal bool IsOnVerticalLine(int x, int y)
-        {
-            for (int i = 1; i < 16; i++)
-            {
-                var x1 = Corners[0].X + (Corners[1].X - Corners[0].X) / 16 * i;
-                var y1 = Corners[0].Y + (Corners[1].Y - Corners[0].Y) / 16 * i;
-                var p1 = new SKPoint(x1, y1);
-                var x2 = Corners[3].X + (Corners[2].X - Corners[3].X) / 16 * i;
-                var y2 = Corners[3].Y + (Corners[2].Y - Corners[3].Y) / 16 * i;
-                var p2 = new SKPoint(x2, y2);
-                if (IsOnLine(x, y, p1, p2))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 
     [XamlCompilation(XamlCompilationOptions.Compile)]
@@ -312,7 +186,21 @@ namespace SolverApp.Views.Controls
             };
 
             // Get the 4 corners selected
-            var inputCorners = cornerSelection.Corners;
+            var inputCorners = new List<SKPoint> { };
+            foreach (var corner in cornerSelection.Corners)
+            {
+                inputCorners.Add(corner);
+            }
+                
+            if (true) // Hack
+            {
+                inputCorners.Clear();
+                inputCorners.Add(new SKPoint(29, 232));
+                inputCorners.Add(new SKPoint(1138, 270));
+                inputCorners.Add(new SKPoint(1148, 1318));
+                inputCorners.Add(new SKPoint(48, 1406));
+            }
+            // Exchange bottom corners to have proper order
             var temp = inputCorners[2];
             inputCorners[2] = inputCorners[3];
             inputCorners[3] = temp;
@@ -432,6 +320,124 @@ namespace SolverApp.Views.Controls
                 if (dataContext != null)
                     dataContext.SetBackGroundImage(newFile);
             }
+
+            // Ok so let's start recognition !
+            var map = RecognizeMap();
+        }
+
+        private MapViewModel RecognizeMap()
+        {
+            var map = new MapViewModel(16);
+            double caseSize = bitmap.Width / 16.0;
+            // First, let's observe all 60 outside connexions, we should find 8 walls 
+            var outsideConnexions = new List<List<SKColor>> { new List<SKColor>(), new List<SKColor>(), new List<SKColor>(), new List<SKColor>() };
+            for (int i = 0; i < 15; i++)
+            {
+                // First row
+                {
+                    var x = (int)((i + 1) * caseSize);
+                    var y = (int)(caseSize/2);
+                    var color = GetColorForPoint(x, y, true);
+                    outsideConnexions[0].Add(color);
+                    ColorPoint(x, y, color, true);
+                }
+                // Last row
+                {
+                    var x = (int)((i + 1) * caseSize);
+                    var y = (int)(15 * caseSize + caseSize / 2);
+                    var color = GetColorForPoint(x, y, true);
+                    outsideConnexions[1].Add(color);
+                    ColorPoint(x, y, color, true);
+                }
+                // First Column
+                {
+                    var x = (int)(caseSize / 2);
+                    var y = (int)((i + 1) * caseSize);
+                    var color = GetColorForPoint(x, y, false);
+                    outsideConnexions[2].Add(color);
+                    ColorPoint(x, y, color, false);
+                }
+                // Last Column
+                {
+                    var x = (int)(15 * caseSize + caseSize / 2);
+                    var y = (int)((i + 1) * caseSize);
+                    var color = GetColorForPoint(x, y, false);
+                    outsideConnexions[3].Add(color);
+                    ColorPoint(x, y, color, false);
+                }
+            }
+            // We expect the first and last connexions not to be walls, so we can decide this is the not wall color)
+            // Let's print all distances to that color
+            var notWallColor = GetMediumColor(new List<SKColor> {
+                outsideConnexions[0].First(), outsideConnexions[0].Last(),
+                 outsideConnexions[1].First(), outsideConnexions[1].Last(),
+                  outsideConnexions[2].First(), outsideConnexions[2].Last(),
+                   outsideConnexions[3].First(), /*outsideConnexions[3].Last()*/ });
+            foreach (var rowOrColumn in outsideConnexions)
+            {
+                foreach (var color in rowOrColumn)
+                {
+                    var distance = GetColorDistance(color, notWallColor);
+                    Debug.WriteLine($"Distance to not wall color: {distance}");
+                }
+            }
+
+            return map;
+        }
+
+        static int GetColorDistance(SKColor c1, SKColor c2)
+        {
+            int redDiff = c1.Red - c2.Red;
+            int greenDiff = c1.Green - c2.Green;
+            int blueDiff = c1.Blue - c2.Blue;
+            return Math.Abs(redDiff)+ Math.Abs(greenDiff) + Math.Abs(blueDiff);
+        }
+
+        static int offset = 5;
+        static int lateralOffset = 10;
+        SKColor GetColorForPoint(int x, int y, bool horizontal)
+        {
+            var yOffset = horizontal ? offset : lateralOffset;
+            var kOffset = horizontal ? lateralOffset : offset;
+            var colorsWithOffset = new List<SKColor>();
+            for (int j = -yOffset; j < yOffset; j++)
+            {
+                for (int k = -kOffset; k < kOffset; k++)
+                {
+                    var color = bitmap.GetPixel(x + j, y + k);
+                    bitmap.SetPixel(x + j, y, SKColors.Red);
+                    colorsWithOffset.Add(color);
+                }
+            }
+            return GetMediumColor(colorsWithOffset);
+        }
+
+        void ColorPoint(int x, int y, SKColor color, bool horizontal)
+        {
+            var yOffset = horizontal ? offset : lateralOffset;
+            var kOffset = horizontal ? lateralOffset : offset;
+            for (int j = -yOffset; j < yOffset; j++)
+            {
+                for (int k = -kOffset; k < kOffset; k++)
+                {
+                    bitmap.SetPixel(x + j, y + k, color);
+                }
+            }
+        }
+
+        static SKColor GetMediumColor(List<SKColor> colors)
+        {
+            int red = 0;
+            int blue = 0;
+            int green = 0;
+            foreach (var color in colors)
+            {
+                red += color.Red;
+                green += color.Green;
+                blue += color.Blue;
+            }
+            int count = colors.Count;
+            return new SKColor((byte)(red/count), (byte)(green/count), (byte)(blue/count));
         }
 
         static SKPoint GetInputPoint(double x, double y, double[,] H)

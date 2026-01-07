@@ -2,7 +2,7 @@
 
 namespace SolverApp.Views.Controls
 {
-    [XamlCompilation(XamlCompilationOptions.Compile)]
+    [XamlCompilation(XamlCompilationOptions.Skip)]
     public partial class CaseControl : ContentView
     {
         public CaseControl()

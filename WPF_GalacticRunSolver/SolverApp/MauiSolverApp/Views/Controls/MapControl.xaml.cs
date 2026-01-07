@@ -9,6 +9,8 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui;
 using SolverApp.Models;
 using System.Collections.ObjectModel;
+using Microsoft.Maui.Controls.Shapes;
+using MauiSolverApp.Views.Controls;
 
 namespace SolverApp.Views.Controls
 {
@@ -19,15 +21,17 @@ namespace SolverApp.Views.Controls
         {
             InitializeComponent();
 
-            sizeToCaseControl = new Dictionary<int, List<CaseControl>>();
+            sizeToCaseControl = new Dictionary<int, List<CaseControl2>>();
             for (int i = 8; i <= 20; i++)
-                sizeToCaseControl.Add(i, new List<CaseControl>());
+                sizeToCaseControl.Add(i, new List<CaseControl2>());
         }
 
-        Dictionary<int, List<CaseControl>> sizeToCaseControl;
+        Dictionary<int, List<CaseControl2>> sizeToCaseControl;
 
         public void GenerateMap(MapViewModel theMap)
         {
+            MapGrid.BatchBegin();
+
             // RESET
             MapGrid.Children.Clear();
             MapGrid.RowDefinitions.Clear();
@@ -63,11 +67,13 @@ namespace SolverApp.Views.Controls
                     AddRobot(robotVM);
                 }
             }
+
+            MapGrid.BatchCommit();
         }
 
         public void AddCase(CaseViewModel theCase)
         {
-            var caseControl = new CaseControl();
+            var caseControl = new CaseControl2();
             caseControl.ZIndex = 1;
             caseControl.BindingContext = theCase;
             var i = theCase._Case._Position.X;
@@ -101,6 +107,7 @@ namespace SolverApp.Views.Controls
 
         internal void UpdateSize(MapViewModel theMap)
         {
+            MapGrid.BatchBegin();
             var newSize = theMap._Map._Size;
             int currentSize = MapGrid.RowDefinitions.Count;
             if (newSize > currentSize)
@@ -142,6 +149,7 @@ namespace SolverApp.Views.Controls
                     sizeToCaseControl[i+1].Clear();
                 }
             }
+            MapGrid.BatchCommit();
         }
     }
 }

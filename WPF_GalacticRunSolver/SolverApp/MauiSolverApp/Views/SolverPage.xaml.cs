@@ -1,4 +1,6 @@
-﻿using SolverApp.ViewModels;
+﻿using MauiSolverApp.Views.Controls;
+using SolverApp.ViewModels;
+using SolverApp.Views.Controls;
 using System.Diagnostics;
 
 namespace SolverApp.Views

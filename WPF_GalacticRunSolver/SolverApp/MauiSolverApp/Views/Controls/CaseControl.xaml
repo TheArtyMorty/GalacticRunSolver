@@ -3,14 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:localConverters="clr-namespace:SolverApp.Converters"
              x:Class="SolverApp.Views.Controls.CaseControl">
+
+    <Image x:Name="Case" 
+       MinimumHeightRequest="10"
+       MinimumWidthRequest="10"
+       Aspect="AspectFill"
+        Source="{Binding Path=_WallType, Mode=OneWay, Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}"/>
     
-    <ContentView.Content>
-        <Image x:Name="Case" 
-               Aspect="AspectFill"
-               MinimumHeightRequest="10"
-               MinimumWidthRequest="10"
-               Source="{Binding Path=_WallType, Mode=OneWay, Converter={x:Static localConverters:CaseTypeToImageConverter.Instance}}"/>
-    </ContentView.Content>
     <ContentView.GestureRecognizers>
         <TapGestureRecognizer
                         Command="{Binding Path=_IncrementWallType}"
