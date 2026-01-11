@@ -157,6 +157,20 @@ namespace SolverApp.Views.Controls
             }
         }
 
+        private void DisplayAlert(string title, string message)
+        {
+            var Parent = this.Parent;
+            while (Parent != null && !(Parent is Page))
+            {
+                Parent = Parent.Parent;
+            }
+
+            if (Parent is Page parentPage)
+            {
+                parentPage.DisplayAlert(title, message, "Ok");
+            }
+        }
+
         private SKBitmap bitmap;
         public void SetPhoto(string path)
         {
@@ -308,15 +322,11 @@ namespace SolverApp.Views.Controls
             {
                 File.Delete(newFile);
             }
-            await Task.Delay(250);
-
-            if (File.Exists(newFile))
-            {
-                Console.WriteLine("WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            }
 
             using (var newStream = File.OpenWrite(newFile))
+            {
                 bitmap.Encode(newStream, SKEncodedImageFormat.Jpeg, 90);
+            }
 
             var Parent = this.Parent;
             while (Parent != null && !(Parent is PhotoHelperPage))
@@ -581,17 +591,8 @@ namespace SolverApp.Views.Controls
                 map.SetQuadrant(quadrants[quadrantIndex], bestBoard.Item1, 0);
             }
             // Little message for user
-            var Parent = this.Parent;
-            while (Parent != null && !(Parent is Page))
-            {
-                Parent = Parent.Parent;
-            }
+            DisplayAlert("Map Recognized !", messageForUser);
 
-            if (Parent is Page parentPage)
-            {
-                parentPage.DisplayAlert("Map Recognized !", messageForUser, "Ok");
-            }
-            
             return map;
         }
 
