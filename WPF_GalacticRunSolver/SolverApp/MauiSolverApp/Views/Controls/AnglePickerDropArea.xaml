@@ -9,7 +9,6 @@
     <ContentView.Content BackgroundColor="#20ffffff">
         <Frame Grid.Row="1" Margin="0" CornerRadius="0" Padding="0" BackgroundColor="Transparent">
             <Grid>
-                
                 <ctrls:PanPinchContainer x:Name="PanPinchContainer">
                     <skia_controls:SKCanvasView x:Name="canvasView" PaintSurface="OnCanvasViewPaintSurface" />
                 </ctrls:PanPinchContainer>

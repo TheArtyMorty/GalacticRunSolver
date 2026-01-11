@@ -240,7 +240,7 @@ namespace SolverApp.ViewModels
             }
         }
 
-        internal void RotateRight(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        public static void RotateRight(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
         {
             var toRotate = wallsToSet[i];
             EWallType wallType = toRotate.Item3;
@@ -258,7 +258,7 @@ namespace SolverApp.ViewModels
             wallsToSet[i] = new Tuple<int, int, EWallType>(newY, newX, newWallType);
         }
 
-        internal void RotateLeft(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        public static void RotateLeft(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
         {
             var toRotate = wallsToSet[i];
             EWallType wallType = toRotate.Item3;
@@ -276,7 +276,7 @@ namespace SolverApp.ViewModels
             wallsToSet[i] = new Tuple<int, int, EWallType>(newY, newX, newWallType);
         }
 
-        internal void RotateTwice(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
+        public static void RotateTwice(ref List<Tuple<int, int, EWallType>> wallsToSet, int i)
         {
             var toRotate = wallsToSet[i];
             int newX = 15 - toRotate.Item2;

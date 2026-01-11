@@ -1,5 +1,7 @@
 ﻿using Android.Graphics;
 using Android.Icu.Number;
+using Android.Service.QuickAccessWallet;
+using Dalvik.SystemInterop;
 using Kotlin;
 using Kotlin.Coroutines;
 using MauiSolverApp.Utilities;
@@ -174,7 +176,7 @@ namespace SolverApp.Views.Controls
             canvasView.InvalidateSurface();
         }
 
-        public void StartRecognition()
+        public async void StartRecognition()
         {
             var outputSize = 500;
             // My 4 corners of output
@@ -193,14 +195,6 @@ namespace SolverApp.Views.Controls
                 inputCorners.Add(corner);
             }
                 
-            if (true) // Hack
-            {
-                inputCorners.Clear();
-                inputCorners.Add(new SKPoint(29, 232));
-                inputCorners.Add(new SKPoint(1138, 270));
-                inputCorners.Add(new SKPoint(1148, 1318));
-                inputCorners.Add(new SKPoint(48, 1406));
-            }
             // Exchange bottom corners to have proper order
             var temp = inputCorners[2];
             inputCorners[2] = inputCorners[3];
@@ -314,6 +308,13 @@ namespace SolverApp.Views.Controls
             {
                 File.Delete(newFile);
             }
+            await Task.Delay(250);
+
+            if (File.Exists(newFile))
+            {
+                Console.WriteLine("WTF !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            }
+
             using (var newStream = File.OpenWrite(newFile))
                 bitmap.Encode(newStream, SKEncodedImageFormat.Jpeg, 90);
 
@@ -445,18 +446,19 @@ namespace SolverApp.Views.Controls
             var robotsInTopRight = map._Robots.Where(r => r._Position.X > 7 && r._Position.Y <= 7).Count();
             var robotsInBottomLeft = map._Robots.Where(r => r._Position.X <= 7 && r._Position.Y > 7).Count();
             var robotsInBottomRight = map._Robots.Where(r => r._Position.X > 7 && r._Position.Y > 7).Count();
-            var probableWalls = new List<Tuple<int, int, SKColor, bool>>();
+            var probableWalls = new List<List<Tuple<int, int, SKColor, bool>>>();
             foreach (var wallListAndSafeCount in new List<Tuple<List<Tuple<int, int, SKColor, bool>>, int>> {
                 new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleTopLeftWalls,robotsInTopLeft),
                 new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleTopRightWalls,robotsInTopRight),
                 new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleBottomLeftWalls,robotsInBottomLeft),
                 new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleBottomRightWalls,robotsInBottomRight),})
             {
+                probableWalls.Add(new List<Tuple<int, int, SKColor, bool>>());
                 var wallnumbersToBeSafe = 12 + wallListAndSafeCount.Item2;
                 var walls = GetOutliersUsingIQR(wallListAndSafeCount.Item1, wallnumbersToBeSafe);
                 foreach (var wall in walls)
                 {
-                    probableWalls.Add(wall);
+                    probableWalls.Last().Add(wall);
                     if (wall.Item4)
                     {
                         var x = (int)((wall.Item1 + 0.5) * caseSize);
@@ -470,9 +472,126 @@ namespace SolverApp.Views.Controls
                         ColorPoint(x, y, SKColors.Red, false);
                     }
                 }
-            }   
+            }
+            // Lets add the center square
+            probableWalls[0].Add(new Tuple<int, int, SKColor, bool>(6, 7, SKColors.Pink, false));
+            probableWalls[0].Add(new Tuple<int, int, SKColor, bool>(7, 6, SKColors.Pink, true));
+            probableWalls[1].Add(new Tuple<int, int, SKColor, bool>(8, 7, SKColors.Pink, false));
+            probableWalls[1].Add(new Tuple<int, int, SKColor, bool>(8, 6, SKColors.Pink, true));
+            probableWalls[2].Add(new Tuple<int, int, SKColor, bool>(6, 8, SKColors.Pink, false));
+            probableWalls[2].Add(new Tuple<int, int, SKColor, bool>(7, 8, SKColors.Pink, true));
+            probableWalls[3].Add(new Tuple<int, int, SKColor, bool>(7, 8, SKColors.Pink, false));
+            probableWalls[3].Add(new Tuple<int, int, SKColor, bool>(8, 8, SKColors.Pink, true));
             // Then we have to try and recognize those walls :o
+            var quadrants = new List<string> { "TopLeft", "TopRight", "BottomLeft", "BottomRight" };
+            string messageForUser = "";
+            for (int quadrantIndex = 0; quadrantIndex < 4; quadrantIndex++)
+            {
+                var boardScores = new List<Tuple<int, double>>();
+                var wallsRecognized = probableWalls[quadrantIndex];
+                for (int i = 1; i <= 16; i++)
+                {
+                    var boardWallsAsWallType = BoardUtilities.GetWallsForQuadrant(i, 0);
+                    // Let's rotate them if needed :
+                    for (int j = 0; j < boardWallsAsWallType.Count; j++)
+                    {
+                        switch (quadrants[quadrantIndex])
+                        {
+                            case "TopRight":
+                                MapViewModel.RotateRight(ref boardWallsAsWallType, j);
+                                break;
+                            case "BottomLeft":
+                                MapViewModel.RotateLeft(ref boardWallsAsWallType, j);
+                                break;
+                            case "BottomRight":
+                                MapViewModel.RotateTwice(ref boardWallsAsWallType, j);
+                                break;
+                            case "TopLeft":
+                            default:
+                                break;
+                        }
+                    }
+                    // Lets split walls to vertical and horizontal walls
+                    var boardWalls = new List<Tuple<int, int, bool>>();
+                    foreach (var wall in boardWallsAsWallType)
+                    {
+                        var x = wall.Item2;
+                        var y = wall.Item1;
+                        switch (wall.Item3)
+                        {
+                            case Models.EWallType.TopLeft:
+                                //Vertical wall
+                                if (x > 0)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x - 1, y, false));
+                                //Horizontal wall
+                                if (y > 0)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y - 1, true));
+                                break;
+                            case Models.EWallType.TopRight:
+                                //Vertical wall
+                                if (x < 16)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y, false));
+                                //Horizontal wall
+                                if (y > 0)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y - 1, true));
+                                break;
+                            case Models.EWallType.BottomLeft:
+                                //Vertical wall
+                                if (x > 0)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x - 1, y, false));
+                                //Horizontal wall
+                                if (y < 16)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y, true));
+                                break;
+                            case Models.EWallType.BottomRight:
+                                //Vertical wall
+                                if (x < 16)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y, false));
+                                //Horizontal wall
+                                if (y < 16)
+                                    boardWalls.Add(new Tuple<int, int, bool>(x, y, true));
+                                break;
+                            case Models.EWallType.None:
+                            default:
+                                break;
+                        }
+                    }
+                    // Now I have to check how many boards walls are in the recognized walls
+                    int matchedWalls = 0;
+                    int failedWalls = 0;
+                    foreach (var wall in boardWalls)
+                    {
+                        if (wallsRecognized.Any(wr => wr.Item1 == wall.Item1 && wr.Item2 == wall.Item2 && wr.Item4 == wall.Item3))
+                        {
+                            matchedWalls++;
+                        }
+                        else
+                        {
+                            failedWalls++;
+                        }
+                    }
+                    // Let's keep the score for this board
+                    double score = (double)(matchedWalls * 100) / (double)(matchedWalls + failedWalls + (wallsRecognized.Count - matchedWalls));
+                    boardScores.Add(new Tuple<int, double>(i, score));
+                }
+                // Now we keep the board with highest score :
+                boardScores.Sort((t1, t2) => t2.Item2.CompareTo(t1.Item2));
+                var bestBoard = boardScores.First();
+                messageForUser += string.Format("Quadrant {0} recognized as Board {1} with score {2:0.00}%\n", quadrants[quadrantIndex], bestBoard.Item1, bestBoard.Item2);
+                map.SetQuadrant(quadrants[quadrantIndex], bestBoard.Item1, 0);
+            }
+            // Little message for user
+            var Parent = this.Parent;
+            while (Parent != null && !(Parent is Page))
+            {
+                Parent = Parent.Parent;
+            }
 
+            if (Parent is Page parentPage)
+            {
+                parentPage.DisplayAlert("Map Recognized !", messageForUser, "Ok");
+            }
+            
             return map;
         }
 
