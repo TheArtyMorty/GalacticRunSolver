@@ -32,5 +32,10 @@ namespace SolverApp.ViewModels
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(PhotoLoaded)));
             PropertyChanged(this, new PropertyChangedEventArgs(nameof(NoPhotoLoaded)));
         }
+
+        internal void SetRecognizedMap(MapViewModel map)
+        {
+            _SolverVM.CreateNewMap(map);
+        }
     }
 }

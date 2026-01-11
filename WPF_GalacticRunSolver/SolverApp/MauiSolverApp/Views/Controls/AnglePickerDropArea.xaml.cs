@@ -1,5 +1,6 @@
 ﻿using Android.Graphics;
 using Android.Icu.Number;
+using Kotlin;
 using Kotlin.Coroutines;
 using MauiSolverApp.Utilities;
 using SkiaSharp;
@@ -285,10 +286,14 @@ namespace SolverApp.Views.Controls
                         var x = (int)p.X;
                         var y = (int)p.Y;
                         var color = bitmap.GetPixel(x, y);
+                        //Increase contrast to max
+                        var red = ContrastColor(color.Red);
+                        var green = ContrastColor(color.Green);
+                        var blue = ContrastColor(color.Blue);
                         //Change output color
-                        *ptr++ = (byte)color.Red;    // red
-                        *ptr++ = (byte)color.Green;  // green
-                        *ptr++ = (byte)color.Blue;   // blue
+                        *ptr++ = (byte)red;    // red
+                        *ptr++ = (byte)green;  // green
+                        *ptr++ = (byte)blue;   // blue
                         *ptr++ = (byte)color.Alpha;  // alpha
                     }
                 }   
@@ -305,6 +310,10 @@ namespace SolverApp.Views.Controls
 
             //Let's also copy this image to the solver page background
             var newFile = System.IO.Path.Combine(FileSystem.CacheDirectory, "BackgroundPhotoForSolver");
+            if (File.Exists(newFile))
+            {
+                File.Delete(newFile);
+            }
             using (var newStream = File.OpenWrite(newFile))
                 bitmap.Encode(newStream, SKEncodedImageFormat.Jpeg, 90);
 
@@ -323,66 +332,243 @@ namespace SolverApp.Views.Controls
 
             // Ok so let's start recognition !
             var map = RecognizeMap();
+
+            // And send it to the solver page
+            if (Parent is PhotoHelperPage photoHelperPage2)
+            {
+                var dataContext = photoHelperPage2.BindingContext as PhotoHelperViewModel;
+                if (dataContext != null)
+                    dataContext.SetRecognizedMap(map);
+            }
+        }
+
+        static int contrastFactor = 2; // contrast value is 100, and factor is ((100+v)/100)²
+        private int ContrastColor(byte color)
+        {
+            var newColor = (((float)(color / 255f) - 0.5f) * contrastFactor + 0.5f) * 255f;
+            if (newColor < 0) newColor = 0;
+            if (newColor > 255) newColor = 255;
+            return (int)newColor;
         }
 
         private MapViewModel RecognizeMap()
         {
             var map = new MapViewModel(16);
             double caseSize = bitmap.Width / 16.0;
-            // First, let's observe all 60 outside connexions, we should find 8 walls 
-            var outsideConnexions = new List<List<SKColor>> { new List<SKColor>(), new List<SKColor>(), new List<SKColor>(), new List<SKColor>() };
+            // First, let's find all 'interesting' cells by looking at center of each cell
+            var interestingCells = new List<Tuple<int, int, SKColor>> { };
+            for (int i = 0; i < 16; i++)
+            {
+                for (int j = 0; j < 16; j++)
+                {
+                    if ((i == 7 || i == 8) && (j == 7 || j == 8))
+                        continue; // Skip center area
+                    var x = (int)((i + 0.5) * caseSize);
+                    var y = (int)((j + 0.5) * caseSize);
+                    var color = GetColorForCellCenter(x, y);
+                    interestingCells.Add(new Tuple<int, int, SKColor>(i, j, color));
+                    //ColorCenter(x, y, color);
+                }
+            }
+            //From those we can find robots
+            var RobotsShouldBeThereSomewhere = GetOutliersUsingIQR(interestingCells,8);
+            var BlueRobot = GetMostProbableRobotPosition(RobotsShouldBeThereSomewhere, SKColors.Blue);
+            var GreenRobot = GetMostProbableRobotPosition(RobotsShouldBeThereSomewhere, SKColors.Green);
+            var YellowRobot = GetMostProbableRobotPosition(RobotsShouldBeThereSomewhere, SKColors.Yellow);
+            var RedRobot = GetMostProbableRobotPosition(RobotsShouldBeThereSomewhere, SKColors.Red);
+            map._Robots.Where(r => r._Color == Models.EColor.Blue).First()._Position = new Models.Position(BlueRobot.Item1, BlueRobot.Item2);
+            map._Robots.Where(r => r._Color == Models.EColor.Red).First()._Position = new Models.Position(RedRobot.Item1, RedRobot.Item2);
+            map._Robots.Where(r => r._Color == Models.EColor.Green).First()._Position = new Models.Position(GreenRobot.Item1, GreenRobot.Item2);
+            map._Robots.Where(r => r._Color == Models.EColor.Yellow).First()._Position = new Models.Position(YellowRobot.Item1, YellowRobot.Item2);
+
+            // Then, let's observe all 60 outside connexions, we should find 8 walls 
+            var possibleTopLeftWalls = new List<Tuple<int,int,SKColor, bool>> {};
+            var possibleTopRightWalls = new List<Tuple<int,int,SKColor, bool>> {};
+            var possibleBottomLeftWalls = new List<Tuple<int,int,SKColor, bool>> {};
+            var possibleBottomRightWalls = new List<Tuple<int,int,SKColor, bool>> {};
+            //Get vertical wall
             for (int i = 0; i < 15; i++)
             {
-                // First row
+                for (int j = 0; j < 16; j++)
                 {
+                    if ((i >= 6 && i <= 8) && (j >= 7 && j <= 8))
+                        continue; // Skip center area
                     var x = (int)((i + 1) * caseSize);
-                    var y = (int)(caseSize/2);
-                    var color = GetColorForPoint(x, y, true);
-                    outsideConnexions[0].Add(color);
-                    ColorPoint(x, y, color, true);
-                }
-                // Last row
-                {
-                    var x = (int)((i + 1) * caseSize);
-                    var y = (int)(15 * caseSize + caseSize / 2);
-                    var color = GetColorForPoint(x, y, true);
-                    outsideConnexions[1].Add(color);
-                    ColorPoint(x, y, color, true);
-                }
-                // First Column
-                {
-                    var x = (int)(caseSize / 2);
-                    var y = (int)((i + 1) * caseSize);
+                    var y = (int)((j + 0.5) * caseSize);
                     var color = GetColorForPoint(x, y, false);
-                    outsideConnexions[2].Add(color);
-                    ColorPoint(x, y, color, false);
-                }
-                // Last Column
-                {
-                    var x = (int)(15 * caseSize + caseSize / 2);
-                    var y = (int)((i + 1) * caseSize);
-                    var color = GetColorForPoint(x, y, false);
-                    outsideConnexions[3].Add(color);
-                    ColorPoint(x, y, color, false);
+                    //ColorPoint(x, y, SKColors.Pink, false);
+                    if (i <= 7)
+                    {
+                        if (j <= 7)
+                            possibleTopLeftWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, false));
+                        else
+                            possibleBottomLeftWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, false));
+                    }
+                    else
+                    {
+                        if (j <= 7)
+                            possibleTopRightWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, false));
+                        else
+                            possibleBottomRightWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, false));
+                    }
                 }
             }
-            // We expect the first and last connexions not to be walls, so we can decide this is the not wall color)
-            // Let's print all distances to that color
-            var notWallColor = GetMediumColor(new List<SKColor> {
-                outsideConnexions[0].First(), outsideConnexions[0].Last(),
-                 outsideConnexions[1].First(), outsideConnexions[1].Last(),
-                  outsideConnexions[2].First(), outsideConnexions[2].Last(),
-                   outsideConnexions[3].First(), /*outsideConnexions[3].Last()*/ });
-            foreach (var rowOrColumn in outsideConnexions)
+            //Get horizontal wall
+            for (int i = 0; i < 16; i++)
             {
-                foreach (var color in rowOrColumn)
+                for (int j = 0; j < 15; j++)
                 {
-                    var distance = GetColorDistance(color, notWallColor);
-                    Debug.WriteLine($"Distance to not wall color: {distance}");
+                    if ((i >= 7 && i <= 8) && (j >= 6 && j <= 8))
+                        continue; // Skip center area
+                    var x = (int)((i+0.5)*caseSize);
+                    var y = (int)((j + 1) * caseSize);
+                    var color = GetColorForPoint(x, y, true);
+                    //ColorPoint(x, y, SKColors.Pink, true);
+                    if (i <= 7)
+                    {
+                        if (j <= 7)
+                            possibleTopLeftWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, true));
+                        else
+                            possibleBottomLeftWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, true));
+                    }
+                    else
+                    {
+                        if (j <= 7)
+                            possibleTopRightWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, true));
+                        else
+                            possibleBottomRightWalls.Add(new Tuple<int, int, SKColor, bool>(i, j, color, true));
+                    }
                 }
             }
+            // Let's keep the darkest ones as walls in each quadrant
+            var robotsInTopLeft = map._Robots.Where(r => r._Position.X <= 7 && r._Position.Y <= 7).Count();
+            var robotsInTopRight = map._Robots.Where(r => r._Position.X > 7 && r._Position.Y <= 7).Count();
+            var robotsInBottomLeft = map._Robots.Where(r => r._Position.X <= 7 && r._Position.Y > 7).Count();
+            var robotsInBottomRight = map._Robots.Where(r => r._Position.X > 7 && r._Position.Y > 7).Count();
+            var probableWalls = new List<Tuple<int, int, SKColor, bool>>();
+            foreach (var wallListAndSafeCount in new List<Tuple<List<Tuple<int, int, SKColor, bool>>, int>> {
+                new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleTopLeftWalls,robotsInTopLeft),
+                new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleTopRightWalls,robotsInTopRight),
+                new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleBottomLeftWalls,robotsInBottomLeft),
+                new Tuple<List<Tuple<int, int, SKColor, bool>>, int>(possibleBottomRightWalls,robotsInBottomRight),})
+            {
+                var wallnumbersToBeSafe = 12 + wallListAndSafeCount.Item2;
+                var walls = GetOutliersUsingIQR(wallListAndSafeCount.Item1, wallnumbersToBeSafe);
+                foreach (var wall in walls)
+                {
+                    probableWalls.Add(wall);
+                    if (wall.Item4)
+                    {
+                        var x = (int)((wall.Item1 + 0.5) * caseSize);
+                        var y = (int)((wall.Item2 + 1) * caseSize);
+                        ColorPoint(x, y, SKColors.Red, true);
+                    }
+                    else
+                    {
+                        var x = (int)((wall.Item1 + 1) * caseSize);
+                        var y = (int)((wall.Item2 + 0.5) * caseSize);
+                        ColorPoint(x, y, SKColors.Red, false);
+                    }
+                }
+            }   
+            // Then we have to try and recognize those walls :o
 
             return map;
+        }
+
+        static Tuple<int,int> GetMostProbableRobotPosition(List<Tuple<int, int, SKColor>> possibleRobotPositions, SKColor robotColor)
+        {
+            if (possibleRobotPositions.Count == 0)
+                return new Tuple<int,int>(0,0);
+            possibleRobotPositions.Sort((t1, t2) => GetColorDistance(t1.Item3, robotColor).CompareTo(GetColorDistance(t2.Item3, robotColor)));
+            var robot = possibleRobotPositions.First();
+            possibleRobotPositions.Remove(robot);
+            return new Tuple<int, int>(robot.Item1, robot.Item2);
+        }
+
+        static List<Tuple<int, int, SKColor>> GetOutliersUsingIQR(List<Tuple<int, int, SKColor>> colors, int minResult = 0)
+        {
+            var result = new List<Tuple<int, int, SKColor>>();
+            colors.Sort((t1, t2) => GetColorDistance(t1.Item3, SKColors.Black).CompareTo(GetColorDistance(t2.Item3, SKColors.Black)));
+            var distances = colors.ConvertAll(c => (double)GetColorDistance(c.Item3, SKColors.Black));
+            var Q1 = Quantile(distances, 0.25);
+            var Q3 = Quantile(distances, 0.75);
+            var IQR = Q3 - Q1;
+            var lowerBound = Q1 - 1.5 * IQR;
+            var upperBound = Q3 + 1.5 * IQR;
+            Console.WriteLine(string.Format("Lowerbound : {0}", lowerBound));
+            Console.WriteLine(string.Format("Upperbound : {0}", upperBound));
+            foreach (var item in colors)
+            {
+                var distance = GetColorDistance(item.Item3, SKColors.Black);
+                Console.WriteLine(string.Format("Item at : {0} , {1} , value = {2}", item.Item1, item.Item2, distance));
+                if (distance < lowerBound) // || distance > upperBound)  // The item above upperbound is outlier, however I'm only interested in darkest one, so closer to 0
+                {
+                    result.Add(item);
+                }
+            }
+            // if we have enough result, let's stop here, otherwise, we take from the sorted result 
+            if (result.Count < minResult)
+            {
+                result.Clear();
+                for (int i = 0; i < minResult; i++)
+                {
+                    result.Add(colors[i]);
+                }
+            }
+            return result;
+        }
+
+        static List<Tuple<int, int, SKColor, bool>> GetOutliersUsingIQR(List<Tuple<int, int, SKColor, bool>> colors, int minResult = 0)
+        {
+            var result = new List<Tuple<int, int, SKColor, bool>>();
+            colors.Sort((t1, t2) => GetColorDistance(t1.Item3, SKColors.Black).CompareTo(GetColorDistance(t2.Item3, SKColors.Black)));
+            var distances = colors.ConvertAll(c => (double)GetColorDistance(c.Item3, SKColors.Black));
+            var Q1 = Quantile(distances, 0.25);
+            var Q3 = Quantile(distances, 0.75);
+            var IQR = Q3 - Q1;
+            var lowerBound = Q1 - 1.5 * IQR;
+            var upperBound = Q3 + 1.5 * IQR;
+            Console.WriteLine(string.Format("Lowerbound : {0}", lowerBound));
+            Console.WriteLine(string.Format("Upperbound : {0}", upperBound));
+            foreach (var item in colors)
+            {
+                var distance = GetColorDistance(item.Item3, SKColors.Black);
+                Console.WriteLine(string.Format("Item at : {0} , {1} , value = {2}", item.Item1, item.Item2, distance));
+                if (distance < lowerBound) // || distance > upperBound)  // The item above upperbound is outlier, however I'm only interested in darkest one, so closer to 0
+                {
+                    result.Add(item);
+                }
+            }
+            // if we have enough result, let's stop here, otherwise, we take from the sorted result 
+            if (result.Count < minResult)
+            {
+                result.Clear();
+                for (int i = 0; i < minResult; i++)
+                {
+                    result.Add(colors[i]);
+                }
+            }
+            return result;
+        }
+
+        public static double Quantile(List<double> sortedData, double q)
+        {
+            if (sortedData == null || sortedData.Count == 0)
+                throw new ArgumentException("Data array must not be null or empty.");
+            if (q < 0 || q > 1)
+                throw new ArgumentOutOfRangeException(nameof(q), "Quantile must be between 0 and 1.");
+
+            int n = sortedData.Count;
+            double pos = (n - 1) * q;
+            int lowerIndex = (int)Math.Floor(pos);
+            int upperIndex = (int)Math.Ceiling(pos);
+
+            if (lowerIndex == upperIndex)
+                return sortedData[lowerIndex];
+
+            double weight = pos - lowerIndex;
+            return sortedData[lowerIndex] * (1 - weight) + sortedData[upperIndex] * weight;
         }
 
         static int GetColorDistance(SKColor c1, SKColor c2)
@@ -397,15 +583,30 @@ namespace SolverApp.Views.Controls
         static int lateralOffset = 10;
         SKColor GetColorForPoint(int x, int y, bool horizontal)
         {
+            var xOffset = horizontal ? lateralOffset : offset;
             var yOffset = horizontal ? offset : lateralOffset;
-            var kOffset = horizontal ? lateralOffset : offset;
             var colorsWithOffset = new List<SKColor>();
-            for (int j = -yOffset; j < yOffset; j++)
+            for (int j = -xOffset; j < xOffset; j++)
             {
-                for (int k = -kOffset; k < kOffset; k++)
+                for (int k = -yOffset; k < yOffset; k++)
                 {
                     var color = bitmap.GetPixel(x + j, y + k);
-                    bitmap.SetPixel(x + j, y, SKColors.Red);
+                    colorsWithOffset.Add(color);
+                }
+            }
+            return GetMediumColor(colorsWithOffset);
+        }
+
+        SKColor GetColorForCellCenter(int x, int y)
+        {
+            var xOffset = lateralOffset;
+            var yOffset = lateralOffset;
+            var colorsWithOffset = new List<SKColor>();
+            for (int j = -xOffset; j < xOffset; j++)
+            {
+                for (int k = -yOffset; k < yOffset; k++)
+                {
+                    var color = bitmap.GetPixel(x + j, y + k);
                     colorsWithOffset.Add(color);
                 }
             }
@@ -414,11 +615,24 @@ namespace SolverApp.Views.Controls
 
         void ColorPoint(int x, int y, SKColor color, bool horizontal)
         {
+            var xOffset = horizontal ? lateralOffset : offset;
             var yOffset = horizontal ? offset : lateralOffset;
-            var kOffset = horizontal ? lateralOffset : offset;
-            for (int j = -yOffset; j < yOffset; j++)
+            for (int j = -xOffset; j < xOffset; j++)
             {
-                for (int k = -kOffset; k < kOffset; k++)
+                for (int k = -yOffset; k < yOffset; k++)
+                {
+                    bitmap.SetPixel(x + j, y + k, color);
+                }
+            }
+        }
+
+        void ColorCenter(int x, int y, SKColor color)
+        {
+            var xOffset = lateralOffset;
+            var yOffset = lateralOffset;
+            for (int j = -xOffset; j < xOffset; j++)
+            {
+                for (int k = -yOffset; k < yOffset; k++)
                 {
                     bitmap.SetPixel(x + j, y + k, color);
                 }
@@ -449,19 +663,6 @@ namespace SolverApp.Views.Controls
                 p2[i] = H[i, 0] * p[0] + H[i, 1] * p[1] + H[i, 2] * p[2];
             }
             return new SKPoint((float)(p2[0] / p2[2]), (float)(p2[1] / p2[2]));
-        }
-
-        // Helper method to print a 2D matrix
-        static void PrintMatrix(double[,] mat)
-        {
-            int rows = mat.GetLength(0);
-            int cols = mat.GetLength(1);
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < cols; j++)
-                    Console.Write($"{mat[i, j],10:F6} ");
-                Console.WriteLine();
-            }
         }
     }
 }
