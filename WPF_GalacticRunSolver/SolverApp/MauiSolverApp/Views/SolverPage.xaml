@@ -5,6 +5,7 @@
              xmlns:controls="clr-namespace:SolverApp.Views.Controls"
              xmlns:local="clr-namespace:MauiSolverApp"
              xmlns:ctrls="clr-namespace:SolverApp.Views.Controls"
+             xmlns:skia_controls="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              BackgroundImageSource="background.png"
              x:Name="TheSolverPage"
              NavigationPage.HasNavigationBar="False">
@@ -34,7 +35,7 @@
             <Frame Margin="0" CornerRadius="0" Padding="0" BackgroundColor="Transparent">
                 <ctrls:PanPinchContainer x:Name="MainPanPinch">
                     <Grid>
-                        <Image Source="{Binding _backgroundPhoto}" Opacity="0.4"/>
+                        <skia_controls:SKCanvasView x:Name="backgroundImage" PaintSurface="OnCanvasViewPaintSurface" Opacity="0.4" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand" />
                         <controls:MapControl x:Name="TheMapControl" BindingContext="{Binding theMap}"/>
                     </Grid>
                 </ctrls:PanPinchContainer>

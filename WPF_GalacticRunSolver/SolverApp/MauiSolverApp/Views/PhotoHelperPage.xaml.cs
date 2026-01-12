@@ -100,6 +100,10 @@ namespace SolverApp.Views
         void Reset(object sender, EventArgs args)
         {
             LoadPhoto(string.Empty);
+
+            var dataContext = BindingContext as PhotoHelperViewModel;
+            if (dataContext != null)
+                dataContext.SetBackGroundImage("");
         }
 
         void RecognizeMap(object sender, EventArgs args)

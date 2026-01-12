@@ -286,12 +286,9 @@ namespace SolverApp.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(nameof(_ZoomSize)));
         }
         
-        public string _backgroundPhoto {  get; set; }
         internal void SetBackgroundImage(string photoPath)
         {
-            _backgroundPhoto = photoPath;
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(nameof(_backgroundPhoto)));
+            _solverPage.SetBackgroundImage(photoPath);
         }
 
         internal void SetQuadrant(string quadrant, int board, int editionIndex)

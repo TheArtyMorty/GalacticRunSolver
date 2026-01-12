@@ -325,7 +325,7 @@ namespace SolverApp.Views.Controls
 
             using (var newStream = File.OpenWrite(newFile))
             {
-                bitmap.Encode(newStream, SKEncodedImageFormat.Jpeg, 90);
+                bitmap.Encode(newStream, SKEncodedImageFormat.Png, 90);
             }
 
             var Parent = this.Parent;

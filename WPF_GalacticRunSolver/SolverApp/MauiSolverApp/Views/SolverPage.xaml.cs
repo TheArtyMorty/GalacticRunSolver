@@ -1,4 +1,6 @@
 ﻿using MauiSolverApp.Views.Controls;
+using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using SolverApp.ViewModels;
 using SolverApp.Views.Controls;
 using System.Diagnostics;
@@ -176,6 +178,41 @@ namespace SolverApp.Views
 
             BottomRightBoard.Text = "Board " + e.NewValue.ToString();
             bindingContext.SetQuadrant("BottomRight", (int)e.NewValue, BoardEdition.SelectedIndex);
+        }
+
+        // Background Image
+
+        private SKBitmap? bitmap;
+        public void SetBackgroundImage(string path)
+        {
+            if (path.Length > 0)
+            {
+                var fileStream = File.OpenRead(path);
+                bitmap = SKBitmap.Decode(fileStream);
+            }
+            else
+            {
+                bitmap = null;
+            }
+            backgroundImage.InvalidateSurface();
+        }
+
+        void OnCanvasViewPaintSurface(object sender, SKPaintSurfaceEventArgs args)
+        {
+            SKImageInfo info = args.Info;
+            SKSurface surface = args.Surface;
+            SKCanvas canvas = surface.Canvas;
+
+            canvas.Clear(SKColors.Transparent);
+
+            if (bitmap != null)
+            {
+                // Calculate rectangle for displaying bitmap
+                float scaleX = (float)info.Width / (float)bitmap.Width;
+                float scaleY = (float)info.Height / (float)bitmap.Height;
+                SKRect bitmapRect = new SKRect(0, 0, scaleX * bitmap.Width, scaleY * bitmap.Height);
+                canvas.DrawBitmap(bitmap, bitmapRect);
+            }
         }
     }
 }

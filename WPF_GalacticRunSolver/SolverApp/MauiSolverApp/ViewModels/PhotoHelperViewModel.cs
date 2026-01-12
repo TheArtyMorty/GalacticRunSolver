@@ -19,7 +19,6 @@ namespace SolverApp.ViewModels
         internal void SetBackGroundImage(string photoPath)
         {
             _SolverVM.SetBackgroundImage(photoPath);
-            Refresh(photoPath.Length > 0);
         }
 
         public bool PhotoLoaded { get; set; } = false;
