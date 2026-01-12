@@ -13,6 +13,10 @@
         Icon="IconOptions.png">
             <ShellContent x:Name="ShellSolverPage" Route="SolverPage"/>
         </Tab>
+        <Tab Title="GalacticRun"
+        Icon="IconPlayer.png">
+            <ShellContent x:Name="ShellGalacticRunPage" Route="GalacticRunPage"/>
+        </Tab>
         <Tab Title="Photo"
         Icon="IconPhoto.png">
             <ShellContent x:Name="ShellPhotoHelperPage" Route="PhotoHelperPage"/>

@@ -18,6 +18,9 @@ namespace MauiSolverApp
             //newMapPage.BindingContext = new NewMapViewModel(solverVM);
             //ShellNewMapPage.Content = newMapPage;
 
+            GalacticRunPage galacticRunPage = new GalacticRunPage(solverVM);
+            ShellGalacticRunPage.Content = galacticRunPage;
+
             PhotoHelperPage photoHelperPage = new PhotoHelperPage();
             photoHelperPage.BindingContext = new PhotoHelperViewModel(solverVM);
             ShellPhotoHelperPage.Content = photoHelperPage;

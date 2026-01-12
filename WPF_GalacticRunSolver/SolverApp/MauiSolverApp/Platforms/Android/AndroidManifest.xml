@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+	<uses-permission android:name="android.permission.INTERNET" />
 	<application android:label="Robot Solver" android:icon="@mipmap/icon" android:allowBackup="true" android:supportsRtl="true"></application>
 	<!--android:icon="@mipmap/appicon" android:roundIcon="@mipmap/appicon_round"-->
 </manifest>

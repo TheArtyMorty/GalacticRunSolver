@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MauiSolverApp.Views.GalacticRunPage"
+             BackgroundImageSource="background.png"
+             Title="GalacticRunPage">
+    <VerticalStackLayout Margin="5" Padding="5">
+        <Label Text="Select a valid galactic run map URL and Load it..." FontSize="Default"  TextColor="White" Margin="5"/>
+        <Entry x:Name="userInputURL" TextColor="White" BackgroundColor="DarkSlateGray" VerticalOptions="Center" Placeholder="Enter URL..." TextChanged="userInputURL_TextChanged" Margin="5"/>
+        <Button x:Name="LoadMap" Text="Load map from URL" Clicked="LoadMapFromURL" VerticalOptions="Center" Margin="5"/>
+    </VerticalStackLayout>
+</ContentPage>
