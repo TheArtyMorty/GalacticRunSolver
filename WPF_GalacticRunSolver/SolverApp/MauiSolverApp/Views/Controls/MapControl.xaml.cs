@@ -28,7 +28,31 @@ namespace SolverApp.Views.Controls
 
         Dictionary<int, List<CaseControl2>> sizeToCaseControl;
 
-        public void GenerateMap(MapViewModel theMap)
+        public void GenerateMap(MapViewModel map)
+        {
+            if (MapGrid.RowDefinitions.Count == 0)
+            {
+                CreateFirstMap(map);
+                return;
+            }
+            else
+            {
+                // Let's update the size
+                UpdateSize(map);
+                // Let's add/remove extra robot if needed
+                var robotControls = MapGrid.Children.OfType<RobotControl>().ToList();
+                if (map._Robots.Count == 5 && robotControls.Count == 4)
+                {
+                    AddRobot(map._Robots.Last());
+                }
+                else if (map._Robots.Count == 4 && robotControls.Count == 5)
+                {
+                    RemoveAdditionalRobot();
+                }
+            }
+        }
+
+        public void CreateFirstMap(MapViewModel theMap)
         {
             MapGrid.BatchBegin();
 

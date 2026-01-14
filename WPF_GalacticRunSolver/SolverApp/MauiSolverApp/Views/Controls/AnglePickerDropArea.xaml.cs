@@ -351,6 +351,9 @@ namespace SolverApp.Views.Controls
                 if (dataContext != null)
                     dataContext.SetRecognizedMap(map);
             }
+
+            // Let's send the user to the solver page 
+            await Shell.Current.GoToAsync("//SolverPage");
         }
 
         static int contrastFactor = 2; // contrast value is 100, and factor is ((100+v)/100)²

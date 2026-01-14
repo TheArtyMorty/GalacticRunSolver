@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MauiSolverApp.Views.GalacticRunPage"
              BackgroundImageSource="background.png"
-             Title="GalacticRunPage">
+             NavigationPage.HasNavigationBar="False">
     <VerticalStackLayout Margin="5" Padding="5">
         <Label Text="Select a valid galactic run map URL and Load it..." FontSize="Default"  TextColor="White" Margin="5"/>
         <Entry x:Name="userInputURL" TextColor="White" BackgroundColor="DarkSlateGray" VerticalOptions="Center" Placeholder="Enter URL..." TextChanged="userInputURL_TextChanged" Margin="5"/>

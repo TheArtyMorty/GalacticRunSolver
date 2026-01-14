@@ -214,5 +214,10 @@ namespace SolverApp.Views
                 canvas.DrawBitmap(bitmap, bitmapRect);
             }
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+            return true;
+        }
     }
 }

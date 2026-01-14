@@ -36,6 +36,13 @@
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<PackageIcon>icon.png</PackageIcon>
+		<AssemblyVersion>1</AssemblyVersion>
+		<FileVersion>1</FileVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -76,12 +83,13 @@
 	  <MauiXaml Update="Views\GalacticRunPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\TestPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Update="Platforms\Android\Resources\mipmap-xhdpi\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
 	  <None Update="Resources\AppIcon\icon.png">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>

@@ -341,7 +341,7 @@ namespace SolverApp.ViewModels
                 }
             }
         }
-        
+
         public void RemoveAdditionalRobot()
         {
             if (_Map._Robots.Count == 5)
@@ -384,7 +384,7 @@ namespace SolverApp.ViewModels
             else
             {
                 //Handle removing cases
-                for (int i = _Map._Size -1; i >= newSize; i--)
+                for (int i = _Map._Size - 1; i >= newSize; i--)
                 {
                     _Map._Cases.RemoveAt(i);
                     _Cases.RemoveAt(i);
@@ -417,6 +417,42 @@ namespace SolverApp.ViewModels
             }
             //Finally we set the new size
             _Map._Size = newSize;
+        }
+
+
+        // Attempt at speeding up map loading
+        public void LoadFromOtherMap(MapViewModel other)
+        {
+            // Let's readjust the size first
+            if (other._Map._Size != _Map._Size)
+            {
+                ChangeSize(other._Map._Size);
+            }
+            // Now let's set all walls
+            for (int i = 0; i < other._Map._Size; i++)
+            {
+                for (int j = 0; j < other._Map._Size; j++)
+                {
+                    _Cases[i][j]._WallType = other._Cases[i][j]._WallType;
+                }
+            }
+            // Let's add or remove extra robot if needed
+            if (other._Map._Robots.Count == 5 && _Map._Robots.Count == 4)
+            {
+                CreateAdditionalRobot();
+            }
+            else if (other._Map._Robots.Count == 4 && _Map._Robots.Count == 5)
+            {
+                RemoveAdditionalRobot();
+            }
+            // Now let's set robots positions
+            for (int i = 0; i < other._Map._Robots.Count; i++)
+            {
+                _Robots[i]._Position = other._Robots[i]._Position;
+            }
+            // Let's set the target
+            _Target._Position = other._Target._Position;
+            _Target._Color = other._Target._Color;
         }
     }
 }

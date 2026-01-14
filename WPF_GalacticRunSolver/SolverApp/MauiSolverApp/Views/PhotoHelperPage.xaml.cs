@@ -120,5 +120,11 @@ namespace SolverApp.Views
                 DropArea.SelectCorner(int.Parse(indexAsString));
             }
         }
+
+        protected override bool OnBackButtonPressed()
+        {
+            Shell.Current.GoToAsync("//SolverPage");
+            return true;
+        }
     }
 }

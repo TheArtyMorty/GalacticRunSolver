@@ -21,9 +21,17 @@ public partial class GalacticRunPage : ContentPage
         if (IsURLValid(url))
         {
             // Load the map
-            var map = GetMapFromWeburl(userInputURL.Text);
-            _solvervm.CreateNewMap(map);
-            await Shell.Current.GoToAsync("//SolverPage");
+            try
+            {
+                var map = GetMapFromWeburl(userInputURL.Text);
+                _solvervm.CreateNewMap(map);
+                await Shell.Current.GoToAsync("//SolverPage");
+            }
+            catch
+            {
+                await DisplayAlert("Error", "Could not load map from URL.", "OK");
+                return;
+            }
         }
     }
 
@@ -83,5 +91,11 @@ public partial class GalacticRunPage : ContentPage
         var id = url.Split('/').Last();
         var boardAsString = GalacticRunBoardFromUrl.GetBoardFromBoardID(id).GetString();
         return GetMapFromUrlBoardString(boardAsString);
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        Shell.Current.GoToAsync("//SolverPage");
+        return true;
     }
 }

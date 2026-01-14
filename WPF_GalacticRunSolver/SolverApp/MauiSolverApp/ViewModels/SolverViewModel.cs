@@ -85,7 +85,14 @@ namespace SolverApp.ViewModels
         private SolverPage _solverPage;
         public void CreateNewMap(MapViewModel map)
         {
-            theMap = map;
+            if (theMap == null)
+            {
+                theMap = map;
+            }
+            else
+            {
+                theMap.LoadFromOtherMap(map);
+            }
             _solverPage.GenerateMap(theMap);
             _solverPage.SetMaxSizeCheckbox(theMap._Map._Size);
         }
